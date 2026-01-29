@@ -11,6 +11,8 @@ builder.Services.AddSingleton<SqlConnectionFactory>();
 
 var app = builder.Build();
 
+// TODO: add global exception handler middleware
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
