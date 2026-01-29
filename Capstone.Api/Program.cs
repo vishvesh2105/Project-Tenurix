@@ -1,8 +1,13 @@
+using Capstone.Api.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// DB
+builder.Services.AddSingleton<SqlConnectionFactory>();
 
 var app = builder.Build();
 

@@ -4,3 +4,9 @@ obj/
 *.user
 *.suo
 .vs/
+*.vsidx
+appsettings.Local.json
+
+# Node
+node_modules/
+.next/
