@@ -84,6 +84,7 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Tenurix API v1");
         c.RoutePrefix = "swagger";
+        c.EnableFilter();
     });
 }
 
