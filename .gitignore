@@ -21,3 +21,8 @@ __pycache__/
 # IDE
 .idea/
 *.swp
+.commitmsg
+
+# OS
+.DS_Store
+Thumbs.db
