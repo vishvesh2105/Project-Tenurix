@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Branding\tenurix_logoA.png" />
+    <None Remove="Assets\Branding\tenurix_logoB.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tenurix.Management.Client\Tenurix.Management.Client.csproj" />
+    <ProjectReference Include="..\Tenurix.Management.Models\Tenurix.Management.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\" />
+    <Folder Include="ViewModels\" />
+    <Folder Include="Themes\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Branding\tenurix_logoA.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Branding\tenurix_logoB.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\ShellWindow.xaml.cs">
+      <Generator></Generator>
+    </Compile>
+  </ItemGroup>
+
+</Project>
