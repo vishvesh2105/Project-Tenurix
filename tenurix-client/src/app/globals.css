@@ -2,14 +2,47 @@
 
 :root {
   --font-inter: ui-sans-serif, system-ui;
+  --font-sora: ui-sans-serif, system-ui;
 }
 
 html, body {
   height: 100%;
 }
 
+/* Default (light) — clean white base */
 body {
   font-family: var(--font-inter);
   background: #F8FAFC;
   color: #0F172A;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Light mode explicit */
+html:not(.dark) body {
+  background: #F8FAFC;
+  color: #0F172A;
+}
+
+/* Dark mode — kept for users who prefer it */
+html.dark body {
+  background:
+    radial-gradient(1200px 600px at 20% 0%, rgba(37, 99, 235, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 80% 10%, rgba(201, 162, 39, 0.12), transparent 55%),
+    linear-gradient(180deg, #070A10 0%, #060812 100%);
+  color: #E5E7EB;
+}
+
+/* Auth page gradient */
+.auth-bg {
+  background:
+    radial-gradient(900px 500px at 15% 10%, rgba(139, 92, 246, 0.35), transparent 55%),
+    radial-gradient(900px 500px at 85% 10%, rgba(37, 99, 235, 0.35), transparent 55%),
+    radial-gradient(900px 500px at 35% 85%, rgba(239, 68, 68, 0.28), transparent 55%),
+    linear-gradient(135deg, #7c3aed 0%, #2563eb 55%, #ef4444 120%);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-sora);
+  letter-spacing: -0.02em;
 }
