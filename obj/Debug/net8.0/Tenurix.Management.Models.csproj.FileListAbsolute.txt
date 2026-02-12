@@ -1,0 +1,11 @@
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Models\bin\Debug\net8.0\Tenurix.Management.Models.deps.json
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Models\bin\Debug\net8.0\Tenurix.Management.Models.dll
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Models\bin\Debug\net8.0\Tenurix.Management.Models.pdb
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Models\obj\Debug\net8.0\Tenurix.Management.Models.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Models\obj\Debug\net8.0\Tenurix.Management.Models.AssemblyInfoInputs.cache
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Models\obj\Debug\net8.0\Tenurix.Management.Models.AssemblyInfo.cs
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Models\obj\Debug\net8.0\Tenurix.Management.Models.csproj.CoreCompileInputs.cache
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Models\obj\Debug\net8.0\Tenurix.Management.Models.dll
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Models\obj\Debug\net8.0\refint\Tenurix.Management.Models.dll
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Models\obj\Debug\net8.0\Tenurix.Management.Models.pdb
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Models\obj\Debug\net8.0\ref\Tenurix.Management.Models.dll
