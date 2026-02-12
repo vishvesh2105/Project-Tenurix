@@ -1,0 +1,25 @@
+{
+  "dependencies": {},
+  "parameters": {
+    "capstone-api-aryan.resourceGroupName": {
+      "Name": "capstone-api-aryan.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "aryan-capstone-sql-01"
+    },
+    "capstone-api-aryan.resourceGroupLocation": {
+      "Name": "capstone-api-aryan.resourceGroupLocation",
+      "Type": null,
+      "Value": "canadacentral"
+    },
+    "capstone-api-aryan.resourceName": {
+      "Name": "capstone-api-aryan.resourceName",
+      "Type": null,
+      "Value": "capstone-api-aryan"
+    },
+    "capstone-api-aryan.subscriptionId": {
+      "Name": "capstone-api-aryan.subscriptionId",
+      "Type": "subscription",
+      "Value": "017ebe7d-5127-40f6-8231-3e9d58354fa8"
+    }
+  }
+}

@@ -1,0 +1,1211 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Tenurix API v1",
+    "version": "v1"
+  },
+  "paths": {
+    "/account/change-password": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Capstone.Api.Models.ChangePasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/auth/management/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Capstone.Api.Models.LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/auth/management/change-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Capstone.Api.Controllers.AuthController+ChangePasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/management/landlords": {
+      "get": {
+        "tags": [
+          "Landlords"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Capstone.Api.Models.Landlords.LandlordSearchDto"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/landlords/{landlordUserId}/portfolio": {
+      "get": {
+        "tags": [
+          "Landlords"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "landlordUserId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Capstone.Api.Models.Landlords.LandlordPortfolioDto"
+            }
+          }
+        }
+      }
+    },
+    "/management/property-submissions/{propertyId}/assign": {
+      "post": {
+        "tags": [
+          "Management"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "propertyId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Capstone.Api.Controllers.ManagementController+AssignRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/management/dashboard": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Capstone.Api.Models.DashboardDto"
+            }
+          }
+        }
+      }
+    },
+    "/management/property-submissions": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "type": "string",
+            "default": "Pending"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Capstone.Api.Models.PropertySubmissionDto"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/property-submissions/{propertyId}/approve": {
+      "post": {
+        "tags": [
+          "Management"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "propertyId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Capstone.Api.Models.ReviewRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/management/property-submissions/{propertyId}/reject": {
+      "post": {
+        "tags": [
+          "Management"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "propertyId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Capstone.Api.Models.ReviewRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/management/lease-applications": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "type": "string",
+            "default": "Pending"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Capstone.Api.Models.LeaseApplicationDto"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/lease-applications/{applicationId}/approve": {
+      "post": {
+        "tags": [
+          "Management"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "applicationId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Capstone.Api.Models.ReviewRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/management/lease-applications/{applicationId}/reject": {
+      "post": {
+        "tags": [
+          "Management"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "applicationId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Capstone.Api.Models.ReviewRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/management/employees": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Capstone.Api.Models.EmployeeDto"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Management"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Capstone.Api.Models.CreateEmployeeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/management/landlords/{landlordId}/listings": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "landlordId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Capstone.Api.Models.ListingDto"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/landlords/{landlordId}/leases": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "landlordId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Capstone.Api.Models.LeaseDto"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/management/landlords/{landlordId}/issues": {
+      "get": {
+        "tags": [
+          "Management"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "landlordId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Capstone.Api.Models.IssueDto"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WeatherForecast": {
+      "get": {
+        "tags": [
+          "WeatherForecast"
+        ],
+        "operationId": "GetWeatherForecast",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Capstone.Api.WeatherForecast"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Capstone.Api.Controllers.AuthController+ChangePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "currentPassword": {
+          "type": "string"
+        },
+        "newPassword": {
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Controllers.ManagementController+AssignRequest": {
+      "type": "object",
+      "properties": {
+        "assignedToUserId": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "Capstone.Api.Models.ChangePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "currentPassword": {
+          "type": "string"
+        },
+        "newPassword": {
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.CreateEmployeeRequest": {
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "roleName": {
+          "type": "string"
+        },
+        "tempPassword": {
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.DashboardDto": {
+      "type": "object",
+      "properties": {
+        "pendingPropertySubmissions": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "pendingLeaseApplications": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "openIssues": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "activeEmployees": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "recentPropertySubmissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Capstone.Api.Models.RecentPropertySubmissionDto"
+          }
+        },
+        "recentLeaseApplications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Capstone.Api.Models.RecentLeaseAppDto"
+          }
+        },
+        "recentIssues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Capstone.Api.Models.RecentIssueDto"
+          }
+        }
+      }
+    },
+    "Capstone.Api.Models.EmployeeDto": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "fullName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "roleName": {
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Capstone.Api.Models.IssueDto": {
+      "type": "object",
+      "properties": {
+        "issueId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "propertyId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "propertyAddress": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "reportedByEmail": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.Landlords.LandlordPortfolioDto": {
+      "type": "object",
+      "properties": {
+        "landlordUserId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "landlordName": {
+          "type": "string"
+        },
+        "landlordEmail": {
+          "type": "string"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Capstone.Api.Models.Landlords.PortfolioPropertyDto"
+          }
+        },
+        "listings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Capstone.Api.Models.Landlords.PortfolioListingDto"
+          }
+        },
+        "leases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Capstone.Api.Models.Landlords.PortfolioLeaseDto"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Capstone.Api.Models.Landlords.PortfolioIssueDto"
+          }
+        }
+      }
+    },
+    "Capstone.Api.Models.Landlords.LandlordSearchDto": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "fullName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "propertiesCount": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "Capstone.Api.Models.Landlords.PortfolioIssueDto": {
+      "type": "object",
+      "properties": {
+        "issueId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "propertyId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.Landlords.PortfolioLeaseDto": {
+      "type": "object",
+      "properties": {
+        "leaseId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "listingId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ownerUserId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "clientUserId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "leaseStartDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "leaseEndDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "leaseStatus": {
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.Landlords.PortfolioListingDto": {
+      "type": "object",
+      "properties": {
+        "listingId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "propertyId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "listingStatus": {
+          "type": "string"
+        },
+        "createdByMgmtId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "updatedAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.Landlords.PortfolioPropertyDto": {
+      "type": "object",
+      "properties": {
+        "propertyId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "addressLine1": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "propertyType": {
+          "type": "string"
+        },
+        "bedrooms": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "bathrooms": {
+          "format": "double",
+          "type": "number"
+        },
+        "rentAmount": {
+          "format": "double",
+          "type": "number"
+        },
+        "mediaUrl": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.LeaseApplicationDto": {
+      "type": "object",
+      "properties": {
+        "applicationId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "listingId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "listingTitle": {
+          "type": "string"
+        },
+        "applicantUserId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "applicantEmail": {
+          "type": "string"
+        },
+        "leaseStartDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "leaseEndDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.LeaseDto": {
+      "type": "object",
+      "properties": {
+        "leaseId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "listingId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "address": {
+          "type": "string"
+        },
+        "clientUserId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "tenantEmail": {
+          "type": "string"
+        },
+        "leaseStartDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "leaseEndDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "leaseStatus": {
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.ListingDto": {
+      "type": "object",
+      "properties": {
+        "listingId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "propertyId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "address": {
+          "type": "string"
+        },
+        "listingStatus": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.LoginRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.PropertySubmissionDto": {
+      "type": "object",
+      "properties": {
+        "propertyId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ownerUserId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "landlordName": {
+          "type": "string"
+        },
+        "landlordEmail": {
+          "type": "string"
+        },
+        "addressLine1": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "propertyType": {
+          "type": "string"
+        },
+        "bedrooms": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "bathrooms": {
+          "format": "double",
+          "type": "number"
+        },
+        "rentAmount": {
+          "format": "double",
+          "type": "number"
+        },
+        "mediaUrl": {
+          "type": "string"
+        },
+        "submissionStatus": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.RecentIssueDto": {
+      "type": "object",
+      "properties": {
+        "issueId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "propertyAddress": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.RecentLeaseAppDto": {
+      "type": "object",
+      "properties": {
+        "applicationId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "listingTitle": {
+          "type": "string"
+        },
+        "applicantEmail": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.RecentPropertySubmissionDto": {
+      "type": "object",
+      "properties": {
+        "propertyId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "address": {
+          "type": "string"
+        },
+        "landlordEmail": {
+          "type": "string"
+        },
+        "submissionStatus": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.Models.ReviewRequest": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "Capstone.Api.WeatherForecast": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "$ref": "#/definitions/System.DateOnly"
+        },
+        "temperatureC": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "temperatureF": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "summary": {
+          "type": "string"
+        }
+      }
+    },
+    "System.DateOnly": {
+      "type": "object",
+      "properties": {
+        "year": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "month": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "day": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "dayOfWeek": {
+          "$ref": "#/definitions/System.DayOfWeek"
+        },
+        "dayOfYear": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "dayNumber": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        }
+      }
+    },
+    "System.DayOfWeek": {
+      "format": "int32",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "type": "integer"
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": { }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}
