@@ -1,0 +1,15 @@
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\bin\Debug\net8.0\Tenurix.Management.Client.deps.json
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\bin\Debug\net8.0\Tenurix.Management.Client.dll
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\bin\Debug\net8.0\Tenurix.Management.Client.pdb
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\bin\Debug\net8.0\Tenurix.Management.Models.dll
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\bin\Debug\net8.0\Tenurix.Management.Models.pdb
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\obj\Debug\net8.0\Tenurix.Management.Client.csproj.AssemblyReference.cache
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\obj\Debug\net8.0\Tenurix.Management.Client.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\obj\Debug\net8.0\Tenurix.Management.Client.AssemblyInfoInputs.cache
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\obj\Debug\net8.0\Tenurix.Management.Client.AssemblyInfo.cs
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\obj\Debug\net8.0\Tenurix.Management.Client.csproj.CoreCompileInputs.cache
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\obj\Debug\net8.0\Tenurix..5D377322.Up2Date
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\obj\Debug\net8.0\Tenurix.Management.Client.dll
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\obj\Debug\net8.0\refint\Tenurix.Management.Client.dll
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\obj\Debug\net8.0\Tenurix.Management.Client.pdb
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management.Client\obj\Debug\net8.0\ref\Tenurix.Management.Client.dll
