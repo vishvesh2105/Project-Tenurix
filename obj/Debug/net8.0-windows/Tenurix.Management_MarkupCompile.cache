@@ -1,0 +1,20 @@
+﻿Tenurix.Management
+
+
+winexe
+C#
+.cs
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management\obj\Debug\net8.0-windows\
+Tenurix.Management
+none
+false
+TRACE;DEBUG;NET;NET8_0;NETCOREAPP
+C:\Users\Aryan Marediya\source\repos\Tenurix.Management\App.xaml
+13-809460060
+
+15-1290806922
+200-77536078
+MainWindow.xaml;Themes\AppTheme.xaml;Views\CreateEmployeeWindow.xaml;Views\LoginWindow.xaml;Views\Pages\DashboardPage.xaml;Views\Pages\EmployeesPage.xaml;Views\Pages\IssuesPage.xaml;Views\Pages\LandlordsPage.xaml;Views\Pages\LeaseApplicationsPage.xaml;Views\Pages\PropertySubmissionsPage.xaml;Views\ShellWindow.xaml;Views\Windows\ChangePasswordWindow.xaml;Views\Windows\MyProfileWindow.xaml;
+
+False
+

@@ -1,0 +1,45 @@
+<Page x:Class="Tenurix.Management.Views.Pages.IssuesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{StaticResource Panel}">
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Issues" FontSize="22" FontWeight="SemiBold"/>
+
+        <TextBlock Grid.Row="2"
+                   Text="Track maintenance/issues and update status. (Later: API + SQL)"
+                   Foreground="{StaticResource TextMuted}"/>
+
+        <Border Grid.Row="4" Background="{StaticResource Bg}" CornerRadius="12" Padding="12">
+            <DataGrid x:Name="Grid"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      Background="{StaticResource Bg}"
+                      BorderBrush="{StaticResource Border}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Issue Id" Binding="{Binding IssueId}" Width="90"/>
+                    <DataGridTextColumn Header="Property" Binding="{Binding PropertyAddress}" Width="*"/>
+                    <DataGridTextColumn Header="Reported By" Binding="{Binding ReportedBy}" Width="220"/>
+                    <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="120"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="140"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button x:Name="MarkInProgressBtn" Content="Mark In Progress" Width="160" Click="MarkInProgress_Click"/>
+            <Button x:Name="MarkResolvedBtn" Content="Mark Resolved" Width="140" Margin="10,0,0,0" Click="MarkResolved_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>

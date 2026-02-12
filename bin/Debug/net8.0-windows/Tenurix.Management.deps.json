@@ -1,0 +1,50 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Tenurix.Management/1.0.0": {
+        "dependencies": {
+          "Tenurix.Management.Client": "1.0.0",
+          "Tenurix.Management.Models": "1.0.0"
+        },
+        "runtime": {
+          "Tenurix.Management.dll": {}
+        }
+      },
+      "Tenurix.Management.Client/1.0.0": {
+        "dependencies": {
+          "Tenurix.Management.Models": "1.0.0"
+        },
+        "runtime": {
+          "Tenurix.Management.Client.dll": {}
+        }
+      },
+      "Tenurix.Management.Models/1.0.0": {
+        "runtime": {
+          "Tenurix.Management.Models.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Tenurix.Management/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Tenurix.Management.Client/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Tenurix.Management.Models/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -1,0 +1,69 @@
+<Page x:Class="Tenurix.Management.Views.Pages.PropertySubmissionsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{StaticResource Panel}">
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Property Submissions" FontSize="22" FontWeight="SemiBold"/>
+
+        <DockPanel Grid.Row="2">
+            <TextBlock Text="Pending landlord properties waiting for approval."
+                       Foreground="{StaticResource TextMuted}"/>
+            <Button Content="Refresh" DockPanel.Dock="Right" Width="110" Click="Refresh_Click"/>
+        </DockPanel>
+
+        <Border Grid.Row="4" Background="{StaticResource Bg}" CornerRadius="12" Padding="12">
+            <DataGrid x:Name="Grid"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      HeadersVisibility="Column">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding PropertyId}" Width="80"/>
+                    <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*"/>
+                    <DataGridTextColumn Header="Landlord" Binding="{Binding LandlordEmail}" Width="220"/>
+
+                    <!--  NEW: show who it's assigned to -->
+                    <DataGridTextColumn Header="Assigned To" Binding="{Binding AssignedToEmail}" Width="220"/>
+
+                    <DataGridTextColumn Header="Status" Binding="{Binding SubmissionStatus}" Width="120"/>
+
+                    <!-- Actions -->
+                    <DataGridTemplateColumn Header="Actions" Width="340">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button Content="View" Width="70" Margin="0,0,8,0"
+                            Click="View_Click"
+                            Tag="{Binding}"/>
+
+                                    <!-- NEW Assign button -->
+                                    <Button Content="Assign" Width="70" Margin="0,0,8,0"
+                            Click="Assign_Click"
+                            Tag="{Binding}"/>
+
+                                    <Button Content="Approve" Width="80" Margin="0,0,8,0"
+                            Click="Approve_Click"
+                            Tag="{Binding}"/>
+
+                                    <Button Content="Reject" Width="70"
+                            Click="Reject_Click"
+                            Tag="{Binding}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+
+            </DataGrid>
+        </Border>
+    </Grid>
+</Page>

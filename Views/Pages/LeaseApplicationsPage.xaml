@@ -1,0 +1,47 @@
+<Page x:Class="Tenurix.Management.Views.Pages.LeaseApplicationsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{StaticResource Panel}">
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Lease Applications" FontSize="22" FontWeight="SemiBold"/>
+
+        <TextBlock Grid.Row="2"
+                   Text="Review pending applications and approve/reject."
+                   Foreground="{StaticResource TextMuted}"/>
+
+        <Border Grid.Row="4" Background="{StaticResource Bg}" CornerRadius="12" Padding="12">
+            <DataGrid x:Name="Grid"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      HeadersVisibility="Column"
+                      Background="{StaticResource Bg}"
+                      BorderBrush="{StaticResource Border}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="App Id" Binding="{Binding ApplicationId}" Width="90"/>
+                    <DataGridTextColumn Header="Applicant" Binding="{Binding ApplicantEmail}" Width="220"/>
+                    <DataGridTextColumn Header="Property" Binding="{Binding PropertyAddress}" Width="*"/>
+                    <DataGridTextColumn Header="Start" Binding="{Binding LeaseStartDate}" Width="120"/>
+                    <DataGridTextColumn Header="End" Binding="{Binding LeaseEndDate}" Width="120"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="140"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button x:Name="ApproveBtn" Content="Approve" Width="120" Click="Approve_Click"/>
+            <Button x:Name="RejectBtn" Content="Reject" Width="120" Margin="10,0,0,0" Click="Reject_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>

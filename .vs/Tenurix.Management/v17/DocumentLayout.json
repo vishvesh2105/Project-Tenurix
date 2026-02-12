@@ -1,0 +1,286 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|c:\\users\\aryan marediya\\source\\repos\\tenurix.management\\views\\windows\\myprofilewindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\windows\\myprofilewindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\views\\windows\\myprofilewindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\windows\\myprofilewindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CC57377F-3654-4689-9408-F4640D7EC137}|..\\Tenurix.Management.Client\\Tenurix.Management.Client.csproj|c:\\users\\aryan marediya\\source\\repos\\tenurix.management.client\\api\\tenurixapiclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CC57377F-3654-4689-9408-F4640D7EC137}|..\\Tenurix.Management.Client\\Tenurix.Management.Client.csproj|c:\\users\\aryan marediya\\source\\repos\\tenurix.management.client\\models\\myprofiledto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\views\\shellwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\shellwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\views\\shellwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\shellwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CC57377F-3654-4689-9408-F4640D7EC137}|..\\Tenurix.Management.Client\\Tenurix.Management.Client.csproj|c:\\users\\aryan marediya\\source\\repos\\tenurix.management.client\\models\\landlords\\landlorddtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\views\\pages\\employeespage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\pages\\employeespage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\views\\pages\\employeespage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\pages\\employeespage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\views\\pages\\issuespage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\pages\\issuespage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\views\\pages\\issuespage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\pages\\issuespage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\views\\loginwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\loginwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CC57377F-3654-4689-9408-F4640D7EC137}|..\\Tenurix.Management.Client\\Tenurix.Management.Client.csproj|c:\\users\\aryan marediya\\source\\repos\\tenurix.management.client\\models\\employeedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\views\\pages\\dashboardpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\pages\\dashboardpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\views\\pages\\dashboardpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\pages\\dashboardpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\views\\pages\\issuespage.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{589909E9-7722-4074-9985-D6A682A53B20}|Tenurix.Management.csproj|solutionrelative:views\\pages\\issuespage.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cf7341e6-9713-4309-bea6-cdb743e1804d}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MyProfileWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Windows\\MyProfileWindow.xaml.cs",
+              "RelativeDocumentMoniker": "Views\\Windows\\MyProfileWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Windows\\MyProfileWindow.xaml.cs",
+              "RelativeToolTip": "Views\\Windows\\MyProfileWindow.xaml.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAB8AAAAQAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-10T06:23:07.857Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MyProfileWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Windows\\MyProfileWindow.xaml",
+              "RelativeDocumentMoniker": "Views\\Windows\\MyProfileWindow.xaml",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Windows\\MyProfileWindow.xaml",
+              "RelativeToolTip": "Views\\Windows\\MyProfileWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-10T06:22:40.611Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MyProfileDto.cs",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management.Client\\Models\\MyProfileDto.cs",
+              "RelativeDocumentMoniker": "..\\Tenurix.Management.Client\\Models\\MyProfileDto.cs",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management.Client\\Models\\MyProfileDto.cs",
+              "RelativeToolTip": "..\\Tenurix.Management.Client\\Models\\MyProfileDto.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-10T06:19:27.005Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TenurixApiClient.cs",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management.Client\\Api\\TenurixApiClient.cs",
+              "RelativeDocumentMoniker": "..\\Tenurix.Management.Client\\Api\\TenurixApiClient.cs",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management.Client\\Api\\TenurixApiClient.cs",
+              "RelativeToolTip": "..\\Tenurix.Management.Client\\Api\\TenurixApiClient.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAQAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-10T02:11:54.518Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ShellWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\ShellWindow.xaml.cs",
+              "RelativeDocumentMoniker": "Views\\ShellWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\ShellWindow.xaml.cs",
+              "RelativeToolTip": "Views\\ShellWindow.xaml.cs",
+              "ViewState": "AQIAABAAAAAAAAAAAAAIwCMAAAAOAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-10T04:38:55.695Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "LandlordDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management.Client\\Models\\Landlords\\LandlordDtos.cs",
+              "RelativeDocumentMoniker": "..\\Tenurix.Management.Client\\Models\\Landlords\\LandlordDtos.cs",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management.Client\\Models\\Landlords\\LandlordDtos.cs",
+              "RelativeToolTip": "..\\Tenurix.Management.Client\\Models\\Landlords\\LandlordDtos.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-10T06:19:37.14Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ShellWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\ShellWindow.xaml",
+              "RelativeDocumentMoniker": "Views\\ShellWindow.xaml",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\ShellWindow.xaml",
+              "RelativeToolTip": "Views\\ShellWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-06T19:42:37.938Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "EmployeesPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\EmployeesPage.xaml.cs",
+              "RelativeDocumentMoniker": "Views\\Pages\\EmployeesPage.xaml.cs",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\EmployeesPage.xaml.cs",
+              "RelativeToolTip": "Views\\Pages\\EmployeesPage.xaml.cs",
+              "ViewState": "AQIAAHIAAAAAAAAAAAAkwJIAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-10T01:25:58.183Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "IssuesPage.xaml",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\IssuesPage.xaml",
+              "RelativeDocumentMoniker": "Views\\Pages\\IssuesPage.xaml",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\IssuesPage.xaml",
+              "RelativeToolTip": "Views\\Pages\\IssuesPage.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-10T05:34:03.429Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "EmployeesPage.xaml",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\EmployeesPage.xaml",
+              "RelativeDocumentMoniker": "Views\\Pages\\EmployeesPage.xaml",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\EmployeesPage.xaml",
+              "RelativeToolTip": "Views\\Pages\\EmployeesPage.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-10T01:26:42.683Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "IssuesPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\IssuesPage.xaml.cs",
+              "RelativeDocumentMoniker": "Views\\Pages\\IssuesPage.xaml.cs",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\IssuesPage.xaml.cs",
+              "RelativeToolTip": "Views\\Pages\\IssuesPage.xaml.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-10T05:34:06.042Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "LoginWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\LoginWindow.xaml.cs",
+              "RelativeDocumentMoniker": "Views\\LoginWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\LoginWindow.xaml.cs",
+              "RelativeToolTip": "Views\\LoginWindow.xaml.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACgAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-06T08:14:17.052Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "EmployeeDto.cs",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management.Client\\Models\\EmployeeDto.cs",
+              "RelativeDocumentMoniker": "..\\Tenurix.Management.Client\\Models\\EmployeeDto.cs",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management.Client\\Models\\EmployeeDto.cs",
+              "RelativeToolTip": "..\\Tenurix.Management.Client\\Models\\EmployeeDto.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAHAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-10T04:20:08.43Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "DashboardPage.xaml",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\DashboardPage.xaml",
+              "RelativeDocumentMoniker": "Views\\Pages\\DashboardPage.xaml",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\DashboardPage.xaml",
+              "RelativeToolTip": "Views\\Pages\\DashboardPage.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-10T02:15:29.594Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "DashboardPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\DashboardPage.xaml.cs",
+              "RelativeDocumentMoniker": "Views\\Pages\\DashboardPage.xaml.cs",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\DashboardPage.xaml.cs",
+              "RelativeToolTip": "Views\\Pages\\DashboardPage.xaml.cs",
+              "ViewState": "AQIAAAUAAAAAAAAAAAAQwBcAAAAzAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-10T02:15:32.765Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "IssuesPage.xaml",
+              "DocumentMoniker": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\IssuesPage.xaml",
+              "RelativeDocumentMoniker": "Views\\Pages\\IssuesPage.xaml",
+              "ToolTip": "C:\\Users\\Aryan Marediya\\source\\repos\\Tenurix.Management\\Views\\Pages\\IssuesPage.xaml",
+              "RelativeToolTip": "Views\\Pages\\IssuesPage.xaml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-10T01:40:48.369Z"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 1695,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

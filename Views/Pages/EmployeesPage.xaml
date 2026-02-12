@@ -1,0 +1,66 @@
+<Page x:Class="Tenurix.Management.Views.Pages.EmployeesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{StaticResource Panel}">
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Employees" FontSize="22" FontWeight="SemiBold"/>
+
+        <TextBlock Grid.Row="2"
+                   Text="Manager can create TeamLead / Staff accounts and reset passwords."
+                   Foreground="{StaticResource TextMuted}"/>
+
+        <Border Grid.Row="4" Background="{StaticResource Bg}" CornerRadius="12" Padding="12">
+            <DataGrid x:Name="Grid"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      Background="{StaticResource Bg}"
+                      BorderBrush="{StaticResource Border}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="User Id" Binding="{Binding UserId}" Width="90"/>
+                    <DataGridTextColumn Header="Full Name" Binding="{Binding FullName}" Width="*"/>
+                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="260"/>
+                    <DataGridTextColumn Header="Role" Binding="{Binding RoleName}" Width="160"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
+
+                    <DataGridTemplateColumn Header="Actions" Width="160">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Reset Password"
+        Padding="8,4"
+        CommandParameter="{Binding UserId}"
+        Click="ResetPassword_Click"/>
+
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button x:Name="ResetPwBtn"
+                    Content="Reset Password"
+                    Width="150"
+                    Margin="0,0,10,0"
+                    Click="ResetPassword_Click"/>
+
+            <Button x:Name="CreateBtn"
+                    Content="Create Employee"
+                    Width="160"
+                    Click="Create_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>
