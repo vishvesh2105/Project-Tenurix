@@ -16,3 +16,9 @@ Create a `.env.local` file:
 ```
 NEXT_PUBLIC_API_BASE_URL=https://localhost:7001
 ```
+
+## Project Structure
+
+- `src/app/` — Pages and routes
+- `src/components/` — Reusable UI components
+- `src/lib/` — Utilities and API client
