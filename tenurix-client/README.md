@@ -22,3 +22,9 @@ NEXT_PUBLIC_API_BASE_URL=https://localhost:7001
 - `src/app/` — Pages and routes
 - `src/components/` — Reusable UI components
 - `src/lib/` — Utilities and API client
+
+## Features
+
+- Property listings with search and filters
+- Tenant dashboard
+- Landlord portal
