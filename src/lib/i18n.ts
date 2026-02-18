@@ -1,0 +1,51 @@
+export type Lang = "en" | "fr";
+
+export const dict = {
+  en: {
+    tenurix: "Tenurix",
+    findHome: "Find your next home",
+    browse: "Browse",
+    login: "Login",
+    clientPortal: "Client Portal",
+    landlordPortal: "Landlord Portal",
+    choosePortal: "Choose a portal",
+    client: "Client",
+    landlord: "Landlord",
+    googleSignin: "Continue with Google",
+    signingIn: "Signing in…",
+    terms: "By continuing, you agree to Tenurix Terms & Privacy.",
+    applications: "Applications",
+    dashboard: "Dashboard",
+    profile: "Profile",
+    signout: "Sign out",
+    light: "Light",
+    dark: "Dark",
+    newRentalsTitle: "New Apartments for Rent",
+    seeAllRecent: "See All Recently Added Rentals",
+
+  },
+  fr: {
+    tenurix: "Tenurix",
+    findHome: "Trouvez votre prochain logement",
+    browse: "Explorer",
+    login: "Connexion",
+    clientPortal: "Portail Client",
+    landlordPortal: "Portail Propriétaire",
+    choosePortal: "Choisir un portail",
+    client: "Client",
+    landlord: "Propriétaire",
+    googleSignin: "Continuer avec Google",
+    signingIn: "Connexion…",
+    terms: "En continuant, vous acceptez les conditions et la confidentialité de Tenurix.",
+    applications: "Demandes",
+    dashboard: "Tableau de bord",
+    profile: "Profil",
+    signout: "Déconnexion",
+    light: "Clair",
+    dark: "Sombre",
+    newRentalsTitle: "New Apartments for Rent",
+    seeAllRecent: "See All Recently Added Rentals",
+
+  },
+  
+} as const;
