@@ -32,3 +32,7 @@ NEXT_PUBLIC_API_BASE_URL=https://localhost:7001
 ## Authentication
 
 Uses JWT tokens stored in localStorage. Supports email/password and Google OAuth.
+
+## API Integration
+
+All API calls go through `src/lib/api.ts` which handles auth tokens and error responses.
