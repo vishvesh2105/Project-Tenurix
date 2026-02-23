@@ -2,6 +2,8 @@
 
 public sealed class DashboardDto
 {
+    public int PendingPropertySubmissions { get; set; }
+    public int PendingLeaseApplications { get; set; }
     public int OpenIssues { get; set; }
     public int ActiveEmployees { get; set; }
 
@@ -43,6 +45,8 @@ public sealed class RecentIssueDto
 
 public sealed class DashboardResponse
 {
+    public int PendingPropertySubmissions { get; set; }
+    public int PendingLeaseApps { get; set; } // if you have LeaseApplications table
     public int OpenIssues { get; set; }
     public int ActiveEmployees { get; set; }
 
