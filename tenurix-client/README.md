@@ -45,3 +45,7 @@ Build for production:
 npm run build
 npm start
 ```
+
+## Testing
+
+Run tests with `npm test`.
