@@ -36,3 +36,12 @@ Uses JWT tokens stored in localStorage. Supports email/password and Google OAuth
 ## API Integration
 
 All API calls go through `src/lib/api.ts` which handles auth tokens and error responses.
+
+## Deployment
+
+Build for production:
+
+```bash
+npm run build
+npm start
+```
