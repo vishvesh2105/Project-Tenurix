@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { PublicShell } from "@/components/public/PublicShell";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ function digitsOnly(v: string): string {
 }
 
 function ListingsContent() {
+  const searchParams = useSearchParams();
 
   const [rows, setRows] = useState<ListingCard[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,17 +48,31 @@ function ListingsContent() {
 
   // Pagination
   const PAGE_SIZE = 12;
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1", 10));
   const [totalItems, setTotalItems] = useState(0);
   const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
 
   // Initialize from URL search params (reactive — updates on navigation)
+  const [city, setCity] = useState(searchParams.get("city") || "");
+  const [minRent, setMinRent] = useState(searchParams.get("minRent") || "");
+  const [maxRent, setMaxRent] = useState(searchParams.get("maxRent") || "");
+  const [bedrooms, setBedrooms] = useState(searchParams.get("bedrooms") || "");
+  const [propertyType, setPropertyType] = useState(searchParams.get("propertyType") || "");
 
   // Sync state when URL search params change (e.g. city link from home page)
   useEffect(() => {
+    setCity(searchParams.get("city") || "");
+    setMinRent(searchParams.get("minRent") || "");
+    setMaxRent(searchParams.get("maxRent") || "");
+    setBedrooms(searchParams.get("bedrooms") || "");
+    setPropertyType(searchParams.get("propertyType") || "");
+  }, [searchParams]);
 
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(false);
 
   function buildQuery(page: number = currentPage) {
+    const p = new URLSearchParams();
     if (city.trim()) p.set("city", city.trim());
     if (minRent) p.set("minRent", minRent);
     if (maxRent) p.set("maxRent", maxRent);
@@ -85,6 +101,7 @@ function ListingsContent() {
     }
   }, []);
 
+  // Load on filter changes with debounce (skip debounce on first load)
   useEffect(() => {
     const qs = buildQuery();
 
@@ -95,6 +112,7 @@ function ListingsContent() {
 
     // Update URL
     if (typeof window !== "undefined") {
+      const urlP = new URLSearchParams();
       if (city.trim()) urlP.set("city", city.trim());
       if (minRent) urlP.set("minRent", minRent);
       if (maxRent) urlP.set("maxRent", maxRent);
@@ -105,11 +123,16 @@ function ListingsContent() {
     }
 
     if (!mountedRef.current) {
+      // First load — no debounce
       mountedRef.current = true;
       load(qs);
       return;
     }
 
+    // Subsequent changes — debounce 400ms
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => load(qs), 400);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [city, minRent, maxRent, bedrooms, propertyType, load]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reload when page changes
