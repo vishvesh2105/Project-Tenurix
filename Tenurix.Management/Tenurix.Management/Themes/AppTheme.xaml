@@ -284,6 +284,4 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Added: hover effects and focus indicators -->
-    <!-- Updated: card border radius and shadow depth -->
 </ResourceDictionary>
