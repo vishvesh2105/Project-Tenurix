@@ -14,36 +14,165 @@ public class AuthController : ControllerBase
 {
     private readonly AuthService _auth;
     private readonly SqlConnectionFactory _db;
+    private readonly TwoFactorService _twoFactor;
 
-    public AuthController(AuthService auth, SqlConnectionFactory db)
+    public AuthController(AuthService auth, SqlConnectionFactory db, TwoFactorService twoFactor)
     {
         _auth = auth;
         _db = db;
+        _twoFactor = twoFactor;
     }
 
+    /// <summary>
+    /// Step 1: Validate email + password. If correct, send 2FA code to the user's email.
+    /// Does NOT return a JWT token yet.
+    /// </summary>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest req)
     {
+        // Validate credentials (but don't return the token yet)
         var (ok, data, error) = await _auth.ManagementLoginAsync(req);
         if (!ok) return Unauthorized(new ApiError(error));
+
+        // Credentials valid — send 2FA code
+        var email = req.Email.Trim();
+        try
+        {
+            await _twoFactor.SendCodeAsync(email);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiError($"Failed to send verification code. Please try again. ({ex.Message})"));
+        }
+
+        // Mask the email for display
+        var masked = MaskEmail(email);
+
+        return Ok(new { requiresTwoFactor = true, maskedEmail = masked, email });
+    }
+
+    /// <summary>
+    /// Step 2: Verify the 6-digit code. If correct, return the full JWT session.
+    /// </summary>
+    [HttpPost("verify-2fa")]
+    public async Task<IActionResult> VerifyTwoFactor([FromBody] Verify2FaRequest req)
+    {
+        if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Code))
+            return BadRequest(new ApiError("Please enter the verification code."));
+
+        if (string.IsNullOrWhiteSpace(req.Password))
+            return BadRequest(new ApiError("Session expired. Please sign in again."));
+
+        // Verify the 2FA code
+        if (!_twoFactor.VerifyCode(req.Email, req.Code))
+            return Unauthorized(new ApiError("Invalid or expired verification code."));
+
+        // Code is correct — re-authenticate and issue JWT
+        var loginReq = new LoginRequest { Email = req.Email, Password = req.Password };
+        var (ok, data, error) = await _auth.ManagementLoginAsync(loginReq);
+        if (!ok) return Unauthorized(new ApiError("Session expired. Please sign in again."));
+
         return Ok(data);
     }
 
+    /// <summary>
+    /// Resend the 2FA code (requires valid credentials again to prevent abuse).
+    /// </summary>
+    [HttpPost("resend-2fa")]
+    public async Task<IActionResult> ResendTwoFactor([FromBody] LoginRequest req)
+    {
+        // Re-validate credentials
+        var (ok, _, error) = await _auth.ManagementLoginAsync(req);
+        if (!ok) return Unauthorized(new ApiError("Session expired. Please sign in again."));
+
+        try
+        {
+            await _twoFactor.SendCodeAsync(req.Email.Trim());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiError($"Failed to send verification code. ({ex.Message})"));
+        }
+
+        return Ok(new { sent = true });
+    }
+
+    //  Logged-in user changes THEIR OWN password
     [Authorize]
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest req)
     {
+        if (string.IsNullOrWhiteSpace(req.CurrentPassword))
+            return BadRequest(new ApiError("Please enter your current password."));
+
+        if (string.IsNullOrWhiteSpace(req.NewPassword))
+            return BadRequest(new ApiError("Please enter a new password."));
+
+        // always change password for the logged-in user
         var userId = Perm.UserId(User);
-        if (userId == null) return Unauthorized();
-        var success = await _auth.ChangePasswordAsync(userId.Value, req.OldPassword, req.NewPassword);
-        return success ? Ok(new { message = "Password updated." }) : BadRequest(new ApiError("Current password is incorrect."));
+
+        await using var conn = _db.Create();
+
+        const string sqlGet = @"
+SELECT PasswordHash, PasswordSalt
+FROM dbo.Users
+WHERE UserId = @UserId;
+";
+        var row = await conn.QuerySingleOrDefaultAsync(sqlGet, new { UserId = userId });
+        if (row == null) return Unauthorized(new ApiError("Your session has expired. Please sign in again."));
+
+        string? hash = ReadHashOrBase64(row.PasswordHash);
+        string? salt = ReadHashOrBase64(row.PasswordSalt);
+
+        if (string.IsNullOrWhiteSpace(hash) || string.IsNullOrWhiteSpace(salt))
+            return BadRequest(new ApiError("Your account password is not set up. Please contact support."));
+
+        if (!PinHasher.Verify(req.CurrentPassword, hash!, salt!))
+            return BadRequest(new ApiError("The current password you entered is incorrect."));
+
+
+        //  update to new password
+        var (newHash, newSalt) = PinHasher.Hash(req.NewPassword);
+
+        const string sqlUpdate = @"
+UPDATE dbo.Users
+SET PasswordHash=@Hash,
+    PasswordSalt=@Salt,
+    MustChangePassword=0
+WHERE UserId=@UserId;
+";
+        await conn.ExecuteAsync(sqlUpdate, new { Hash = newHash, Salt = newSalt, UserId = userId });
+
+        return Ok();
     }
 
-    [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
+    private static string? ReadHashOrBase64(object? value)
     {
-        if (string.IsNullOrWhiteSpace(req.Email))
-            return BadRequest(new ApiError("Email is required."));
-        return Ok(new { message = "If that email exists, a reset link has been sent." });
+        if (value is null) return null;
+        if (value is string s) return string.IsNullOrWhiteSpace(s) ? null : s;
+        if (value is byte[] b && b.Length > 0) return Convert.ToBase64String(b);
+        return null;
     }
+
+    private static string MaskEmail(string email)
+    {
+        var parts = email.Split('@');
+        if (parts.Length != 2) return "***@***.***";
+
+        var local = parts[0];
+        var domain = parts[1];
+
+        var maskedLocal = local.Length <= 2
+            ? local[0] + "***"
+            : local[0] + "***" + local[^1];
+
+        return $"{maskedLocal}@{domain}";
+    }
+}
+
+public class Verify2FaRequest
+{
+    public string Email { get; set; } = "";
+    public string Password { get; set; } = "";
+    public string Code { get; set; } = "";
 }
