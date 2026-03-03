@@ -9,6 +9,7 @@ using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load local secrets file (gitignored) if present — overrides appsettings.json placeholders
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 builder.Services.AddControllers()
@@ -22,7 +23,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tenurix API v1", Version = "v1" });
+
+    //  Fixes Swagger 500 when DTO class names collide (very common)
     c.CustomSchemaIds(t => t.FullName);
+
+    // (optional but recommended for JWT testing in Swagger)
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -32,6 +37,7 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Description = "Enter: Bearer {token}"
     });
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -44,12 +50,22 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// CORS
+// CORS (allow your websites to call the API)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("TenurixWeb", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy
+            .WithOrigins(
+                "https://tenurix.net",
+                "https://www.tenurix.net",
+                "https://client.tenurix.net",
+                "https://landlord.tenurix.net",
+                "https://manage.tenurix.net",
+                "http://localhost:3000", // local dev
+                "https://tenurix.net/auth"
+
+            )
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -58,6 +74,8 @@ builder.Services.AddCors(options =>
 // DB + Services
 builder.Services.AddSingleton<SqlConnectionFactory>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddSingleton<EmailService>();
+builder.Services.AddSingleton<TwoFactorService>();
 
 // JWT Auth
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Missing Jwt:Key");
@@ -84,7 +102,7 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Global exception handler
+// Global exception handler — always returns JSON, never leaks internal details
 app.UseExceptionHandler(errApp =>
 {
     errApp.Run(async ctx =>
@@ -107,6 +125,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseCors("TenurixWeb");
 app.UseAuthentication();
 app.UseAuthorization();
