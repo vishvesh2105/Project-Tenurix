@@ -49,3 +49,7 @@ npm start
 ## Testing
 
 Run tests with `npm test`.
+
+## Linting
+
+Run `npm run lint` to check for issues.
