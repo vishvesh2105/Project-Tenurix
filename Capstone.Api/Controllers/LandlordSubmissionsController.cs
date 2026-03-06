@@ -40,6 +40,12 @@ public sealed class LandlordSubmissionsController : ControllerBase
 
         public string? Description { get; set; }
 
+        public int? NumberOfUnits { get; set; }
+        public int? ParkingSpots { get; set; }
+        public string? ParkingType { get; set; }
+        public string? AvailableDate { get; set; }
+        public string? UtilitiesJson { get; set; }
+        public string? AmenitiesJson { get; set; }
 
         public List<IFormFile> OwnerIdPhotos { get; set; } = new();
         public List<IFormFile> PropertyPhotos { get; set; } = new();
@@ -154,6 +160,8 @@ INSERT INTO dbo.Properties
     OwnerIdPhotoUrl,
     OwnerIdPhotosJson,
     PhotosJson,
+    ParkingSpots, ParkingType, AvailableDate,
+    UtilitiesJson, AmenitiesJson,
     SubmissionStatus,
     CreatedAt
 )
@@ -168,6 +176,8 @@ VALUES
     @OwnerIdPhotoUrl,
     @OwnerIdPhotosJson,
     @PhotosJson,
+    @ParkingSpots, @ParkingType, @AvailableDate,
+    @UtilitiesJson, @AmenitiesJson,
     'Pending',
     SYSUTCDATETIME()
 );", new
@@ -187,6 +197,12 @@ VALUES
                 OwnerIdPhotoUrl = ownerIdPrimaryUrl,
                 OwnerIdPhotosJson = ownerIdPhotosJson,
                 PhotosJson = photosJson,
+                NumberOfUnits = form.NumberOfUnits,
+                ParkingSpots = form.ParkingSpots,
+                ParkingType = string.IsNullOrWhiteSpace(form.ParkingType) ? null : form.ParkingType.Trim(),
+                AvailableDate = DateTime.TryParse(form.AvailableDate, out var avDate) ? (DateTime?)avDate : null,
+                UtilitiesJson = string.IsNullOrWhiteSpace(form.UtilitiesJson) ? null : form.UtilitiesJson,
+                AmenitiesJson = string.IsNullOrWhiteSpace(form.AmenitiesJson) ? null : form.AmenitiesJson
             });
 
             // Send confirmation email to landlord
