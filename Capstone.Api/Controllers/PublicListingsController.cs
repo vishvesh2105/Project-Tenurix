@@ -51,6 +51,20 @@ public sealed class PublicListingsController : ControllerBase
 
         public string? MediaUrl { get; set; }
 
+        public string? Description { get; set; }
+        public string? PhotosJson { get; set; }
+        public string? PropertySubType { get; set; }
+        public string? LeaseTerm { get; set; }
+        public bool? IsShortTerm { get; set; }
+        public bool? IsFurnished { get; set; }
+        public int? YearBuilt { get; set; }
+        public int? NumberOfFloors { get; set; }
+        public int? NumberOfUnits { get; set; }
+        public int? ParkingSpots { get; set; }
+        public string? ParkingType { get; set; }
+        public DateTime? AvailableDate { get; set; }
+        public string? UtilitiesJson { get; set; }
+        public string? AmenitiesJson { get; set; }
     }
 
 
@@ -157,6 +171,20 @@ SELECT TOP 1
     p.Bathrooms,
     p.RentAmount,
     p.MediaUrl,
+    p.Description,
+    p.PhotosJson,
+    p.PropertySubType,
+    p.LeaseTerm,
+    p.IsShortTerm,
+    p.IsFurnished,
+    p.YearBuilt,
+    p.NumberOfFloors,
+    p.NumberOfUnits,
+    p.ParkingSpots,
+    p.ParkingType,
+    p.AvailableDate,
+    p.UtilitiesJson,
+    p.AmenitiesJson
 FROM dbo.Listings l
 JOIN dbo.Properties p ON p.PropertyId = l.PropertyId
 WHERE
