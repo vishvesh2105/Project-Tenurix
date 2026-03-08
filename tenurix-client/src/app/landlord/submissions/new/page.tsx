@@ -115,6 +115,12 @@ export default function NewSubmission() {
   const [description, setDescription] = useState("");
 
   // Additional details
+  const [availableDate, setAvailableDate] = useState("");
+  const [yearBuilt, setYearBuilt] = useState("");
+  const [numberOfFloors, setNumberOfFloors] = useState("");
+  const [numberOfUnits, setNumberOfUnits] = useState("");
+  const [parkingSpots, setParkingSpots] = useState("");
+  const [parkingType, setParkingType] = useState("");
 
   // Utilities & Amenities
   const [selectedUtilities, setSelectedUtilities] = useState<string[]>([]);
@@ -199,6 +205,12 @@ export default function NewSubmission() {
     if (description.trim()) fd.append("Description", description);
 
     // Additional details
+    if (availableDate) fd.append("AvailableDate", availableDate);
+    if (yearBuilt) fd.append("YearBuilt", yearBuilt);
+    if (numberOfFloors) fd.append("NumberOfFloors", numberOfFloors);
+    if (numberOfUnits) fd.append("NumberOfUnits", numberOfUnits);
+    if (parkingSpots) fd.append("ParkingSpots", parkingSpots);
+    if (parkingType) fd.append("ParkingType", parkingType);
 
     // JSON arrays
 
@@ -411,15 +423,19 @@ export default function NewSubmission() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Available Date</label>
+              <input type="date" className={inputClass} value={availableDate} onChange={(e) => setAvailableDate(e.target.value)} />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Year Built</label>
+              <input className={inputClass} inputMode="numeric" placeholder="e.g. 2020" value={yearBuilt} onChange={(e) => setYearBuilt(e.target.value)} />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Number of Floors</label>
+              <input className={inputClass} inputMode="numeric" value={numberOfFloors} onChange={(e) => setNumberOfFloors(e.target.value)} />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Number of Units</label>
+              <input className={inputClass} inputMode="numeric" value={numberOfUnits} onChange={(e) => setNumberOfUnits(e.target.value)} />
             </div>
           </div>
 
@@ -429,9 +445,11 @@ export default function NewSubmission() {
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">
                 <span className="inline-flex items-center gap-1"><Car className="h-3.5 w-3.5" /> Parking Spots</span>
               </label>
+              <input className={inputClass} inputMode="numeric" placeholder="0" value={parkingSpots} onChange={(e) => setParkingSpots(e.target.value)} />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Parking Type</label>
+              <select className={inputClass} value={parkingType} onChange={(e) => setParkingType(e.target.value)}>
                 <option value="">Select...</option>
                 {PARKING_TYPES.map((t) => (
                   <option key={t} value={t}>{t}</option>
