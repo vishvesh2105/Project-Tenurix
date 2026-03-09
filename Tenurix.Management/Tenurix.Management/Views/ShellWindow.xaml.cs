@@ -45,12 +45,10 @@ namespace Tenurix.Management.Views
                 if (!string.IsNullOrWhiteSpace(me.PhotoBase64))
                 {
                     HeaderAvatar.Source = Base64ToImage(me.PhotoBase64);
-                    HeaderAvatarFallback.Visibility = Visibility.Collapsed;
                 }
                 else
                 {
                     HeaderAvatar.Source = null;
-                    HeaderAvatarFallback.Visibility = Visibility.Visible;
                 }
 
                 // If name changed server-side, keep initials consistent
@@ -64,7 +62,6 @@ namespace Tenurix.Management.Views
             catch
             {
                 HeaderAvatar.Source = null;
-                HeaderAvatarFallback.Visibility = Visibility.Visible;
             }
         }
 
@@ -113,11 +110,15 @@ namespace Tenurix.Management.Views
 
             NavProps.IsEnabled = Has("REVIEW_PROPERTY") || Has("APPROVE_PROPERTY");
             NavApps.IsEnabled = Has("REVIEW_LEASE_APP") || Has("APPROVE_LEASE_APP");
+            NavIssues.IsEnabled = Has("MANAGE_ISSUES");
+            NavLandlords.IsEnabled = Has("VIEW_LANDLORD_PORTFOLIO");
             NavListings.IsEnabled = Has("VIEW_LISTINGS") || Has("MANAGE_LISTINGS") || true; // keep visible; adjust key if you have one
 
+            // Employees tab: only visible for users with MANAGE_USERS (Manager role)
             // TeamLead and Staff won't see this tab at all
             if (Has("MANAGE_USERS"))
             {
+                NavEmployees.IsEnabled = true;
             }
             else
             {
@@ -136,15 +137,22 @@ namespace Tenurix.Management.Views
 
         private void Apps_Click(object sender, RoutedEventArgs e)
         {
+            Navigate(new LeaseApplicationsPage(_api));
         }
 
+        private void Issues_Click(object sender, RoutedEventArgs e)
         {
+            Navigate(new IssuesPage(_api));
         }
 
+        private void Landlords_Click(object sender, RoutedEventArgs e)
         {
+            Navigate(new LandlordsPage(_api));
         }
 
+        private void Employees_Click(object sender, RoutedEventArgs e)
         {
+            Navigate(new EmployeesPage(_api, _session));
         }
 
         private void Listings_Click(object sender, RoutedEventArgs e)
