@@ -37,6 +37,11 @@ type ListingDetail = {
   description: string | null;
   photosJson: string | null;
   propertySubType: string | null;
+  leaseTerm: string | null;
+  isShortTerm: boolean | null;
+  isFurnished: boolean | null;
+  yearBuilt: number | null;
+  numberOfFloors: number | null;
   numberOfUnits: number | null;
   availableDate: string | null;
 };
@@ -113,7 +118,12 @@ export default function ListingDetailPage() {
   if (row) {
     aboutRows.push({ label: "Property Type", value: row.propertyType });
     if (row.propertySubType) aboutRows.push({ label: "Sub-Type", value: row.propertySubType });
+    if (row.leaseTerm) aboutRows.push({ label: "Lease Term", value: row.leaseTerm });
     if (row.availableDate) aboutRows.push({ label: "Available Date", value: new Date(row.availableDate).toLocaleDateString("en-CA", { year: "numeric", month: "long", day: "numeric" }) });
+    if (row.isFurnished != null) aboutRows.push({ label: "Furnished", value: row.isFurnished ? "Yes" : "No" });
+    if (row.isShortTerm != null) aboutRows.push({ label: "Short-Term Rental", value: row.isShortTerm ? "Yes" : "No" });
+    if (row.yearBuilt) aboutRows.push({ label: "Year Built", value: String(row.yearBuilt) });
+    if (row.numberOfFloors) aboutRows.push({ label: "Number of Floors", value: String(row.numberOfFloors) });
     if (row.numberOfUnits) aboutRows.push({ label: "Number of Units", value: String(row.numberOfUnits) });
     }
   }
@@ -259,14 +269,19 @@ export default function ListingDetailPage() {
 
                   {/* Quick badges */}
                   <div className="flex flex-wrap gap-2 mt-4">
+                    {row.isFurnished && (
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 border border-indigo-100 px-3 py-1.5 text-xs font-semibold text-indigo-600">
+                        <Sofa className="h-3.5 w-3.5" /> Furnished
                       </span>
                     )}
+                    {row.isShortTerm && (
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-600">
                         <Clock className="h-3.5 w-3.5" /> Short-Term
                       </span>
                     )}
+                    {row.leaseTerm && (
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600">
+                        <Calendar className="h-3.5 w-3.5" /> {row.leaseTerm}
                       </span>
                     )}
                   </div>
@@ -411,6 +426,7 @@ export default function ListingDetailPage() {
                       { label: "Bedrooms", value: row.bedrooms != null ? `${row.bedrooms} bed${row.bedrooms !== 1 ? "s" : ""}` : "N/A" },
                       { label: "Bathrooms", value: row.bathrooms != null ? `${row.bathrooms} bath${row.bathrooms !== 1 ? "s" : ""}` : "N/A" },
                       ...(row.availableDate ? [{ label: "Available", value: new Date(row.availableDate).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }) }] : []),
+                      ...(row.leaseTerm ? [{ label: "Lease", value: row.leaseTerm }] : []),
                     ].map((item) => (
                       <div key={item.label} className="flex justify-between text-sm py-1">
                         <span className="text-slate-500">{item.label}</span>
