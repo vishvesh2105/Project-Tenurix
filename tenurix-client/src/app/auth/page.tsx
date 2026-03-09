@@ -140,10 +140,12 @@ function AuthPageInner() {
             </div>
 
             <div className="relative space-y-4">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm hover:bg-white/10 transition-colors">
                 <p className="text-sm font-semibold">Client Portal</p>
                 <p className="text-xs text-white/50 mt-1">Browse listings, apply for leases, manage payments</p>
               </div>
 
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm hover:bg-white/10 transition-colors">
                 <p className="text-sm font-semibold">Landlord Portal</p>
                 <p className="text-xs text-white/50 mt-1">Submit properties, manage tenants, track income</p>
               </div>
@@ -183,6 +185,7 @@ function AuthPageInner() {
                 <button
                   type="button"
                   onClick={() => setRole("client")}
+                  className={`rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
                     role === "client"
                       ? "bg-white text-indigo-600 shadow-sm"
                       : "text-slate-500 hover:text-slate-900"
@@ -194,6 +197,7 @@ function AuthPageInner() {
                 <button
                   type="button"
                   onClick={() => setRole("landlord")}
+                  className={`rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
                     role === "landlord"
                       ? "bg-white text-indigo-600 shadow-sm"
                       : "text-slate-500 hover:text-slate-900"
