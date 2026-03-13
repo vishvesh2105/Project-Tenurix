@@ -120,6 +120,7 @@ function ListingsContent() {
       if (propertyType) urlP.set("propertyType", propertyType);
       const urlQs = urlP.toString();
       const url = urlQs ? `${window.location.pathname}?${urlQs}` : window.location.pathname;
+      window.history.replaceState(null, "", url);
     }
 
     if (!mountedRef.current) {
