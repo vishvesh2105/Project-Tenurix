@@ -53,3 +53,7 @@ Run tests with `npm test`.
 ## Linting
 
 Run `npm run lint` to check for issues.
+
+## Troubleshooting
+
+If you encounter issues, try deleting `node_modules` and `.next`, then reinstalling.
