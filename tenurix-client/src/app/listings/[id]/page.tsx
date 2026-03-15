@@ -43,7 +43,11 @@ type ListingDetail = {
   yearBuilt: number | null;
   numberOfFloors: number | null;
   numberOfUnits: number | null;
+  parkingSpots: number | null;
+  parkingType: string | null;
   availableDate: string | null;
+  utilitiesJson: string | null;
+  amenitiesJson: string | null;
 };
 
 function parseJsonArray(json: string | null | undefined): string[] {
@@ -109,6 +113,8 @@ export default function ListingDetailPage() {
     if (src) photos.push(src);
   }
 
+  const utilities = row ? parseJsonArray(row.utilitiesJson) : [];
+  const amenities = row ? parseJsonArray(row.amenitiesJson) : [];
 
   function prevPhoto() { setActivePhoto((p) => (p <= 0 ? photos.length - 1 : p - 1)); }
   function nextPhoto() { setActivePhoto((p) => (p >= photos.length - 1 ? 0 : p + 1)); }
@@ -125,6 +131,8 @@ export default function ListingDetailPage() {
     if (row.yearBuilt) aboutRows.push({ label: "Year Built", value: String(row.yearBuilt) });
     if (row.numberOfFloors) aboutRows.push({ label: "Number of Floors", value: String(row.numberOfFloors) });
     if (row.numberOfUnits) aboutRows.push({ label: "Number of Units", value: String(row.numberOfUnits) });
+    if (row.parkingSpots != null && row.parkingSpots > 0) {
+      aboutRows.push({ label: "Parking", value: `${row.parkingSpots} spot${row.parkingSpots !== 1 ? "s" : ""}${row.parkingType ? ` (${row.parkingType})` : ""}` });
     }
   }
 
@@ -305,33 +313,46 @@ export default function ListingDetailPage() {
                   ))}
                 </div>
 
+                {/* Parking Section */}
+                {(row.parkingSpots != null && row.parkingSpots > 0) && (
                   <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
                         <Car className="h-5 w-5 text-slate-600" />
                       </div>
                       <div>
+                        <h2 className="font-bold text-slate-800 text-sm">Parking Available</h2>
+                        <p className="text-xs text-slate-400">Dedicated parking included</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="flex items-baseline gap-1.5">
+                        <span className="text-3xl font-extrabold text-slate-900">{row.parkingSpots}</span>
+                        <span className="text-sm text-slate-500 font-medium">spot{row.parkingSpots !== 1 ? "s" : ""}</span>
                       </div>
+                      {row.parkingType && (
                         <span className="rounded-full bg-indigo-50 border border-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-600">
+                          {row.parkingType}
                         </span>
                       )}
                     </div>
                   </div>
                 )}
 
+                {/* Utilities */}
+                {utilities.length > 0 && (
                   <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-5">
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100">
                         <Zap className="h-5 w-5 text-amber-600" />
                       </div>
                       <div>
+                        <h2 className="font-bold text-slate-800 text-sm">Utilities Included</h2>
+                        <p className="text-xs text-slate-400">The following utilities are included in rent</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      {utilities.map((u) => {
                         const Icon = UTILITY_ICONS[u] || Zap;
                         return (
                           <div key={u} className="flex items-center gap-2.5 rounded-xl border border-amber-100 bg-amber-50/50 px-3.5 py-3 text-sm">
@@ -346,15 +367,20 @@ export default function ListingDetailPage() {
                   </div>
                 )}
 
+                {/* Amenities */}
+                {amenities.length > 0 && (
                   <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-5">
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100">
                         <Dumbbell className="h-5 w-5 text-emerald-600" />
                       </div>
                       <div>
+                        <h2 className="font-bold text-slate-800 text-sm">Amenities</h2>
+                        <p className="text-xs text-slate-400">{amenities.length} amenities available</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      {amenities.map((a) => {
                         const Icon = AMENITY_ICONS[a] || CheckCircle2;
                         return (
                           <div key={a} className="flex items-center gap-2.5 rounded-xl border border-emerald-100 bg-emerald-50/50 px-3.5 py-3 text-sm">
@@ -413,6 +439,7 @@ export default function ListingDetailPage() {
                       <span className="text-base font-medium text-indigo-200 ml-1">/month</span>
                     </div>
                     <p className="mt-1.5 text-xs text-indigo-200">
+                      {utilities.length > 0 ? `Includes ${utilities.length} utilit${utilities.length !== 1 ? "ies" : "y"}` : "Utilities not included"}
                     </p>
                   </div>
 
