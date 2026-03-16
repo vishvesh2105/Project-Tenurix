@@ -115,12 +115,16 @@ export default function NewSubmission() {
   const [description, setDescription] = useState("");
 
   // Additional details
+  const [propertySubType, setPropertySubType] = useState("");
+  const [leaseTerm, setLeaseTerm] = useState("");
   const [availableDate, setAvailableDate] = useState("");
   const [yearBuilt, setYearBuilt] = useState("");
   const [numberOfFloors, setNumberOfFloors] = useState("");
   const [numberOfUnits, setNumberOfUnits] = useState("");
   const [parkingSpots, setParkingSpots] = useState("");
   const [parkingType, setParkingType] = useState("");
+  const [isFurnished, setIsFurnished] = useState(false);
+  const [isShortTerm, setIsShortTerm] = useState(false);
 
   // Utilities & Amenities
   const [selectedUtilities, setSelectedUtilities] = useState<string[]>([]);
@@ -205,12 +209,16 @@ export default function NewSubmission() {
     if (description.trim()) fd.append("Description", description);
 
     // Additional details
+    if (propertySubType) fd.append("PropertySubType", propertySubType);
+    if (leaseTerm) fd.append("LeaseTerm", leaseTerm);
     if (availableDate) fd.append("AvailableDate", availableDate);
     if (yearBuilt) fd.append("YearBuilt", yearBuilt);
     if (numberOfFloors) fd.append("NumberOfFloors", numberOfFloors);
     if (numberOfUnits) fd.append("NumberOfUnits", numberOfUnits);
     if (parkingSpots) fd.append("ParkingSpots", parkingSpots);
     if (parkingType) fd.append("ParkingType", parkingType);
+    fd.append("IsShortTerm", String(isShortTerm));
+    fd.append("IsFurnished", String(isFurnished));
 
     // JSON arrays
 
@@ -407,6 +415,7 @@ export default function NewSubmission() {
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Property Sub-Type</label>
+              <select className={inputClass} value={propertySubType} onChange={(e) => setPropertySubType(e.target.value)}>
                 <option value="">Select...</option>
                 {PROPERTY_SUBTYPES.map((t) => (
                   <option key={t} value={t}>{t}</option>
@@ -415,6 +424,7 @@ export default function NewSubmission() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Lease Term</label>
+              <select className={inputClass} value={leaseTerm} onChange={(e) => setLeaseTerm(e.target.value)}>
                 <option value="">Select...</option>
                 {LEASE_TERMS.map((t) => (
                   <option key={t} value={t}>{t}</option>
@@ -462,21 +472,29 @@ export default function NewSubmission() {
           <div className="mt-4 flex flex-wrap gap-3">
             <button
               type="button"
+              onClick={() => setIsFurnished(!isFurnished)}
               className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                isFurnished
                   ? "border-indigo-600 bg-indigo-50 text-indigo-700"
                   : "border-slate-200 bg-white text-slate-600 hover:border-indigo-300"
               }`}
             >
+              <div className={`h-4 w-4 rounded border-2 flex items-center justify-center ${isFurnished ? "border-indigo-600 bg-indigo-600" : "border-slate-300"}`}>
+                {isFurnished && <span className="text-white text-[10px]">✓</span>}
               </div>
               Furnished
             </button>
             <button
               type="button"
+              onClick={() => setIsShortTerm(!isShortTerm)}
               className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                isShortTerm
                   ? "border-indigo-600 bg-indigo-50 text-indigo-700"
                   : "border-slate-200 bg-white text-slate-600 hover:border-indigo-300"
               }`}
             >
+              <div className={`h-4 w-4 rounded border-2 flex items-center justify-center ${isShortTerm ? "border-indigo-600 bg-indigo-600" : "border-slate-300"}`}>
+                {isShortTerm && <span className="text-white text-[10px]">✓</span>}
               </div>
               Short-Term Rental
             </button>
