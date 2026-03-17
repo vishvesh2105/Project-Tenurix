@@ -221,6 +221,7 @@ export default function NewSubmission() {
     fd.append("IsFurnished", String(isFurnished));
 
     // JSON arrays
+    if (selectedUtilities.length > 0) fd.append("UtilitiesJson", JSON.stringify(selectedUtilities));
 
     if (ownerIdPhotos.length > 0) {
       ownerIdPhotos.forEach((f) => fd.append("OwnerIdPhotos", f));
@@ -509,6 +510,7 @@ export default function NewSubmission() {
             </div>
             <div>
               <h2 className="text-sm font-bold text-slate-800">Utilities Included</h2>
+              <p className="text-xs text-slate-400">Select utilities included in rent</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -531,6 +533,7 @@ export default function NewSubmission() {
             </div>
             <div>
               <h2 className="text-sm font-bold text-slate-800">Amenities</h2>
+              <p className="text-xs text-slate-400">Select available amenities</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
