@@ -481,7 +481,254 @@ public TenurixApiClient(string baseUrl)
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                 ) ?? throw new Exception("Invalid property detail response (null).");
             }
-}
-}
-}
+            catch (Exception ex)
+            {
+                // Give a useful error showing actual payload
+                throw new Exception(
+                    $"Failed to parse JSON from {path}. Body was:\n{lastRaw}\n\nParser error: {ex.Message}"
+                );
+            }
+        }
+
+        // If we got here, either both routes were 404 or returned non-JSON
+        var status = lastRes == null ? "NO RESPONSE" : $"HTTP {(int)lastRes.StatusCode}";
+        throw new Exception(
+            $"Failed to load submission. Tried: {string.Join(" OR ", pathsToTry)}.\n" +
+            $"Last result: {status} from {lastPath}\n" +
+            $"Last body:\n{lastRaw}"
+        );
+    }
+
+
+    public async Task HoldPropertySubmissionAsync(int propertyId, string? reason)
+    {
+        var body = new { Reason = reason };
+        using var res = await _http.PostAsJsonAsync($"management/property-submissions/{propertyId}/hold", body);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+    }
+
+    public async Task<LeaseApplicationDetailDto> GetLeaseApplicationDetailAsync(int applicationId)
+    {
+        using var res = await _http.GetAsync($"management/lease-applications/{applicationId}");
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+
+        return JsonSerializer.Deserialize<LeaseApplicationDetailDto>(raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+            ?? throw new Exception("Invalid lease detail response.");
+    }
+
+    public async Task<IssueDetailDto> GetIssueDetailAsync(int issueId)
+    {
+        using var res = await _http.GetAsync($"management/issues/{issueId}");
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+
+        return JsonSerializer.Deserialize<IssueDetailDto>(raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+            ?? throw new Exception("Invalid issue detail response.");
+    }
+
+    public async Task UpdateIssueStatusAsync(int issueId, string status)
+    {
+        var body = new { Status = status };
+        using var res = await _http.PostAsJsonAsync($"management/issues/{issueId}/status", body);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+    }
+
+    public async Task<List<IssueDto>> GetIssuesAsync(string status = "All")
+    {
+        using var res = await _http.GetAsync($"management/issues?status={Uri.EscapeDataString(status)}");
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+        return JsonSerializer.Deserialize<List<IssueDto>>(raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+    }
+
+
+    public sealed class AttendancePunchRequest
+    {
+        public string EventType { get; set; } = "";
+        public string? BreakType { get; set; }
+        public DateTime? OccurredAtUtc { get; set; }
+        public string Source { get; set; } = "App";
+        public string? Note { get; set; }
+    }
+
+    public sealed class AttendanceTimeBlockDto
+    {
+        public string Type { get; set; } = "";     // Shift / Break
+        public string? BreakType { get; set; }
+        public DateTime StartUtc { get; set; }
+        public DateTime EndUtc { get; set; }
+        public int? StartEventId { get; set; }
+        public int? EndEventId { get; set; }
+    }
+
+    public sealed class AttendanceDailySummaryDto
+    {
+        public string Day { get; set; } = ""; // serialize DateOnly as string easily
+        public int MinutesWorked { get; set; }
+        public int MinutesBreaks { get; set; }
+        public int MinutesShift { get; set; }
+        public int ShortBreakCount { get; set; }
+    }
+
+    public async Task<int> PunchAttendanceAsync(AttendancePunchRequest req)
+    {
+        using var res = await _http.PostAsJsonAsync("management/attendance/punch", req);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+
+        using var doc = JsonDocument.Parse(raw);
+        return doc.RootElement.GetProperty("eventId").GetInt32();
+    }
+
+    public async Task<List<AttendanceTimeBlockDto>> GetMyAttendanceBlocksAsync(DateTime fromUtc, DateTime toUtc)
+    {
+        var url = $"management/attendance/me/blocks?from={Uri.EscapeDataString(fromUtc.ToString("o"))}&to={Uri.EscapeDataString(toUtc.ToString("o"))}";
+        using var res = await _http.GetAsync(url);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+
+        return JsonSerializer.Deserialize<List<AttendanceTimeBlockDto>>(raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+    }
+
+    public async Task<List<AttendanceTimeBlockDto>> GetUserAttendanceBlocksAsync(int userId, DateTime fromUtc, DateTime toUtc)
+    {
+        var url = $"management/attendance/users/{userId}/blocks?from={Uri.EscapeDataString(fromUtc.ToString("o"))}&to={Uri.EscapeDataString(toUtc.ToString("o"))}";
+        using var res = await _http.GetAsync(url);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+
+        return JsonSerializer.Deserialize<List<AttendanceTimeBlockDto>>(raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+    }
+
+    public async Task<List<AttendanceDailySummaryDto>> GetUserAttendanceSummaryAsync(int userId, DateTime fromUtc, DateTime toUtc)
+    {
+        var url = $"management/attendance/users/{userId}/summary?from={Uri.EscapeDataString(fromUtc.ToString("o"))}&to={Uri.EscapeDataString(toUtc.ToString("o"))}";
+        using var res = await _http.GetAsync(url);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+
+        // Day is DateOnly in API; easiest is string in WPF DTO
+        return JsonSerializer.Deserialize<List<AttendanceDailySummaryDto>>(raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+    }
+
+    public async Task VoidAttendanceEventAsync(int eventId, string reason)
+    {
+        using var res = await _http.PostAsJsonAsync($"management/attendance/events/{eventId}/void", new { Reason = reason });
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+    }
+
+    public async Task<int> AdminPunchAttendanceAsync(int userId, AttendancePunchRequest req)
+    {
+        using var res = await _http.PostAsJsonAsync($"management/attendance/users/{userId}/admin-punch", req);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+
+        using var doc = JsonDocument.Parse(raw);
+        return doc.RootElement.GetProperty("eventId").GetInt32();
+    }
+
+    public async Task<List<LandlordDocumentDto>> GetLandlordDocumentsAsync(int landlordId, string type = "ID_PROOF", bool includeDeleted = false)
+    {
+        var url = $"management/landlords/{landlordId}/documents?type={Uri.EscapeDataString(type)}&includeDeleted={(includeDeleted ? "true" : "false")}";
+        using var res = await _http.GetAsync(url);
+        var raw = await res.Content.ReadAsStringAsync();
+
+        if (!res.IsSuccessStatusCode)
+            throw new Exception($"HTTP {(int)res.StatusCode} {res.ReasonPhrase}\nURL: {res.RequestMessage?.RequestUri}\nBody:\n{raw}");
+
+        return JsonSerializer.Deserialize<List<LandlordDocumentDto>>(raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+    }
+
+    public async Task RequestLandlordDocumentAsync(int landlordId, string docType = "ID_PROOF", string? message = null)
+    {
+        var body = JsonSerializer.Serialize(new { docType, message });
+        using var res = await _http.PostAsync(
+            $"management/landlords/{landlordId}/documents/request",
+            new StringContent(body, Encoding.UTF8, "application/json"));
+
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode)
+            throw new Exception($"HTTP {(int)res.StatusCode} {res.ReasonPhrase}\nBody:\n{raw}");
+    }
+
+    public async Task DeleteLandlordDocumentAsync(int documentId, string? reason = null)
+    {
+        var body = JsonSerializer.Serialize(new { reason });
+        using var res = await _http.PostAsync(
+            $"management/documents/{documentId}/delete",
+            new StringContent(body, Encoding.UTF8, "application/json"));
+
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode)
+            throw new Exception($"HTTP {(int)res.StatusCode} {res.ReasonPhrase}\nBody:\n{raw}");
+    }
+
+    public async Task ReviewLandlordDocumentAsync(int documentId, string status, string? note = null)
+    {
+        var body = JsonSerializer.Serialize(new { status, note });
+        using var res = await _http.PostAsync(
+            $"management/documents/{documentId}/review",
+            new StringContent(body, Encoding.UTF8, "application/json"));
+
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode)
+            throw new Exception($"HTTP {(int)res.StatusCode} {res.ReasonPhrase}\nBody:\n{raw}");
+    }
+
+    public async Task<List<LandlordPropertyDto>> GetLandlordPropertiesAsync(int landlordId)
+    {
+        using var res = await _http.GetAsync($"management/landlords/{landlordId}/properties");
+        var raw = await res.Content.ReadAsStringAsync();
+
+        if (!res.IsSuccessStatusCode)
+            throw new Exception($"HTTP {(int)res.StatusCode} {res.ReasonPhrase}\nURL: {res.RequestMessage?.RequestUri}\nBody:\n{raw}");
+
+        return JsonSerializer.Deserialize<List<LandlordPropertyDto>>(
+            raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        ) ?? new();
+    }
+
+
+
+
+    public async Task<List<ListingDto>> GetAllListingsAsync()
+    {
+        using var res = await _http.GetAsync("management/listings");
+        var raw = await res.Content.ReadAsStringAsync();
+
+        if (!res.IsSuccessStatusCode)
+            throw new Exception($"HTTP {(int)res.StatusCode} {res.ReasonPhrase}\nURL: {res.RequestMessage?.RequestUri}\nBody:\n{raw}");
+
+        return JsonSerializer.Deserialize<List<ListingDto>>(raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+    }
+
+    public async Task ToggleListingStatusAsync(int listingId)
+    {
+        using var res = await _http.PostAsync($"management/listings/{listingId}/toggle-status", null);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode)
+            throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+    }
+
+
+
+
+
+
+
+
+
 }
