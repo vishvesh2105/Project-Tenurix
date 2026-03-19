@@ -40,8 +40,14 @@
                                  Content="Property Submissions" Tag="" Click="Props_Click"/>
                     <RadioButton x:Name="NavApps" Style="{StaticResource NavRadio}" GroupName="Nav"
                                  Content="Lease Applications" Tag="" Click="Apps_Click"/>
+                    <RadioButton x:Name="NavIssues" Style="{StaticResource NavRadio}" GroupName="Nav"
+                                 Content="Issues" Tag="" Click="Issues_Click"/>
                     <RadioButton x:Name="NavListings" Style="{StaticResource NavRadio}" GroupName="Nav"
                                  Content="Listings" Tag="" Click="Listings_Click"/>
+                    <RadioButton x:Name="NavLandlords" Style="{StaticResource NavRadio}" GroupName="Nav"
+                                 Content="Landlord Portfolio" Tag="" Click="Landlords_Click"/>
+                    <RadioButton x:Name="NavEmployees" Style="{StaticResource NavRadio}" GroupName="Nav"
+                                 Content="Employees" Tag="" Click="Employees_Click"/>
                     <RadioButton x:Name="NavChangePw" Style="{StaticResource NavRadio}" GroupName="Nav"
                                  Content="Change Password" Tag="" Click="ChangePassword_Click"/>
                 </StackPanel>

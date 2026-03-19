@@ -1,0 +1,529 @@
+<Window x:Class="Tenurix.Management.Views.Windows.PropertySubmissionReviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Property Details"
+        Width="1020" Height="860"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource Bg}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Property Details"
+                   FontSize="22" FontWeight="SemiBold"
+                   Margin="0,0,0,16"/>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <!-- ============================================ -->
+                <!-- LANDLORD PERSONAL DETAILS                    -->
+                <!-- ============================================ -->
+                <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="LANDLORD PERSONAL DETAILS" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextMuted}" Margin="0,0,0,12"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Width="60" Height="60" CornerRadius="30"
+                                    BorderBrush="{StaticResource Border}" BorderThickness="1"
+                                    ClipToBounds="True" VerticalAlignment="Top">
+                                <Grid>
+                                    <Image x:Name="LandlordAvatar" Stretch="UniformToFill"/>
+                                    <TextBlock x:Name="LandlordAvatarFallback" Text="&#xE77B;"
+                                               FontFamily="Segoe MDL2 Assets" FontSize="26"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextMuted}"/>
+                                </Grid>
+                            </Border>
+
+                            <Grid Grid.Column="1" Margin="14,0,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="24"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="12"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel>
+                                    <TextBlock Text="FULL NAME" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
+                                    <TextBlock x:Name="LandlordNameText" FontSize="15" FontWeight="SemiBold"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="EMAIL" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
+                                    <TextBlock x:Name="LandlordEmailText" FontSize="13"
+                                               Foreground="{StaticResource Text}" TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2">
+                                    <TextBlock Text="PHONE" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
+                                    <TextBlock x:Name="LandlordPhoneText" FontSize="13"
+                                               Foreground="{StaticResource Text}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ============================================ -->
+                <!-- PROPERTY OVERVIEW (type, address, rent)      -->
+                <!-- ============================================ -->
+                <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="PROPERTY OVERVIEW" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextMuted}" Margin="0,0,0,12"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="24"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Left column -->
+                            <StackPanel>
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="PROPERTY TYPE" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock x:Name="PropTypeText" FontSize="14" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource Text}"/>
+                                        <TextBlock x:Name="PropSubTypeText" FontSize="13"
+                                                   Foreground="{StaticResource TextMuted}" Margin="6,1,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="ADDRESS" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                    <TextBlock x:Name="PropAddressLine1Text" FontSize="13" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="PropAddressLine2Text" FontSize="12"
+                                               Foreground="{StaticResource TextMuted}" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="PropCityProvinceText" FontSize="12"
+                                               Foreground="{StaticResource TextMuted}"/>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="MONTHLY RENT" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                    <TextBlock x:Name="PropRentText" FontSize="18" FontWeight="Bold"
+                                               Foreground="#166534"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Right column -->
+                            <StackPanel Grid.Column="2">
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel>
+                                        <TextBlock Text="BEDROOMS" FontSize="10" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                        <TextBlock x:Name="PropBedsText" FontSize="16" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="BATHROOMS" FontSize="10" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                        <TextBlock x:Name="PropBathsText" FontSize="16" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="LEASE TERM" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                    <TextBlock x:Name="PropLeaseTermText" FontSize="13"/>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="AVAILABLE FROM" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                    <TextBlock x:Name="PropAvailDateText" FontSize="13"/>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="DESCRIPTION" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                    <TextBlock x:Name="PropDescText" FontSize="12" TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextMuted}" MaxHeight="80"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ============================================ -->
+                <!-- PROPERTY FEATURES (2-col details grid)       -->
+                <!-- ============================================ -->
+                <Border x:Name="FeaturesCard" Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12"
+                        Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="PROPERTY FEATURES" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextMuted}" Margin="0,0,0,12"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Margin="0,0,12,10">
+                                <TextBlock Text="FURNISHED" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                <TextBlock x:Name="FurnishedText" FontSize="13" FontWeight="Medium"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="0,0,12,10">
+                                <TextBlock Text="SHORT TERM" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                <TextBlock x:Name="ShortTermText" FontSize="13" FontWeight="Medium"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Margin="0,0,12,10">
+                                <TextBlock Text="YEAR BUILT" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                <TextBlock x:Name="YearBuiltText" FontSize="13" FontWeight="Medium"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="3" Margin="0,0,0,10">
+                                <TextBlock Text="FLOORS" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                <TextBlock x:Name="FloorsText" FontSize="13" FontWeight="Medium"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Margin="0,0,12,0">
+                                <TextBlock Text="UNITS" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                <TextBlock x:Name="UnitsText" FontSize="13" FontWeight="Medium"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,12,0">
+                                <TextBlock Text="PARKING SPOTS" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                <TextBlock x:Name="ParkingSpotsText" FontSize="13" FontWeight="Medium"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="0,0,0,0">
+                                <TextBlock Text="PARKING TYPE" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
+                                <TextBlock x:Name="ParkingTypeText" FontSize="13" FontWeight="Medium"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ============================================ -->
+                <!-- UTILITIES INCLUDED                           -->
+                <!-- ============================================ -->
+                <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="UTILITIES INCLUDED" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextMuted}" Margin="0,0,0,10"/>
+                        <TextBlock x:Name="NoUtilitiesText" Text="No utilities specified"
+                                   Foreground="{StaticResource TextMuted}" FontSize="12" FontStyle="Italic"
+                                   Visibility="Collapsed"/>
+                        <ItemsControl x:Name="UtilitiesList">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#EEF2FF" CornerRadius="8"
+                                            Padding="12,7" Margin="0,0,8,8">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xE10B;" FontFamily="Segoe MDL2 Assets"
+                                                       FontSize="11" Foreground="#4338CA"
+                                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                            <TextBlock Text="{Binding}" FontSize="12"
+                                                       Foreground="#4338CA" FontWeight="Medium"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- ============================================ -->
+                <!-- AMENITIES                                    -->
+                <!-- ============================================ -->
+                <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="AMENITIES" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextMuted}" Margin="0,0,0,10"/>
+                        <TextBlock x:Name="NoAmenitiesText" Text="No amenities specified"
+                                   Foreground="{StaticResource TextMuted}" FontSize="12" FontStyle="Italic"
+                                   Visibility="Collapsed"/>
+                        <ItemsControl x:Name="AmenitiesList">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#F0FDF4" CornerRadius="8"
+                                            Padding="12,7" Margin="0,0,8,8">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xE10B;" FontFamily="Segoe MDL2 Assets"
+                                                       FontSize="11" Foreground="#166534"
+                                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                            <TextBlock Text="{Binding}" FontSize="12"
+                                                       Foreground="#166534" FontWeight="Medium"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- ============================================ -->
+                <!-- PROPERTY PHOTOS Gallery                      -->
+                <!-- ============================================ -->
+                <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,12">
+                            <TextBlock Text="PROPERTY PHOTOS" FontSize="10" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="PropPhotoCountText"
+                                       Foreground="{StaticResource TextMuted}"
+                                       FontSize="11" Margin="8,0,0,0"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+
+                        <TextBlock x:Name="NoPropertyPhotosText"
+                                   Text="No property photos uploaded."
+                                   Foreground="{StaticResource TextMuted}"
+                                   Visibility="Collapsed"/>
+
+                        <!-- Main selected photo -->
+                        <Border x:Name="PropMainBorder"
+                                Height="320" CornerRadius="10"
+                                BorderBrush="{StaticResource Border}" BorderThickness="1"
+                                ClipToBounds="True"
+                                Margin="0,0,0,10"
+                                Visibility="Collapsed">
+                            <Grid>
+                                <Image x:Name="PropMainImage"
+                                       Stretch="Uniform"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                                <Button x:Name="PropPrevBtn"
+                                        Content="&#x276E;"
+                                        Width="36" Height="36"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Margin="8,0,0,0"
+                                        FontSize="16"
+                                        Click="PropPrev_Click"/>
+                                <Button x:Name="PropNextBtn"
+                                        Content="&#x276F;"
+                                        Width="36" Height="36"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,8,0"
+                                        FontSize="16"
+                                        Click="PropNext_Click"/>
+                                <Border HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                                        Background="#AA000000" CornerRadius="8"
+                                        Padding="8,3" Margin="0,0,0,8">
+                                    <TextBlock x:Name="PropIndexText"
+                                               Foreground="White" FontSize="12"
+                                               HorizontalAlignment="Center"/>
+                                </Border>
+                                <Button Content="&#x26F6; Full Size"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,8,8,0"
+                                        Padding="8,4"
+                                        FontSize="11"
+                                        Click="PropFullSize_Click"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Thumbnail strip -->
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Disabled">
+                            <ItemsControl x:Name="PropertyPhotosList">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Margin="0,0,8,0" Padding="0"
+                                                BorderThickness="0"
+                                                Background="Transparent"
+                                                Click="PropThumb_Click"
+                                                Tag="{Binding Index}">
+                                            <Border Width="110" Height="76"
+                                                    CornerRadius="8"
+                                                    BorderThickness="2"
+                                                    BorderBrush="{Binding BorderColor}"
+                                                    ClipToBounds="True">
+                                                <Image Source="{Binding Image}"
+                                                       Stretch="UniformToFill"/>
+                                            </Border>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+
+                <!-- ============================================ -->
+                <!-- LANDLORD ID DOCUMENTS Gallery                -->
+                <!-- ============================================ -->
+                <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,4">
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,12">
+                            <TextBlock Text="LANDLORD ID DOCUMENTS" FontSize="10" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="IdPhotoCountText"
+                                       Foreground="{StaticResource TextMuted}"
+                                       FontSize="11" Margin="8,0,0,0"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+
+                        <TextBlock x:Name="NoIdPhotosText"
+                                   Text="No ID documents uploaded."
+                                   Foreground="{StaticResource TextMuted}"
+                                   Visibility="Collapsed"/>
+
+                        <Border x:Name="IdMainBorder"
+                                Height="260" CornerRadius="10"
+                                BorderBrush="{StaticResource Border}" BorderThickness="1"
+                                ClipToBounds="True"
+                                Margin="0,0,0,10"
+                                Visibility="Collapsed">
+                            <Grid>
+                                <Image x:Name="IdMainImage"
+                                       Stretch="Uniform"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                                <Button x:Name="IdPrevBtn"
+                                        Content="&#x276E;"
+                                        Width="36" Height="36"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Margin="8,0,0,0"
+                                        FontSize="16"
+                                        Click="IdPrev_Click"/>
+                                <Button x:Name="IdNextBtn"
+                                        Content="&#x276F;"
+                                        Width="36" Height="36"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,8,0"
+                                        FontSize="16"
+                                        Click="IdNext_Click"/>
+                                <Border HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                                        Background="#AA000000" CornerRadius="8"
+                                        Padding="8,3" Margin="0,0,0,8">
+                                    <TextBlock x:Name="IdIndexText"
+                                               Foreground="White" FontSize="12"
+                                               HorizontalAlignment="Center"/>
+                                </Border>
+                                <Button Content="&#x26F6; Full Size"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,8,8,0"
+                                        Padding="8,4"
+                                        FontSize="11"
+                                        Click="IdFullSize_Click"/>
+                            </Grid>
+                        </Border>
+
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Disabled">
+                            <ItemsControl x:Name="OwnerIdPhotosList">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Margin="0,0,8,0" Padding="0"
+                                                BorderThickness="0"
+                                                Background="Transparent"
+                                                Click="IdThumb_Click"
+                                                Tag="{Binding Index}">
+                                            <Border Width="110" Height="76"
+                                                    CornerRadius="8"
+                                                    BorderThickness="2"
+                                                    BorderBrush="{Binding BorderColor}"
+                                                    ClipToBounds="True">
+                                                <Image Source="{Binding Image}"
+                                                       Stretch="UniformToFill"/>
+                                            </Border>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Action bar -->
+        <Border Grid.Row="2" Background="{StaticResource Panel}" CornerRadius="12"
+                Padding="14" Margin="0,12,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="ReasonBox"
+                         Height="40"
+                         VerticalAlignment="Center"
+                         ToolTip="Reason (required for Reject / optional for Hold)"/>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Reject"
+                            Width="100" Height="40" Margin="10,0,0,0"
+                            Background="#7F1D1D"
+                            Click="Reject_Click"/>
+                    <Button Content="Hold"
+                            Width="100" Height="40" Margin="10,0,0,0"
+                            Background="#A16207"
+                            Click="Hold_Click"/>
+                    <Button Content="Approve"
+                            Width="100" Height="40" Margin="10,0,0,0"
+                            Background="#166534"
+                            Click="Approve_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
