@@ -79,6 +79,7 @@ export default function IssuesPage() {
         fd.append("Description", formDesc.trim());
         fd.append("Image", formImage);
 
+        res = await apiFetch("/client/issues/upload", {
           method: "POST",
           body: fd,
         });
@@ -177,6 +178,7 @@ export default function IssuesPage() {
                 />
               </div>
               <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5">Upload Image (optional)</label>
                 <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <ImagePlus className="h-4 w-4 text-slate-400" />
