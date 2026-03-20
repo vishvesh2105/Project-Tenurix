@@ -23,6 +23,7 @@ namespace Tenurix.Management.Views
 
             // Header text
             UserText.Text = $"Welcome, {_session.FullName}";
+            RoleText.Text = $"Role: {_session.RoleName}";
 
             // Initials badge (top-right)
             UserInitialsText.Text = GetInitials(_session.FullName);
@@ -45,10 +46,12 @@ namespace Tenurix.Management.Views
                 if (!string.IsNullOrWhiteSpace(me.PhotoBase64))
                 {
                     HeaderAvatar.Source = Base64ToImage(me.PhotoBase64);
+                    HeaderAvatarFallback.Visibility = Visibility.Collapsed;
                 }
                 else
                 {
                     HeaderAvatar.Source = null;
+                    HeaderAvatarFallback.Visibility = Visibility.Visible;
                 }
 
                 // If name changed server-side, keep initials consistent
@@ -62,6 +65,7 @@ namespace Tenurix.Management.Views
             catch
             {
                 HeaderAvatar.Source = null;
+                HeaderAvatarFallback.Visibility = Visibility.Visible;
             }
         }
 
@@ -118,10 +122,12 @@ namespace Tenurix.Management.Views
             // TeamLead and Staff won't see this tab at all
             if (Has("MANAGE_USERS"))
             {
+                NavEmployees.Visibility = Visibility.Visible;
                 NavEmployees.IsEnabled = true;
             }
             else
             {
+                NavEmployees.Visibility = Visibility.Collapsed;
             }
         }
 

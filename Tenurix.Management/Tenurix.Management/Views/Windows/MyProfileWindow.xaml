@@ -1,0 +1,134 @@
+<Window x:Class="Tenurix.Management.Views.Windows.MyProfileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="My Profile"
+        Height="640" Width="540"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource Bg}">
+
+    <Window.Resources>
+        <Style x:Key="ProfLabel" TargetType="TextBlock">
+            <Setter Property="FontSize"    Value="10"/>
+            <Setter Property="FontWeight"  Value="SemiBold"/>
+            <Setter Property="Foreground"  Value="{StaticResource TextMuted}"/>
+            <Setter Property="Margin"      Value="0,0,0,6"/>
+        </Style>
+        <Style x:Key="ProfInput" TargetType="TextBox">
+            <Setter Property="Height"      Value="40"/>
+            <Setter Property="Padding"     Value="12,0"/>
+            <Setter Property="FontSize"    Value="13"/>
+            <Setter Property="Background"  Value="{StaticResource Panel2}"/>
+            <Setter Property="Foreground"  Value="{StaticResource Text}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Border}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin"      Value="0,0,0,14"/>
+        </Style>
+        <Style x:Key="ProfBtn" TargetType="Button">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize"    Value="13"/>
+            <Setter Property="FontWeight"  Value="SemiBold"/>
+            <Setter Property="Height"      Value="42"/>
+            <Setter Property="Cursor"      Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="16"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="My Profile" FontSize="22" FontWeight="Bold"
+                   Foreground="{StaticResource Text}"/>
+
+        <!-- Content -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <Border Background="{StaticResource Panel}" CornerRadius="14" Padding="20">
+                <StackPanel>
+
+                    <!-- Photo Section -->
+                    <StackPanel HorizontalAlignment="Center" Margin="0,0,0,20">
+                        <Border Width="100" Height="100" CornerRadius="50"
+                                Background="{StaticResource Panel2}"
+                                BorderBrush="{StaticResource Border}" BorderThickness="2"
+                                Margin="0,0,0,10">
+                            <Grid>
+                                <Image x:Name="PhotoImage" Stretch="UniformToFill">
+                                    <Image.Clip>
+                                        <EllipseGeometry Center="50,50" RadiusX="49" RadiusY="49"/>
+                                    </Image.Clip>
+                                </Image>
+                                <TextBlock x:Name="NoPhotoText"
+                                           Text="No Photo"
+                                           Foreground="{StaticResource TextMuted}" FontSize="11"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <Button Content="Choose Photo..."
+                                Style="{StaticResource ProfBtn}"
+                                Background="{StaticResource Panel2}" Foreground="{StaticResource Text}"
+                                Height="32" Padding="16,0"
+                                HorizontalAlignment="Center"
+                                Click="ChoosePhoto_Click"/>
+                    </StackPanel>
+
+                    <!-- Email (read-only) -->
+                    <TextBlock Text="EMAIL" Style="{StaticResource ProfLabel}"/>
+                    <Border Background="{StaticResource Panel2}" CornerRadius="6" Padding="12,10" Margin="0,0,0,14">
+                        <TextBlock x:Name="EmailText" FontSize="13"
+                                   Foreground="{StaticResource TextMuted}"/>
+                    </Border>
+
+                    <!-- Full Name -->
+                    <TextBlock Text="FULL NAME" Style="{StaticResource ProfLabel}"/>
+                    <TextBox x:Name="FullNameBox" Style="{StaticResource ProfInput}"/>
+
+                    <!-- Phone -->
+                    <TextBlock Text="PHONE" Style="{StaticResource ProfLabel}"/>
+                    <TextBox x:Name="PhoneBox" Style="{StaticResource ProfInput}"/>
+
+                    <!-- Job Title -->
+                    <TextBlock Text="JOB TITLE" Style="{StaticResource ProfLabel}"/>
+                    <TextBox x:Name="JobTitleBox" Style="{StaticResource ProfInput}"/>
+
+                    <!-- Department -->
+                    <TextBlock Text="DEPARTMENT" Style="{StaticResource ProfLabel}"/>
+                    <TextBox x:Name="DepartmentBox" Style="{StaticResource ProfInput}"/>
+
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
+
+        <!-- Footer Buttons -->
+        <Grid Grid.Row="3" Margin="0,14,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Cancel"
+                    Style="{StaticResource ProfBtn}"
+                    Background="{StaticResource Panel2}" Foreground="{StaticResource Text}"
+                    Click="Cancel_Click"/>
+            <Button Grid.Column="2" Content="Save Profile"
+                    Style="{StaticResource ProfBtn}"
+                    Background="{StaticResource Accent}" Foreground="White"
+                    Click="Save_Click"/>
+        </Grid>
+    </Grid>
+</Window>
