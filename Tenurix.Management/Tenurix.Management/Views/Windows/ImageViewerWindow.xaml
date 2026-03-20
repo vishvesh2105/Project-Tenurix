@@ -1,0 +1,98 @@
+<Window x:Class="Tenurix.Management.Views.Windows.ImageViewerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Viewer" Height="720" Width="1100"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource Bg}">
+
+    <Window.Resources>
+        <Style x:Key="TbBtn" TargetType="Button">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize"    Value="13"/>
+            <Setter Property="FontWeight"  Value="SemiBold"/>
+            <Setter Property="Cursor"      Value="Hand"/>
+            <Setter Property="Height"      Value="34"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Accent}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <Border Background="{StaticResource Panel}" Padding="14,10"
+                BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1">
+            <DockPanel>
+                <TextBlock x:Name="TitleText" FontSize="16" FontWeight="SemiBold"
+                           Foreground="{StaticResource Text}" VerticalAlignment="Center"
+                           DockPanel.Dock="Left"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Fit" Width="60" Padding="6,0" Margin="0,0,6,0"
+                            Style="{StaticResource TbBtn}"
+                            Background="{StaticResource AccentSoft}" Foreground="{StaticResource Accent}"
+                            Click="Fit_Click"/>
+                    <Button Content="+" Width="38" Padding="6,0" Margin="0,0,6,0"
+                            Style="{StaticResource TbBtn}"
+                            Background="{StaticResource Panel2}" Foreground="{StaticResource Text}"
+                            Click="ZoomIn_Click"/>
+                    <Button Content="-" Width="38" Padding="6,0" Margin="0,0,6,0"
+                            Style="{StaticResource TbBtn}"
+                            Background="{StaticResource Panel2}" Foreground="{StaticResource Text}"
+                            Click="ZoomOut_Click"/>
+                    <Button Content="Close" Width="70" Padding="6,0"
+                            Style="{StaticResource TbBtn}"
+                            Background="{StaticResource DangerSoft}" Foreground="{StaticResource Danger}"
+                            Click="Close_Click"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Image Area -->
+        <Border Grid.Row="1" Margin="14" CornerRadius="12"
+                Background="{StaticResource Panel}" BorderBrush="{StaticResource Border}"
+                BorderThickness="1">
+            <Grid>
+                <TextBlock x:Name="StatusText"
+                           Foreground="{StaticResource TextMuted}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           FontSize="16" Text="Loading..."/>
+
+                <ScrollViewer x:Name="Scroll"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Image x:Name="MainImage"
+                               Stretch="Uniform"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               RenderTransformOrigin="0.5,0.5"
+                               Visibility="Collapsed">
+                            <Image.RenderTransform>
+                                <ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1"/>
+                            </Image.RenderTransform>
+                        </Image>
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

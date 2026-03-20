@@ -37,6 +37,7 @@ export default function LandlordPropertiesPage() {
       setError("");
       const res = await apiFetch("/landlord/properties");
       const data = await safeJson<any>(res);
+      if (!res.ok) throw new Error(data?.message || data?.title || "Failed to load properties. Please try again.");
       setRows(Array.isArray(data) ? data : []);
     } catch (e: any) {
       setError(e?.message ?? "Failed to load properties");
