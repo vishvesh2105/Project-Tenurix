@@ -54,6 +54,8 @@ type PropertyDetail = {
   parkingSpots: number | null;
   parkingType: string | null;
   availableDate: string | null;
+  utilitiesJson: string | null;
+  amenitiesJson: string | null;
   listingId: number | null;
   listingStatus: string | null;
 };
@@ -116,6 +118,7 @@ export default function LandlordPropertyDetailPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [idFiles, setIdFiles] = useState<File[]>([]);
 
+  // Photo gallery
   const [selectedPhoto, setSelectedPhoto] = useState(0);
 
   async function loadProperty() {
@@ -214,7 +217,11 @@ export default function LandlordPropertyDetailPage() {
   const photos: string[] = (() => {
     try { return property.photosJson ? JSON.parse(property.photosJson) : []; } catch { return []; }
   })();
+  const utilities: string[] = (() => {
+    try { return property.utilitiesJson ? JSON.parse(property.utilitiesJson) : []; } catch { return []; }
   })();
+  const amenities: string[] = (() => {
+    try { return property.amenitiesJson ? JSON.parse(property.amenitiesJson) : []; } catch { return []; }
   })();
 
   const fullAddress = [
@@ -332,6 +339,7 @@ export default function LandlordPropertyDetailPage() {
           </div>
         )}
 
+        {/* Photo Gallery */}
         {photos.length > 0 && (
           <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
             <div className="relative h-72 sm:h-96 bg-slate-100">
@@ -412,8 +420,12 @@ export default function LandlordPropertyDetailPage() {
           </div>
         )}
 
+        {/* Utilities */}
+        {utilities.length > 0 && (
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">Utilities Included</h3>
             <div className="flex flex-wrap gap-2">
+              {utilities.map((u) => (
                 <span key={u} className="flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-xs font-medium text-emerald-700">
                   {UTILITY_ICONS[u] || <Zap className="h-4 w-4" />}
                   {u}
@@ -423,8 +435,12 @@ export default function LandlordPropertyDetailPage() {
           </div>
         )}
 
+        {/* Amenities */}
+        {amenities.length > 0 && (
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">Amenities</h3>
             <div className="flex flex-wrap gap-2">
+              {amenities.map((a) => (
                 <span key={a} className="flex items-center gap-1.5 rounded-full bg-indigo-50 border border-indigo-200 px-3 py-1.5 text-xs font-medium text-indigo-700">
                   {AMENITY_ICONS[a] || <CheckCircle2 className="h-4 w-4" />}
                   {a}
