@@ -61,3 +61,7 @@ If you encounter issues, try deleting `node_modules` and `.next`, then reinstall
 ## Contributing
 
 Please create a branch and submit a pull request.
+
+## Browser Support
+
+Chrome, Firefox, Safari, Edge (latest versions).
