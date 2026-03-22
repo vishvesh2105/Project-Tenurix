@@ -40,6 +40,12 @@ public sealed class LandlordSubmissionsController : ControllerBase
 
         public string? Description { get; set; }
 
+        public string? PropertySubType { get; set; }
+        public string? LeaseTerm { get; set; }
+        public bool? IsShortTerm { get; set; }
+        public bool? IsFurnished { get; set; }
+        public int? YearBuilt { get; set; }
+        public int? NumberOfFloors { get; set; }
         public int? NumberOfUnits { get; set; }
         public int? ParkingSpots { get; set; }
         public string? ParkingType { get; set; }
@@ -160,6 +166,8 @@ INSERT INTO dbo.Properties
     OwnerIdPhotoUrl,
     OwnerIdPhotosJson,
     PhotosJson,
+    PropertySubType, LeaseTerm, IsShortTerm, IsFurnished,
+    YearBuilt, NumberOfFloors, NumberOfUnits,
     ParkingSpots, ParkingType, AvailableDate,
     UtilitiesJson, AmenitiesJson,
     SubmissionStatus,
@@ -176,6 +184,8 @@ VALUES
     @OwnerIdPhotoUrl,
     @OwnerIdPhotosJson,
     @PhotosJson,
+    @PropertySubType, @LeaseTerm, @IsShortTerm, @IsFurnished,
+    @YearBuilt, @NumberOfFloors, @NumberOfUnits,
     @ParkingSpots, @ParkingType, @AvailableDate,
     @UtilitiesJson, @AmenitiesJson,
     'Pending',
@@ -197,6 +207,12 @@ VALUES
                 OwnerIdPhotoUrl = ownerIdPrimaryUrl,
                 OwnerIdPhotosJson = ownerIdPhotosJson,
                 PhotosJson = photosJson,
+                PropertySubType = string.IsNullOrWhiteSpace(form.PropertySubType) ? null : form.PropertySubType.Trim(),
+                LeaseTerm = string.IsNullOrWhiteSpace(form.LeaseTerm) ? null : form.LeaseTerm.Trim(),
+                IsShortTerm = form.IsShortTerm,
+                IsFurnished = form.IsFurnished,
+                YearBuilt = form.YearBuilt,
+                NumberOfFloors = form.NumberOfFloors,
                 NumberOfUnits = form.NumberOfUnits,
                 ParkingSpots = form.ParkingSpots,
                 ParkingType = string.IsNullOrWhiteSpace(form.ParkingType) ? null : form.ParkingType.Trim(),

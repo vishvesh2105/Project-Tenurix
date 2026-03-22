@@ -74,6 +74,8 @@ export default function IssuesPage() {
       let res: Response;
 
       if (formImage) {
+        // Use FormData with image → POST /client/issues/upload
+        const fd = new FormData();
         fd.append("LeaseId", formLeaseId);
         fd.append("IssueType", formType.trim());
         fd.append("Description", formDesc.trim());
