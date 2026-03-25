@@ -1,9 +1,12 @@
 using System.Windows;
+using Tenurix.Management.Client.Api;
 
 namespace Tenurix.Management.Views;
 
 public partial class LoginWindow : Window
 {
+    private readonly TenurixApiClient _api =
+        new TenurixApiClient("https://capstone-api-aryan.azurewebsites.net/");
 
     public LoginWindow()
     {
