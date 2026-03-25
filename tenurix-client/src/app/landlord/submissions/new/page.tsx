@@ -222,6 +222,7 @@ export default function NewSubmission() {
 
     // JSON arrays
     if (selectedUtilities.length > 0) fd.append("UtilitiesJson", JSON.stringify(selectedUtilities));
+    if (selectedAmenities.length > 0) fd.append("AmenitiesJson", JSON.stringify(selectedAmenities));
 
     if (ownerIdPhotos.length > 0) {
       ownerIdPhotos.forEach((f) => fd.append("OwnerIdPhotos", f));
