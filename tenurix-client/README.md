@@ -65,3 +65,7 @@ Please create a branch and submit a pull request.
 ## Browser Support
 
 Chrome, Firefox, Safari, Edge (latest versions).
+
+## License
+
+This project is part of the Conestoga College Capstone program.
