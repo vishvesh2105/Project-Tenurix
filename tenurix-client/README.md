@@ -69,3 +69,7 @@ Chrome, Firefox, Safari, Edge (latest versions).
 ## License
 
 This project is part of the Conestoga College Capstone program.
+
+## Credits
+
+Built by the Tenurix team.
