@@ -19,6 +19,7 @@ public partial class VerificationWindow : Window
     // Attempt limits
     private int _verifyAttempts;
     private const int MaxVerifyAttempts = 3;
+    private int _resendCount;
     private const int MaxResends = 2;
     private bool _isBlocked;
 
@@ -58,6 +59,7 @@ public partial class VerificationWindow : Window
                 ResendLabel.Visibility = Visibility.Collapsed;
 
                 // Only show resend button if under limit and not blocked
+                if (_resendCount < MaxResends && !_isBlocked)
                     ResendBtn.Visibility = Visibility.Visible;
             }
             else
@@ -83,6 +85,7 @@ public partial class VerificationWindow : Window
 
         // Show block countdown
         ResendLabel.Visibility = Visibility.Visible;
+        ResendLabel.Text = "Too many attempts. Try again in ";
         TimerText.Visibility = Visibility.Visible;
         AttemptsText.Visibility = Visibility.Collapsed;
 
@@ -98,6 +101,7 @@ public partial class VerificationWindow : Window
 
                 // Reset attempts
                 _verifyAttempts = 0;
+                _resendCount = 0;
 
                 // Re-enable
                 VerifyBtn.IsEnabled = true;
@@ -134,6 +138,7 @@ public partial class VerificationWindow : Window
         }
         else if (left <= 0)
         {
+            AttemptsText.Text = "No attempts remaining";
             AttemptsText.Visibility = Visibility.Visible;
         }
         else
@@ -250,6 +255,7 @@ public partial class VerificationWindow : Window
 
             if (_verifyAttempts >= MaxVerifyAttempts)
             {
+                ErrorText.Text = "Too many failed attempts. Please wait before trying again.";
                 StartBlockTimer(300); // Block for 5 minutes
                 return;
             }
@@ -275,6 +281,7 @@ public partial class VerificationWindow : Window
     {
         if (_isBlocked) return;
 
+        _resendCount++;
 
         ResendBtn.IsEnabled = false;
         ResendBtn.Content = "Sending...";
@@ -293,8 +300,10 @@ public partial class VerificationWindow : Window
             UpdateAttemptsLeft();
             ErrorText.Text = "";
 
+            if (_resendCount >= MaxResends)
             {
                 // No more resends — show message and block
+                ErrorText.Text = "Maximum resend limit reached. This is your last code.";
                 ResendBtn.Visibility = Visibility.Collapsed;
                 StartResendTimer();
             }
