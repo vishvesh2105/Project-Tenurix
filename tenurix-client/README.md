@@ -73,3 +73,7 @@ This project is part of the Conestoga College Capstone program.
 ## Credits
 
 Built by the Tenurix team.
+
+## Acknowledgments
+
+Thanks to our mentors and the Conestoga College faculty.

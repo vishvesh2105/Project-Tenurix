@@ -1,0 +1,31 @@
+# Build outputs
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local secrets — NEVER commit these
+appsettings.Local.json
+appsettings.Production.json
+secrets.json
+.env
+
+# NuGet
+*.nupkg
+packages/
+
+# VS files
+.vs/
+*.rsuser
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Upload folder (user-uploaded content — not committed to source control)
+wwwroot/uploads/
+
