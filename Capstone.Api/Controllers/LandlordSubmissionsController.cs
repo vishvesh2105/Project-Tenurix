@@ -17,12 +17,14 @@ public sealed class LandlordSubmissionsController : ControllerBase
     private readonly SqlConnectionFactory _db;
     private readonly IWebHostEnvironment _env;
     private readonly EmailService _email;
+    private readonly NotificationService _notifications;
 
-    public LandlordSubmissionsController(SqlConnectionFactory db, IWebHostEnvironment env, EmailService email)
+    public LandlordSubmissionsController(SqlConnectionFactory db, IWebHostEnvironment env, EmailService email, NotificationService notifications)
     {
         _db = db;
         _env = env;
         _email = email;
+        _notifications = notifications;
     }
 
     public sealed class CreateSubmissionForm
@@ -234,6 +236,14 @@ VALUES
                     var (subj, html) = EmailTemplates.PropertySubmitted((string)user.FullName, address);
                     _email.SendInBackground((string)user.Email, subj, html);
                 }
+
+                // Notify management staff about new submission
+                var mgmtIds = await _notifications.GetManagementUserIdsAsync();
+                var addr = $"{form.AddressLine1.Trim()}, {form.City.Trim()}";
+                await _notifications.CreateForMultipleAsync(mgmtIds, "NewPropertySubmission",
+                    "New Property Submission",
+                    $"A new property at {addr} has been submitted for review.",
+                    null, propertyId, "Property");
             }
             catch { }
 

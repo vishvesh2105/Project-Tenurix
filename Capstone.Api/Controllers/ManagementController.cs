@@ -20,11 +20,22 @@ public sealed class ManagementController : ControllerBase
 {
     private readonly SqlConnectionFactory _db;
     private readonly EmailService _email;
+    private readonly NotificationService _notifications;
 
-    public ManagementController(SqlConnectionFactory db, EmailService email)
+    public ManagementController(SqlConnectionFactory db, EmailService email, NotificationService notifications)
     {
         _db = db;
         _email = email;
+        _notifications = notifications;
+    }
+
+    // Helper: get landlord UserId by property ID (for notifications)
+    private async Task<int?> GetLandlordUserIdByProperty(int propertyId)
+    {
+        await using var conn = _db.Create();
+        return await conn.ExecuteScalarAsync<int?>(@"
+            SELECT p.OwnerUserId FROM dbo.Properties p WHERE p.PropertyId = @PropertyId",
+            new { PropertyId = propertyId });
     }
 
     // Helper: look up landlord info by property ID
@@ -703,8 +714,15 @@ END
                     var (subj, html) = EmailTemplates.PropertyApproved(name, address, req?.Note);
                     _email.SendInBackground(email, subj, html);
                 }
+
+                // In-app notification to landlord
+                var ownerId = await GetLandlordUserIdByProperty(propertyId);
+                if (ownerId.HasValue)
+                    await _notifications.CreateAsync(ownerId.Value, "PropertyApproved",
+                        "Property Approved", "Your property submission has been approved and is now listed.",
+                        $"/landlord/properties/{propertyId}", propertyId, "Property");
             }
-            catch { /* email failure should not break the response */ }
+            catch { /* email/notification failure should not break the response */ }
 
             return Ok();
         }
@@ -768,6 +786,12 @@ WHERE PropertyId=@PropertyId {statusFilter};
                     var (subj, html) = EmailTemplates.PropertyRejected(name, address, req?.Note);
                     _email.SendInBackground(email, subj, html);
                 }
+
+                var ownerId = await GetLandlordUserIdByProperty(propertyId);
+                if (ownerId.HasValue)
+                    await _notifications.CreateAsync(ownerId.Value, "PropertyRejected",
+                        "Property Submission Rejected", req?.Note ?? "Your property submission was not approved.",
+                        $"/landlord/properties/{propertyId}", propertyId, "Property");
             }
             catch { }
 
@@ -1127,6 +1151,16 @@ END
                     var (subj, html) = EmailTemplates.NewLeaseApplication(lName, tName, tEmail, addr);
                     _email.SendInBackground(lEmail, subj, html);
                 }
+
+                // In-app notifications
+                await _notifications.CreateAsync((int)app.ClientUserId, "LeaseApplicationApproved",
+                    "Lease Application Approved", "Your lease application has been approved!",
+                    $"/leases", applicationId, "LeaseApplication");
+                var ownerIdAppr = await GetLandlordUserIdByProperty((int)app.PropertyId);
+                if (ownerIdAppr.HasValue)
+                    await _notifications.CreateAsync(ownerIdAppr.Value, "LeaseApplicationApproved",
+                        "Lease Application Approved", "A lease application for your property has been approved.",
+                        null, applicationId, "LeaseApplication");
             }
             catch { }
 
@@ -1192,6 +1226,11 @@ WHERE la.ApplicationId = @ApplicationId;
                         var (subj, html) = EmailTemplates.LeaseApplicationRejected(tName, addr, req?.Note);
                         _email.SendInBackground(tEmail, subj, html);
                     }
+
+                    // In-app notification to tenant
+                    await _notifications.CreateAsync((int)appRow.ClientUserId, "LeaseApplicationRejected",
+                        "Lease Application Rejected", req?.Note ?? "Your lease application was not approved.",
+                        $"/applications", applicationId, "LeaseApplication");
                 }
             }
             catch { }
@@ -1710,6 +1749,17 @@ WHERE i.IssueId = @IssueId;
                             oName, (string)issueRow.IssueType, (string)issueRow.Address, "Previous", status);
                         _email.SendInBackground(oEmail, subj, html);
                     }
+
+                    // In-app notifications
+                    var statusLabel = status == "InProgress" ? "In Progress" : status;
+                    await _notifications.CreateAsync((int)issueRow.ReportedById, "IssueStatusChanged",
+                        "Issue Status Updated",
+                        $"Your {(string)issueRow.IssueType} issue at {(string)issueRow.Address} is now {statusLabel}.",
+                        $"/issues", issueId, "Issue");
+                    await _notifications.CreateAsync((int)issueRow.OwnerUserId, "IssueStatusChanged",
+                        "Issue Status Updated",
+                        $"A {(string)issueRow.IssueType} issue at {(string)issueRow.Address} is now {statusLabel}.",
+                        null, issueId, "Issue");
                 }
             }
             catch { }

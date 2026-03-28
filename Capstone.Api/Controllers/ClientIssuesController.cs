@@ -16,12 +16,14 @@ public sealed class ClientIssuesController : ControllerBase
     private readonly SqlConnectionFactory _db;
     private readonly IWebHostEnvironment _env;
     private readonly EmailService _email;
+    private readonly NotificationService _notifications;
 
-    public ClientIssuesController(SqlConnectionFactory db, IWebHostEnvironment env, EmailService email)
+    public ClientIssuesController(SqlConnectionFactory db, IWebHostEnvironment env, EmailService email, NotificationService notifications)
     {
         _db = db;
         _env = env;
         _email = email;
+        _notifications = notifications;
     }
 
     public class CreateIssueRequest
@@ -174,6 +176,13 @@ WHERE le.LeaseId = @LeaseId;
                         (string)issueInfo.OwnerName, (string)issueInfo.ReporterName,
                         issueType.Trim(), (string)issueInfo.Address, description.Trim());
                     _email.SendInBackground((string)issueInfo.OwnerEmail, subj2, html2);
+
+                    // In-app notification to landlord
+                    await _notifications.CreateAsync(
+                        (int)issueInfo.OwnerUserId, "NewIssueReported",
+                        "New Issue Reported",
+                        $"{(string)issueInfo.ReporterName} reported a {issueType.Trim()} issue at {(string)issueInfo.Address}",
+                        $"/issues/{issueId}", issueId, "Issue");
                 }
             }
             catch { }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/shell/NotificationBell";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { apiFetch } from "@/lib/api";
 
@@ -68,6 +69,9 @@ export function TopNav() {
               Browse Listings
             </Button>
           </Link>
+
+          {/* Notifications */}
+          <NotificationBell />
 
           {/* Profile */}
           <Link href="/profile">

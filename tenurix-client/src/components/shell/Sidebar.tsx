@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, FileText, ScrollText, AlertCircle,
-  CreditCard, Shield, Send, Building2, User,
+  CreditCard, Shield, Send, Building2, User, Bell,
 } from "lucide-react";
 import { useI18n } from "@/components/providers/I18nProvider";
 
@@ -31,6 +31,7 @@ export function Sidebar() {
     { href: "/leases", label: t("leases"), icon: ScrollText },
     { href: "/issues", label: t("issues"), icon: AlertCircle },
     { href: "/payments", label: t("payments"), icon: CreditCard },
+    { href: "/notifications", label: "Notifications", icon: Bell },
     { href: "/profile", label: t("profile"), icon: User },
     { href: "/security", label: t("security"), icon: Shield },
   ];
@@ -41,6 +42,7 @@ export function Sidebar() {
     { href: "/landlord/properties", label: t("properties"), icon: Building2 },
     { href: "/landlord/leases", label: t("leases"), icon: ScrollText },
     { href: "/landlord/issues", label: t("issues"), icon: AlertCircle },
+    { href: "/notifications", label: "Notifications", icon: Bell },
     { href: "/profile", label: t("profile"), icon: User },
     { href: "/security", label: t("security"), icon: Shield },
   ];

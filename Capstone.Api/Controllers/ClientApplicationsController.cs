@@ -17,12 +17,14 @@ public sealed class ClientApplicationsController : ControllerBase
     private readonly SqlConnectionFactory _db;
     private readonly IWebHostEnvironment _env;
     private readonly EmailService _email;
+    private readonly NotificationService _notifications;
 
-    public ClientApplicationsController(SqlConnectionFactory db, IWebHostEnvironment env, EmailService email)
+    public ClientApplicationsController(SqlConnectionFactory db, IWebHostEnvironment env, EmailService email, NotificationService notifications)
     {
         _db = db;
         _env = env;
         _email = email;
+        _notifications = notifications;
     }
 
     // Shared DTO for both JSON and FormData
@@ -239,6 +241,13 @@ WHERE l.ListingId = @ListingId;
                         (string)appInfo.OwnerName, (string)appInfo.TenantName,
                         (string)appInfo.TenantEmail, (string)appInfo.Address);
                     _email.SendInBackground((string)appInfo.OwnerEmail, subj2, html2);
+
+                    // In-app notification to landlord
+                    await _notifications.CreateAsync(
+                        (int)appInfo.OwnerUserId, "NewLeaseApplication",
+                        "New Lease Application",
+                        $"{(string)appInfo.TenantName} applied for {(string)appInfo.Address}",
+                        $"/applications/{applicationId}", applicationId, "LeaseApplication");
                 }
             }
             catch { }
