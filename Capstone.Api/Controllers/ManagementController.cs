@@ -21,12 +21,16 @@ public sealed class ManagementController : ControllerBase
     private readonly SqlConnectionFactory _db;
     private readonly EmailService _email;
     private readonly NotificationService _notifications;
+    private readonly LeaseDocumentService _leaseDoc;
+    private readonly IWebHostEnvironment _env;
 
-    public ManagementController(SqlConnectionFactory db, EmailService email, NotificationService notifications)
+    public ManagementController(SqlConnectionFactory db, EmailService email, NotificationService notifications, LeaseDocumentService leaseDoc, IWebHostEnvironment env)
     {
         _db = db;
         _email = email;
         _notifications = notifications;
+        _leaseDoc = leaseDoc;
+        _env = env;
     }
 
     // Helper: get landlord UserId by property ID (for notifications)
@@ -1163,6 +1167,70 @@ END
                         null, applicationId, "LeaseApplication");
             }
             catch { }
+
+            // Auto-generate lease agreement PDF
+            try
+            {
+                await using var pdfConn = _db.Create();
+                // Get the newly created LeaseId
+                var leaseId = await pdfConn.ExecuteScalarAsync<int?>(@"
+                    SELECT LeaseId FROM dbo.Leases WHERE ApplicationId = @ApplicationId;
+                ", new { ApplicationId = applicationId });
+
+                if (leaseId.HasValue)
+                {
+                    var docData = await pdfConn.QuerySingleOrDefaultAsync<dynamic>(@"
+                        SELECT
+                            le.LeaseId, le.LeaseStartDate, le.LeaseEndDate, le.CreatedAt AS IssuedDate,
+                            t.FullName AS TenantName, t.Email AS TenantEmail, t.Phone AS TenantPhone,
+                            ll.FullName AS LandlordName, ll.Email AS LandlordEmail,
+                            CONCAT(p.AddressLine1, ', ', p.City, ', ', p.Province) AS PropertyAddress,
+                            p.RentAmount,
+                            la.NumberOfOccupants, la.HasPets, la.PetDetails
+                        FROM dbo.Leases le
+                        JOIN dbo.Users t ON t.UserId = le.ClientUserId
+                        JOIN dbo.Users ll ON ll.UserId = le.OwnerUserId
+                        JOIN dbo.Listings l ON l.ListingId = le.ListingId
+                        JOIN dbo.Properties p ON p.PropertyId = l.PropertyId
+                        LEFT JOIN dbo.LeaseApplications la ON la.ApplicationId = le.ApplicationId
+                        WHERE le.LeaseId = @LeaseId;
+                    ", new { LeaseId = leaseId.Value });
+
+                    if (docData != null)
+                    {
+                        var leaseData = new LeaseDocumentData
+                        {
+                            LeaseId = (int)docData.LeaseId,
+                            IssuedDate = docData.IssuedDate ?? DateTime.UtcNow,
+                            TenantName = (string)(docData.TenantName ?? ""),
+                            TenantEmail = (string)(docData.TenantEmail ?? ""),
+                            TenantPhone = docData.TenantPhone as string,
+                            LandlordName = (string)(docData.LandlordName ?? ""),
+                            LandlordEmail = (string)(docData.LandlordEmail ?? ""),
+                            PropertyAddress = (string)(docData.PropertyAddress ?? ""),
+                            LeaseStartDate = (DateTime)docData.LeaseStartDate,
+                            LeaseEndDate = (DateTime)docData.LeaseEndDate,
+                            RentAmount = docData.RentAmount != null ? (decimal)docData.RentAmount : 0m,
+                            NumberOfOccupants = docData.NumberOfOccupants != null ? (int)docData.NumberOfOccupants : 1,
+                            HasPets = docData.HasPets != null && (bool)docData.HasPets,
+                            PetDetails = docData.PetDetails as string
+                        };
+
+                        var pdfBytes = _leaseDoc.GenerateLeaseAgreement(leaseData);
+
+                        var wwwroot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+                        var leaseDir = Path.Combine(wwwroot, "lease-docs");
+                        Directory.CreateDirectory(leaseDir);
+                        var fileName = $"lease-{leaseId.Value}.pdf";
+                        await System.IO.File.WriteAllBytesAsync(Path.Combine(leaseDir, fileName), pdfBytes);
+
+                        await pdfConn.ExecuteAsync(@"
+                            UPDATE dbo.Leases SET LeaseDocumentUrl = @Url WHERE LeaseId = @LeaseId;
+                        ", new { Url = $"/lease-docs/{fileName}", LeaseId = leaseId.Value });
+                    }
+                }
+            }
+            catch { /* PDF generation is non-critical */ }
 
             return Ok();
         }

@@ -446,6 +446,32 @@ public static class EmailTemplates
         );
     }
 
+    // ─── LEASE DOCUMENT ─────────────────────────────────────────────
+
+    public static (string subject, string html) LeaseDocumentReady(string tenantName, string address, int leaseId)
+    {
+        return (
+            $"Lease Agreement Ready — {address}",
+            Wrap("Lease Document Ready", $@"
+                <h2 style=""margin:0 0 6px;font-size:22px;color:{NAVY};font-weight:700;"">Lease Agreement Ready</h2>
+                <p style=""margin:0 0 20px;font-size:15px;color:#64748b;"">Hi {tenantName},</p>
+                <p style=""margin:0 0 16px;font-size:15px;color:#475569;line-height:1.6;"">
+                    Your lease agreement for <strong>{address}</strong> has been generated and is ready for your review and signature.
+                </p>
+                {InfoCard($@"
+                    <table cellpadding='0' cellspacing='0' width='100%'>
+                        {FieldRow("Document", $"Lease Agreement #{leaseId}")}
+                        {FieldRow("Property", address)}
+                        {FieldRow("Action Required", StatusPill("E-Sign", "#2563eb"))}
+                    </table>
+                ", "#bfdbfe", "#eff6ff")}
+                <p style=""margin:16px 0 0;font-size:14px;color:#64748b;line-height:1.5;"">
+                    Please log in to review the lease terms and digitally sign the agreement. You can also download the PDF from your leases page.
+                </p>
+            ")
+        );
+    }
+
     // ─── ID REQUEST ──────────────────────────────────────────────────
 
     public static (string subject, string html) NewIdRequested(string landlordName, string? message)

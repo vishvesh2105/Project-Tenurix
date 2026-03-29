@@ -77,6 +77,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddSingleton<EmailService>();
 builder.Services.AddSingleton<TwoFactorService>();
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddSingleton<LeaseDocumentService>();
 
 // JWT Auth
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Missing Jwt:Key");
