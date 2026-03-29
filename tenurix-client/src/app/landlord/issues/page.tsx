@@ -7,7 +7,8 @@ import { StatusBadge } from "@/components/tenurix/StatusBadge";
 import { useAuth } from "@/lib/useAuth";
 import { apiFetch, safeJson } from "@/lib/api";
 import { useI18n } from "@/components/providers/I18nProvider";
-import { AlertCircle, RefreshCw, MapPin, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { AlertCircle, RefreshCw, MapPin, User, ChevronRight, MessageSquare } from "lucide-react";
 
 type IssueRow = {
   issueId: number;
@@ -30,6 +31,7 @@ function fmtDate(d: string) {
 export default function LandlordIssuesPage() {
   const { isReady } = useAuth();
   const { t } = useI18n();
+  const router = useRouter();
   const [rows, setRows] = useState<IssueRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -120,7 +122,8 @@ export default function LandlordIssuesPage() {
               {rows.map((issue) => (
                 <div
                   key={issue.issueId}
-                  className="px-5 py-4 hover:bg-slate-50 transition-colors"
+                  className="px-5 py-4 hover:bg-slate-50 transition-colors cursor-pointer"
+                  onClick={() => router.push(`/landlord/issues/${issue.issueId}`)}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
@@ -138,6 +141,9 @@ export default function LandlordIssuesPage() {
                       </div>
                     </div>
                     <StatusBadge status={issue.status} />
+                    <div className="flex items-center gap-1 text-xs text-slate-400 ml-auto">
+                      <MessageSquare className="h-3.5 w-3.5" /> View <ChevronRight className="h-3 w-3" />
+                    </div>
                   </div>
 
                   <div className="mt-3 rounded-xl border border-slate-100 bg-slate-50 p-3">

@@ -7,7 +7,8 @@ import { StatusBadge } from "@/components/tenurix/StatusBadge";
 import { useAuth } from "@/lib/useAuth";
 import { apiFetch, safeJson } from "@/lib/api";
 import { useI18n } from "@/components/providers/I18nProvider";
-import { AlertCircle, RefreshCw, Plus, X, Send, ImagePlus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { AlertCircle, RefreshCw, Plus, X, Send, ImagePlus, ChevronRight, MessageSquare } from "lucide-react";
 
 type IssueRow = {
   issueId: number;
@@ -34,6 +35,7 @@ const ISSUE_TYPES = ["Plumbing", "Electrical", "Heating/Cooling", "Appliance", "
 export default function IssuesPage() {
   const { isReady } = useAuth();
   const { t } = useI18n();
+  const router = useRouter();
   const [rows, setRows] = useState<IssueRow[]>([]);
   const [leases, setLeases] = useState<LeaseOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -269,7 +271,11 @@ export default function IssuesPage() {
             </div>
             <div className="divide-y divide-slate-100">
               {rows.map((issue) => (
-                <div key={issue.issueId} className="px-5 py-4 hover:bg-slate-50 transition-colors">
+                <div
+                  key={issue.issueId}
+                  className="px-5 py-4 hover:bg-slate-50 transition-colors cursor-pointer"
+                  onClick={() => router.push(`/issues/${issue.issueId}`)}
+                >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-3">
@@ -278,10 +284,14 @@ export default function IssuesPage() {
                       </div>
                       <div className="mt-0.5 text-xs text-slate-400">{issue.propertyAddress} · {fmtDate(issue.createdAt)}</div>
                     </div>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      View <ChevronRight className="h-3 w-3" />
+                    </div>
                   </div>
                   <div className="mt-3 rounded-xl border border-slate-100 bg-slate-50 p-3">
                     <div className="text-xs text-slate-400 font-medium">{t("description")}</div>
-                    <div className="mt-1 text-sm text-slate-700">{issue.description}</div>
+                    <div className="mt-1 text-sm text-slate-700 line-clamp-2">{issue.description}</div>
                   </div>
                 </div>
               ))}
