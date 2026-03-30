@@ -32,6 +32,9 @@ public sealed class PublicListingsController : ControllerBase
         public decimal? RentAmount { get; set; }
 
         public string? MediaUrl { get; set; }
+
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
     }
 
     public sealed class PublicListingDetailDto
@@ -65,6 +68,9 @@ public sealed class PublicListingsController : ControllerBase
         public DateTime? AvailableDate { get; set; }
         public string? UtilitiesJson { get; set; }
         public string? AmenitiesJson { get; set; }
+
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
     }
 
 
@@ -96,7 +102,9 @@ SELECT
     p.Bedrooms,
     p.Bathrooms,
     p.RentAmount,
-    p.MediaUrl
+    p.MediaUrl,
+    p.Latitude,
+    p.Longitude
 FROM dbo.Listings l
 JOIN dbo.Properties p ON p.PropertyId = l.PropertyId
 WHERE
@@ -184,7 +192,9 @@ SELECT TOP 1
     p.ParkingType,
     p.AvailableDate,
     p.UtilitiesJson,
-    p.AmenitiesJson
+    p.AmenitiesJson,
+    p.Latitude,
+    p.Longitude
 FROM dbo.Listings l
 JOIN dbo.Properties p ON p.PropertyId = l.PropertyId
 WHERE

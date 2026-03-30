@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { PublicShell } from "@/components/public/PublicShell";
@@ -13,6 +13,8 @@ import {
   PawPrint, Plug, Calendar, Layers, Users, Sofa,
   CheckCircle2, Clock, Shield,
 } from "lucide-react";
+
+const ListingsMap = lazy(() => import("@/components/map/ListingsMap"));
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/+$/, "");
 
@@ -48,6 +50,8 @@ type ListingDetail = {
   availableDate: string | null;
   utilitiesJson: string | null;
   amenitiesJson: string | null;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 function parseJsonArray(json: string | null | undefined): string[] {
@@ -427,6 +431,39 @@ export default function ListingDetailPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Location Map */}
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100">
+                      <MapPin className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h2 className="font-bold text-slate-800 text-sm">Location</h2>
+                      <p className="text-xs text-slate-400">{row.addressLine1}, {row.city}{row.province ? `, ${row.province}` : ""}</p>
+                    </div>
+                  </div>
+                  <div className="rounded-xl overflow-hidden border border-slate-200" style={{ height: 350 }}>
+                    <Suspense fallback={<div className="h-full flex items-center justify-center text-sm text-slate-400 bg-slate-50">Loading map...</div>}>
+                      <ListingsMap
+                        listings={[{
+                          listingId: row.listingId,
+                          addressLine1: row.addressLine1,
+                          city: row.city,
+                          province: row.province || "",
+                          propertyType: row.propertyType,
+                          bedrooms: row.bedrooms,
+                          bathrooms: row.bathrooms,
+                          rentAmount: row.rentAmount,
+                          latitude: row.latitude,
+                          longitude: row.longitude,
+                          mediaUrl: row.mediaUrl,
+                        }]}
+                        apiBase={API_BASE}
+                      />
+                    </Suspense>
+                  </div>
+                </div>
               </div>
 
               {/* ── Sidebar ── */}

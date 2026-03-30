@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState, lazy } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { PublicShell } from "@/components/public/PublicShell";
@@ -9,7 +9,10 @@ import {
   SlidersHorizontal, Building2, BedDouble, Bath,
   MapPin, ArrowRight, RefreshCw, ChevronDown,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
+  LayoutGrid, Map,
 } from "lucide-react";
+
+const ListingsMap = lazy(() => import("@/components/map/ListingsMap"));
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/+$/, "");
 
@@ -30,6 +33,8 @@ type ListingCard = {
   bathrooms: number | null;
   rentAmount: number | null;
   mediaUrl: string | null;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 const PROPERTY_TYPES = ["", "Apartment", "House", "Condo", "Townhouse", "Studio"];
@@ -45,6 +50,7 @@ function ListingsContent() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [showFilters, setShowFilters] = useState(true);
+  const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
 
   // Pagination
   const PAGE_SIZE = 12;
@@ -274,10 +280,31 @@ function ListingsContent() {
                 <span className="text-sm text-slate-500">
                   {loading ? "Searching..." : `Showing ${rows.length} of ${totalItems} listing${totalItems !== 1 ? "s" : ""}${totalPages > 1 ? ` · Page ${currentPage} of ${totalPages}` : ""}`}
                 </span>
-                <Button variant="outline" size="sm" className="gap-2 text-slate-600 border-slate-200 hover:border-indigo-300" onClick={() => load(buildQuery())} disabled={loading}>
-                  <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-                  Refresh
-                </Button>
+                <div className="flex items-center gap-2">
+                  {/* View toggle */}
+                  <div className="flex rounded-lg border border-slate-200 overflow-hidden">
+                    <button
+                      onClick={() => setViewMode("grid")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
+                        viewMode === "grid" ? "bg-indigo-600 text-white" : "bg-white text-slate-600 hover:bg-slate-50"
+                      }`}
+                    >
+                      <LayoutGrid className="h-3.5 w-3.5" /> Grid
+                    </button>
+                    <button
+                      onClick={() => setViewMode("map")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
+                        viewMode === "map" ? "bg-indigo-600 text-white" : "bg-white text-slate-600 hover:bg-slate-50"
+                      }`}
+                    >
+                      <Map className="h-3.5 w-3.5" /> Map
+                    </button>
+                  </div>
+                  <Button variant="outline" size="sm" className="gap-2 text-slate-600 border-slate-200 hover:border-indigo-300" onClick={() => load(buildQuery())} disabled={loading}>
+                    <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+                    Refresh
+                  </Button>
+                </div>
               </div>
 
               {/* Error */}
@@ -324,8 +351,17 @@ function ListingsContent() {
                 </div>
               )}
 
+              {/* Map view */}
+              {!loading && !err && rows.length > 0 && viewMode === "map" && (
+                <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden" style={{ height: 600 }}>
+                  <Suspense fallback={<div className="h-full flex items-center justify-center text-sm text-slate-400">Loading map...</div>}>
+                    <ListingsMap listings={rows} apiBase={API_BASE} />
+                  </Suspense>
+                </div>
+              )}
+
               {/* Listing cards */}
-              {!loading && !err && rows.length > 0 && (
+              {!loading && !err && rows.length > 0 && viewMode === "grid" && (
                 <>
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {rows.map((x) => {
