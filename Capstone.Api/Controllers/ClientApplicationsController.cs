@@ -285,9 +285,15 @@ WHERE l.ListingId = @ListingId;
             if (reviewNoteCol != null && !allowedReviewCols.Contains(reviewNoteCol, StringComparer.OrdinalIgnoreCase))
                 reviewNoteCol = null;
 
-            var reviewExpr = reviewNoteCol != null
-                ? $"la.[{reviewNoteCol}]"
-                : "CAST(NULL AS NVARCHAR(500))";
+            // Use a switch with literal strings — never interpolate user-derived values into SQL
+            var reviewExpr = reviewNoteCol switch
+            {
+                "ReviewNote"    => "la.[ReviewNote]",
+                "DecisionNotes" => "la.[DecisionNotes]",
+                "Notes"         => "la.[Notes]",
+                "Comments"      => "la.[Comments]",
+                _               => "CAST(NULL AS NVARCHAR(500))"
+            };
 
             var sql = $@"
 SELECT
