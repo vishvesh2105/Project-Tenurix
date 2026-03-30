@@ -80,7 +80,10 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddSingleton<LeaseDocumentService>();
 
 // JWT Auth
-var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Missing Jwt:Key");
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
+    throw new InvalidOperationException(
+        "Jwt:Key is missing or too short. Set a secure key (minimum 32 characters) in appsettings.Local.json.");
 var issuer = builder.Configuration["Jwt:Issuer"] ?? "Capstone.Api";
 var audience = builder.Configuration["Jwt:Audience"] ?? "Capstone.Clients";
 

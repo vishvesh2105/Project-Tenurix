@@ -1,4 +1,5 @@
-using System.Collections.Concurrent;
+using Capstone.Api.Data;
+using Dapper;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
@@ -8,12 +9,13 @@ namespace Capstone.Api.Services;
 public sealed class TwoFactorService
 {
     private readonly SmtpSettings _smtp;
+    private readonly SqlConnectionFactory _db;
     private readonly ILogger<TwoFactorService> _logger;
 
-    // In-memory store: key = email (lowercase), value = (code, expiry)
-    private static readonly ConcurrentDictionary<string, (string Code, DateTime ExpiresUtc)> _codes = new();
+    private const int MaxFailedAttempts = 5;
+    private const int LockoutMinutes = 15;
 
-    public TwoFactorService(IConfiguration config, ILogger<TwoFactorService> logger)
+    public TwoFactorService(IConfiguration config, SqlConnectionFactory db, ILogger<TwoFactorService> logger)
     {
         _smtp = new SmtpSettings();
         config.GetSection("Smtp2FA").Bind(_smtp);
@@ -22,18 +24,36 @@ public sealed class TwoFactorService
         if (string.IsNullOrWhiteSpace(_smtp.Host))
             config.GetSection("Smtp").Bind(_smtp);
 
+        _db = db;
         _logger = logger;
     }
 
     /// <summary>
-    /// Generate a 6-digit code, store it for 5 minutes, and email it.
+    /// Generate a 6-digit code, persist it in the database for 5 minutes, and email it.
+    /// Resets failed attempts so the user gets a fresh window after requesting a new code.
     /// </summary>
     public async Task SendCodeAsync(string email)
     {
         var code = Random.Shared.Next(100000, 999999).ToString();
         var key = email.Trim().ToLowerInvariant();
 
-        _codes[key] = (code, DateTime.UtcNow.AddMinutes(5));
+        await EnsureTableAsync();
+
+        await using var conn = _db.Create();
+
+        // Upsert — reset failed attempts and lockout when a new code is issued
+        await conn.ExecuteAsync(@"
+            MERGE dbo.TwoFactorCodes AS target
+            USING (SELECT @Email AS Email) AS source ON target.Email = source.Email
+            WHEN MATCHED THEN
+                UPDATE SET Code = @Code,
+                           ExpiresUtc = @ExpiresUtc,
+                           FailedAttempts = 0,
+                           LockedUntil = NULL
+            WHEN NOT MATCHED THEN
+                INSERT (Email, Code, ExpiresUtc, FailedAttempts, LockedUntil)
+                VALUES (@Email, @Code, @ExpiresUtc, 0, NULL);",
+            new { Email = key, Code = code, ExpiresUtc = DateTime.UtcNow.AddMinutes(5) });
 
         _logger.LogInformation("2FA code generated for {Email}, expires in 5 min", email);
 
@@ -41,34 +61,112 @@ public sealed class TwoFactorService
     }
 
     /// <summary>
-    /// Verify the code. Returns true if valid. Removes it on success.
+    /// Verify the 6-digit code.
+    /// Returns (true, null) on success.
+    /// Returns (false, errorMessage) on failure — includes lockout and expiry reasons.
+    /// Increments failed attempts and locks the account after MaxFailedAttempts.
     /// </summary>
-    public bool VerifyCode(string email, string code)
+    public async Task<(bool Success, string? Error)> VerifyCodeAsync(string email, string code)
     {
         var key = email.Trim().ToLowerInvariant();
 
-        if (!_codes.TryGetValue(key, out var entry))
-            return false;
+        await EnsureTableAsync();
 
-        if (DateTime.UtcNow > entry.ExpiresUtc)
+        await using var conn = _db.Create();
+
+        var row = await conn.QuerySingleOrDefaultAsync(@"
+            SELECT Code, ExpiresUtc, FailedAttempts, LockedUntil
+            FROM dbo.TwoFactorCodes
+            WHERE Email = @Email;",
+            new { Email = key });
+
+        if (row == null)
+            return (false, "Invalid or expired verification code.");
+
+        // Check lockout
+        DateTime? lockedUntil = row.LockedUntil;
+        if (lockedUntil.HasValue && DateTime.UtcNow < lockedUntil.Value)
         {
-            _codes.TryRemove(key, out _);
-            return false;
+            var remaining = (int)Math.Ceiling((lockedUntil.Value - DateTime.UtcNow).TotalMinutes);
+            return (false, $"Too many failed attempts. Try again in {remaining} minute{(remaining == 1 ? "" : "s")}.");
         }
 
-        if (entry.Code != code.Trim())
-            return false;
+        // Check expiry
+        DateTime expiresUtc = row.ExpiresUtc;
+        if (DateTime.UtcNow > expiresUtc)
+        {
+            await conn.ExecuteAsync("DELETE FROM dbo.TwoFactorCodes WHERE Email = @Email;", new { Email = key });
+            return (false, "Verification code has expired. Please request a new one.");
+        }
 
-        // Valid — remove so it can't be reused
-        _codes.TryRemove(key, out _);
-        return true;
+        // Check code
+        string storedCode = row.Code?.ToString() ?? "";
+        if (storedCode != code.Trim())
+        {
+            int failed = (int)row.FailedAttempts + 1;
+
+            if (failed >= MaxFailedAttempts)
+            {
+                // Lock the account
+                var lockUntil = DateTime.UtcNow.AddMinutes(LockoutMinutes);
+                await conn.ExecuteAsync(@"
+                    UPDATE dbo.TwoFactorCodes
+                    SET FailedAttempts = @Failed, LockedUntil = @LockUntil
+                    WHERE Email = @Email;",
+                    new { Failed = failed, LockUntil = lockUntil, Email = key });
+
+                _logger.LogWarning("2FA account locked for {Email} after {Max} failed attempts", email, MaxFailedAttempts);
+                return (false, $"Too many failed attempts. Your account is locked for {LockoutMinutes} minutes.");
+            }
+
+            await conn.ExecuteAsync(@"
+                UPDATE dbo.TwoFactorCodes
+                SET FailedAttempts = @Failed
+                WHERE Email = @Email;",
+                new { Failed = failed, Email = key });
+
+            int remaining = MaxFailedAttempts - failed;
+            return (false, $"Invalid verification code. {remaining} attempt{(remaining == 1 ? "" : "s")} remaining.");
+        }
+
+        // Valid — remove so it cannot be reused
+        await conn.ExecuteAsync("DELETE FROM dbo.TwoFactorCodes WHERE Email = @Email;", new { Email = key });
+        return (true, null);
+    }
+
+    // ── Private helpers ──────────────────────────────────────────────────────
+
+    private static int _tableEnsured = 0;
+
+    private async Task EnsureTableAsync()
+    {
+        // Only run once per process lifetime
+        if (Interlocked.CompareExchange(ref _tableEnsured, 1, 0) != 0) return;
+
+        await using var conn = _db.Create();
+        await conn.ExecuteAsync(@"
+            IF NOT EXISTS (
+                SELECT 1 FROM sys.objects
+                WHERE object_id = OBJECT_ID(N'dbo.TwoFactorCodes') AND type = 'U'
+            )
+            BEGIN
+                CREATE TABLE dbo.TwoFactorCodes (
+                    Email          NVARCHAR(256) NOT NULL,
+                    Code           NVARCHAR(10)  NOT NULL,
+                    ExpiresUtc     DATETIME2     NOT NULL,
+                    FailedAttempts INT           NOT NULL DEFAULT 0,
+                    LockedUntil    DATETIME2     NULL,
+                    CONSTRAINT PK_TwoFactorCodes PRIMARY KEY (Email)
+                )
+            END");
     }
 
     private async Task SendEmailAsync(string toEmail, string code)
     {
         if (string.IsNullOrWhiteSpace(_smtp.Host) || string.IsNullOrWhiteSpace(_smtp.Username))
         {
-            _logger.LogWarning("2FA SMTP not configured. Code for {Email}: {Code}", toEmail, code);
+            // Do NOT log the code — just warn that email was not sent
+            _logger.LogWarning("2FA SMTP not configured. Verification code was not sent to {Email}.", toEmail);
             return;
         }
 

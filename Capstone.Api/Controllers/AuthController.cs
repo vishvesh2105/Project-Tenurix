@@ -15,12 +15,14 @@ public class AuthController : ControllerBase
     private readonly AuthService _auth;
     private readonly SqlConnectionFactory _db;
     private readonly TwoFactorService _twoFactor;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(AuthService auth, SqlConnectionFactory db, TwoFactorService twoFactor)
+    public AuthController(AuthService auth, SqlConnectionFactory db, TwoFactorService twoFactor, ILogger<AuthController> logger)
     {
         _auth = auth;
         _db = db;
         _twoFactor = twoFactor;
+        _logger = logger;
     }
 
     /// <summary>
@@ -42,7 +44,8 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new ApiError($"Failed to send verification code. Please try again. ({ex.Message})"));
+            _logger.LogError(ex, "Failed to send 2FA code to {Email}", email);
+            return StatusCode(500, new ApiError("Failed to send verification code. Please try again."));
         }
 
         // Mask the email for display
@@ -64,8 +67,9 @@ public class AuthController : ControllerBase
             return BadRequest(new ApiError("Session expired. Please sign in again."));
 
         // Verify the 2FA code
-        if (!_twoFactor.VerifyCode(req.Email, req.Code))
-            return Unauthorized(new ApiError("Invalid or expired verification code."));
+        var (codeOk, codeError) = await _twoFactor.VerifyCodeAsync(req.Email, req.Code);
+        if (!codeOk)
+            return Unauthorized(new ApiError(codeError ?? "Invalid or expired verification code."));
 
         // Code is correct — re-authenticate and issue JWT
         var loginReq = new LoginRequest { Email = req.Email, Password = req.Password };
@@ -91,7 +95,8 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new ApiError($"Failed to send verification code. ({ex.Message})"));
+            _logger.LogError(ex, "Failed to resend 2FA code to {Email}", req.Email);
+            return StatusCode(500, new ApiError("Failed to send verification code. Please try again."));
         }
 
         return Ok(new { sent = true });
