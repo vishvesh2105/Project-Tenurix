@@ -1,0 +1,154 @@
+<Page x:Class="Tenurix.Management.Views.Pages.NotificationsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="Transparent">
+
+    <Page.Resources>
+        <Style x:Key="NotiBtn" TargetType="Button">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="12,6"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="FontWeight"      Value="SemiBold"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="16"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="16"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Page Header -->
+        <StackPanel>
+            <TextBlock Text="Notifications" FontSize="24" FontWeight="Bold"
+                       Foreground="{StaticResource Text}"/>
+            <TextBlock x:Name="UnreadLabel"
+                       Text="Loading..."
+                       FontSize="13" Foreground="{StaticResource TextMuted}" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Toolbar -->
+        <Border Grid.Row="2" Background="{StaticResource Panel}" CornerRadius="12" Padding="16,12">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Mark All Read" Click="MarkAllRead_Click"
+                            Style="{StaticResource NotiBtn}"
+                            Background="{StaticResource AccentSoft}"
+                            Foreground="{StaticResource Accent}"
+                            Margin="0,0,8,0" Height="36"/>
+                    <Button Content="Refresh" Click="Refresh_Click"
+                            Style="{StaticResource NotiBtn}"
+                            Background="{StaticResource Panel2}"
+                            Foreground="{StaticResource Text}"
+                            Height="36" Width="90"/>
+                </StackPanel>
+                <TextBlock Text="Click a notification row to mark it as read."
+                           VerticalAlignment="Center"
+                           FontSize="13" Foreground="{StaticResource TextMuted}"/>
+            </DockPanel>
+        </Border>
+
+        <!-- Notification List -->
+        <Border Grid.Row="4" Background="{StaticResource Panel}" CornerRadius="14" Padding="12">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <ItemsControl x:Name="NotifList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Tag="{Binding}" Click="NotifRow_Click"
+                                        Background="Transparent" BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        Padding="0" Margin="0,0,0,8" Cursor="Hand">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="RowBorder"
+                                                    Background="{StaticResource Panel2}"
+                                                    CornerRadius="12" Padding="16,14">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Unread dot -->
+                                                    <Ellipse Grid.Column="0" Width="8" Height="8"
+                                                             Margin="0,0,12,0" VerticalAlignment="Center">
+                                                        <Ellipse.Style>
+                                                            <Style TargetType="Ellipse">
+                                                                <Setter Property="Fill" Value="#3B82F6"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsRead}" Value="True">
+                                                                        <Setter Property="Fill" Value="Transparent"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Ellipse.Style>
+                                                    </Ellipse>
+
+                                                    <!-- Content -->
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="{Binding Title}" FontSize="13" FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource Text}" TextWrapping="Wrap"/>
+                                                        <TextBlock Text="{Binding Message}" FontSize="12"
+                                                                   Foreground="{StaticResource TextMuted}"
+                                                                   TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                    </StackPanel>
+
+                                                    <!-- Timestamp -->
+                                                    <TextBlock Grid.Column="2" FontSize="11"
+                                                               Foreground="{StaticResource TextMuted}"
+                                                               VerticalAlignment="Top" Margin="12,0,0,0">
+                                                        <TextBlock.Text>
+                                                            <Binding Path="CreatedAt" StringFormat="MMM dd\, HH:mm"/>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="RowBorder" Property="Background" Value="{StaticResource AccentSoft}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Empty state -->
+                    <TextBlock x:Name="EmptyText" Text="No notifications yet."
+                               FontSize="14" Foreground="{StaticResource TextMuted}"
+                               HorizontalAlignment="Center" Margin="0,32,0,0"
+                               Visibility="Collapsed"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Load More -->
+        <Button Grid.Row="5" x:Name="LoadMoreBtn"
+                Content="Load more" Click="LoadMore_Click"
+                Style="{StaticResource NotiBtn}"
+                Background="{StaticResource Panel2}"
+                Foreground="{StaticResource Text}"
+                Height="36" Margin="0,12,0,0"
+                HorizontalAlignment="Center" Width="160"
+                Visibility="Collapsed"/>
+    </Grid>
+</Page>

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Threading;
 using Tenurix.Management.Client.Api;
 using Tenurix.Management.Models.Auth;
 using Tenurix.Management.Views.Pages;
@@ -13,6 +14,7 @@ namespace Tenurix.Management.Views
     {
         private readonly TenurixApiClient _api;
         private readonly LoginResponse _session;
+        private DispatcherTimer? _bellTimer;
 
         public ShellWindow(TenurixApiClient api, LoginResponse session)
         {
@@ -66,6 +68,39 @@ namespace Tenurix.Management.Views
             {
                 HeaderAvatar.Source = null;
                 HeaderAvatarFallback.Visibility = Visibility.Visible;
+            }
+
+            // Initial bell count + start polling every 60 seconds
+            await RefreshBellAsync();
+
+            _bellTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(60) };
+            _bellTimer.Tick += async (_, __) => await RefreshBellAsync();
+            _bellTimer.Start();
+        }
+
+        private async System.Threading.Tasks.Task RefreshBellAsync()
+        {
+            try
+            {
+                int count = await _api.GetNotificationUnreadCountAsync();
+                UpdateBellBadge(count);
+            }
+            catch
+            {
+                // Non-critical — swallow silently
+            }
+        }
+
+        private void UpdateBellBadge(int count)
+        {
+            if (count <= 0)
+            {
+                BellBadge.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                BellBadgeText.Text = count > 99 ? "99+" : count.ToString();
+                BellBadge.Visibility = Visibility.Visible;
             }
         }
 
@@ -166,6 +201,20 @@ namespace Tenurix.Management.Views
             Navigate(new ListingsPage(_api));
         }
 
+        private void Notifications_Click(object sender, RoutedEventArgs e)
+        {
+            Navigate(new NotificationsPage(_api));
+            // Reset bell badge after user navigates to notifications
+            UpdateBellBadge(0);
+        }
+
+        private void Bell_Click(object sender, RoutedEventArgs e)
+        {
+            NavNotifications.IsChecked = true;
+            Navigate(new NotificationsPage(_api));
+            UpdateBellBadge(0);
+        }
+
         private void ChangePassword_Click(object sender, RoutedEventArgs e)
         {
             var win = new Tenurix.Management.Views.Windows.ChangePasswordWindow(_api)
@@ -177,6 +226,7 @@ namespace Tenurix.Management.Views
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
+            _bellTimer?.Stop();
             var login = new LoginWindow();
             login.Show();
             Close();
@@ -203,6 +253,7 @@ namespace Tenurix.Management.Views
 
         private void MenuLogout_Click(object sender, RoutedEventArgs e)
         {
+            _bellTimer?.Stop();
             var login = new LoginWindow();
             login.Show();
             Close();

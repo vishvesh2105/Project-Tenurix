@@ -48,6 +48,8 @@
                                  Content="Landlord Portfolio" Tag="" Click="Landlords_Click"/>
                     <RadioButton x:Name="NavEmployees" Style="{StaticResource NavRadio}" GroupName="Nav"
                                  Content="Employees" Tag="" Click="Employees_Click"/>
+                    <RadioButton x:Name="NavNotifications" Style="{StaticResource NavRadio}" GroupName="Nav"
+                                 Content="Notifications" Tag="" Click="Notifications_Click"/>
                     <RadioButton x:Name="NavChangePw" Style="{StaticResource NavRadio}" GroupName="Nav"
                                  Content="Change Password" Tag="" Click="ChangePassword_Click"/>
                 </StackPanel>
@@ -81,6 +83,35 @@
                            DockPanel.Dock="Left"/>
 
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+
+                    <!-- Notification bell -->
+                    <Button x:Name="BellButton" Click="Bell_Click" ToolTip="Notifications"
+                            Cursor="Hand" Background="Transparent" BorderThickness="0"
+                            Padding="0" Margin="0,0,12,0">
+                        <Grid Width="38" Height="38">
+                            <!-- Bell icon using Segoe MDL2 Assets -->
+                            <TextBlock Text="&#xEA8F;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="18"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource TextMuted}"/>
+                            <!-- Unread count badge -->
+                            <Border x:Name="BellBadge"
+                                    Width="18" Height="18" CornerRadius="9"
+                                    Background="#ef4444"
+                                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                                    Visibility="Collapsed">
+                                <TextBlock x:Name="BellBadgeText"
+                                           Text="0"
+                                           FontSize="9" FontWeight="Bold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </Button>
+
                     <!-- Initials badge = Profile button -->
                     <Button Click="MenuProfile_Click" ToolTip="My Profile"
                             Cursor="Hand" Background="Transparent" BorderThickness="0"

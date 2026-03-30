@@ -723,8 +723,45 @@ public TenurixApiClient(string baseUrl)
             throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
     }
 
+    // ── Notifications ────────────────────────────────────────────────────────
 
+    public async Task<NotificationsPageResult> GetNotificationsAsync(int page = 1, int pageSize = 20)
+    {
+        using var res = await _http.GetAsync($"notifications?page={page}&pageSize={pageSize}");
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode)
+            throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
 
+        return JsonSerializer.Deserialize<NotificationsPageResult>(raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+    }
+
+    public async Task<int> GetNotificationUnreadCountAsync()
+    {
+        using var res = await _http.GetAsync("notifications/unread-count");
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode)
+            return 0;
+
+        using var doc = JsonDocument.Parse(raw);
+        return doc.RootElement.TryGetProperty("unreadCount", out var prop) ? prop.GetInt32() : 0;
+    }
+
+    public async Task MarkNotificationReadAsync(int notificationId)
+    {
+        using var res = await _http.PostAsync($"notifications/{notificationId}/read", null);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode)
+            throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+    }
+
+    public async Task MarkAllNotificationsReadAsync()
+    {
+        using var res = await _http.PostAsync("notifications/read-all", null);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode)
+            throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+    }
 
 
 
