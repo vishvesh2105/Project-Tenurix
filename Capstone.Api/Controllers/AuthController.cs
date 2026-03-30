@@ -5,6 +5,7 @@ using Capstone.Api.Services;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Capstone.Api.Controllers;
 
@@ -30,6 +31,7 @@ public class AuthController : ControllerBase
     /// Does NOT return a JWT token yet.
     /// </summary>
     [HttpPost("login")]
+    [EnableRateLimiting("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest req)
     {
         // Validate credentials (but don't return the token yet)
@@ -58,6 +60,7 @@ public class AuthController : ControllerBase
     /// Step 2: Verify the 6-digit code. If correct, return the full JWT session.
     /// </summary>
     [HttpPost("verify-2fa")]
+    [EnableRateLimiting("verify2fa")]
     public async Task<IActionResult> VerifyTwoFactor([FromBody] Verify2FaRequest req)
     {
         if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Code))
@@ -83,6 +86,7 @@ public class AuthController : ControllerBase
     /// Resend the 2FA code (requires valid credentials again to prevent abuse).
     /// </summary>
     [HttpPost("resend-2fa")]
+    [EnableRateLimiting("resend2fa")]
     public async Task<IActionResult> ResendTwoFactor([FromBody] LoginRequest req)
     {
         // Re-validate credentials

@@ -215,6 +215,17 @@ END
         if (file.Length > 2_000_000)
             return BadRequest(new ApiError("Your photo is too large. Please use an image under 2MB."));
 
+        // Validate allowed extensions
+        var ext = Path.GetExtension(file.FileName)?.ToLowerInvariant() ?? "";
+        var allowedPhotoExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp" };
+        if (!allowedPhotoExts.Contains(ext))
+            return BadRequest(new ApiError("Only image files are allowed (JPG, PNG, GIF, WebP, BMP)."));
+
+        // Validate actual file content with magic bytes — never trust Content-Type alone
+        using var fileStream = file.OpenReadStream();
+        if (!await FileValidator.IsValidContentAsync(fileStream, ext))
+            return BadRequest(new ApiError("The file content does not match the expected image format."));
+
         var contentType = file.ContentType ?? "application/octet-stream";
 
         byte[] bytes;

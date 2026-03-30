@@ -2,10 +2,12 @@ using Capstone.Api.Data;
 using Capstone.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,7 +52,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// CORS (allow your websites to call the API)
+// CORS — restrict to known origins, methods, and headers only (H3)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("TenurixWeb", policy =>
@@ -62,13 +64,51 @@ builder.Services.AddCors(options =>
                 "https://client.tenurix.net",
                 "https://landlord.tenurix.net",
                 "https://manage.tenurix.net",
-                "http://localhost:3000", // local dev
-                "https://tenurix.net/auth"
-
+                "http://localhost:3000"
             )
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .WithHeaders("Content-Type", "Authorization", "X-Health-Key");
     });
+});
+
+// Rate limiting — protect auth endpoints from brute force (H2)
+builder.Services.AddRateLimiter(options =>
+{
+    // Login: max 10 attempts per minute per IP
+    options.AddFixedWindowLimiter("login", o =>
+    {
+        o.Window = TimeSpan.FromMinutes(1);
+        o.PermitLimit = 10;
+        o.QueueLimit = 0;
+        o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+
+    // 2FA verify: max 5 attempts per minute per IP
+    options.AddFixedWindowLimiter("verify2fa", o =>
+    {
+        o.Window = TimeSpan.FromMinutes(1);
+        o.PermitLimit = 5;
+        o.QueueLimit = 0;
+        o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+
+    // Resend 2FA: max 3 per minute per IP
+    options.AddFixedWindowLimiter("resend2fa", o =>
+    {
+        o.Window = TimeSpan.FromMinutes(1);
+        o.PermitLimit = 3;
+        o.QueueLimit = 0;
+        o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+
+    // Return 429 as JSON instead of plain text
+    options.OnRejected = async (ctx, token) =>
+    {
+        ctx.HttpContext.Response.StatusCode = 429;
+        ctx.HttpContext.Response.ContentType = "application/json";
+        await ctx.HttpContext.Response.WriteAsync(
+            "{\"message\":\"Too many requests. Please wait and try again.\"}", token);
+    };
 });
 
 // DB + Services
@@ -129,7 +169,12 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// HSTS — tell browsers to always use HTTPS (H5)
+if (!app.Environment.IsDevelopment())
+    app.UseHsts();
+
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 
 // Security headers
 app.Use(async (ctx, next) =>

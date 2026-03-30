@@ -20,7 +20,9 @@ export function useAuth() {
   useEffect(() => {
     if (!token) {
       const role = portal === "landlord" ? "landlord" : "client";
-      window.location.href = `/auth?role=${role}&next=${encodeURIComponent(pathname)}`;
+      // Only pass relative paths as next — prevents open redirect
+      const safePath = pathname.startsWith("/") && !pathname.startsWith("//") ? pathname : "/dashboard";
+      window.location.href = `/auth?role=${role}&next=${encodeURIComponent(safePath)}`;
     } else {
       setIsReady(true);
     }

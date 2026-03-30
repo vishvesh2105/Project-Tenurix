@@ -48,8 +48,6 @@
                                  Content="Landlord Portfolio" Tag="" Click="Landlords_Click"/>
                     <RadioButton x:Name="NavEmployees" Style="{StaticResource NavRadio}" GroupName="Nav"
                                  Content="Employees" Tag="" Click="Employees_Click"/>
-                    <RadioButton x:Name="NavNotifications" Style="{StaticResource NavRadio}" GroupName="Nav"
-                                 Content="Notifications" Tag="" Click="Notifications_Click"/>
                     <RadioButton x:Name="NavChangePw" Style="{StaticResource NavRadio}" GroupName="Nav"
                                  Content="Change Password" Tag="" Click="ChangePassword_Click"/>
                 </StackPanel>

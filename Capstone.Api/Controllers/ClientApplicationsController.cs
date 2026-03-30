@@ -18,13 +18,15 @@ public sealed class ClientApplicationsController : ControllerBase
     private readonly IWebHostEnvironment _env;
     private readonly EmailService _email;
     private readonly NotificationService _notifications;
+    private readonly ILogger<ClientApplicationsController> _logger;
 
-    public ClientApplicationsController(SqlConnectionFactory db, IWebHostEnvironment env, EmailService email, NotificationService notifications)
+    public ClientApplicationsController(SqlConnectionFactory db, IWebHostEnvironment env, EmailService email, NotificationService notifications, ILogger<ClientApplicationsController> logger)
     {
         _db = db;
         _env = env;
         _email = email;
         _notifications = notifications;
+        _logger = logger;
     }
 
     // Shared DTO for both JSON and FormData
@@ -250,7 +252,11 @@ WHERE l.ListingId = @ListingId;
                         $"/applications/{applicationId}", applicationId, "LeaseApplication");
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                // Non-critical: notification/email failure should not block the application submission
+                _logger.LogWarning(ex, "Failed to send notification/email for applicationId {ApplicationId}", applicationId);
+            }
 
             return Ok(new { applicationId });
         }
@@ -332,6 +338,11 @@ ORDER BY la.SubmittedAt DESC;
 
         if (!AllowedExtensions.Contains(ext))
             return (null, "This file type is not allowed. Please upload an image or PDF.");
+
+        // Validate actual file content with magic bytes — never trust extension alone
+        using var readStream = file.OpenReadStream();
+        if (!await FileValidator.IsValidContentAsync(readStream, ext))
+            return (null, "The file content does not match the expected format. Please upload a valid image or PDF.");
 
         var webRoot = _env.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot");
         var uploadsDir = Path.Combine(webRoot, "uploads", folder);

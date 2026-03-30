@@ -32,7 +32,10 @@ function AuthPageInner() {
   const initialRole = (sp.get("role") as Role) || "client";
   const [role, setRole] = useState<Role>(initialRole);
 
-  const next = sp.get("next") || (role === "client" ? "/dashboard" : "/landlord/dashboard");
+  // Validate next to prevent open redirect — must be a relative path starting with /
+  const rawNext = sp.get("next") || "";
+  const defaultNext = role === "client" ? "/dashboard" : "/landlord/dashboard";
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : defaultNext;
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
