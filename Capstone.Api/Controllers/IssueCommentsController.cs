@@ -16,12 +16,14 @@ public sealed class IssueCommentsController : ControllerBase
     private readonly SqlConnectionFactory _db;
     private readonly IWebHostEnvironment _env;
     private readonly NotificationService _notifications;
+    private readonly AuditService _audit;
 
-    public IssueCommentsController(SqlConnectionFactory db, IWebHostEnvironment env, NotificationService notifications)
+    public IssueCommentsController(SqlConnectionFactory db, IWebHostEnvironment env, NotificationService notifications, AuditService audit)
     {
         _db = db;
         _env = env;
         _notifications = notifications;
+        _audit = audit;
     }
 
     // ─── Get issue detail (any role with access) ────────────────────
@@ -252,6 +254,9 @@ IF OBJECT_ID('dbo.IssueComments') IS NOT NULL
         }
         catch { }
 
+        await _audit.LogAsync("REOPEN", "Issue", issueId, Perm.UserId(User),
+            req?.Reason, "Resolved", "Submitted");
+
         return Ok(new { message = "Issue re-opened successfully." });
     }
 
@@ -333,6 +338,9 @@ WHERE i.IssueId = @IssueId;
             }
         }
         catch { }
+
+        await _audit.LogAsync("RESOLVE", "Issue", issueId, Perm.UserId(User),
+            form.ResolutionNote, "Submitted", "Resolved");
 
         return Ok(new { message = "Issue resolved successfully." });
     }

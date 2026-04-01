@@ -21,17 +21,13 @@ public sealed class ManagementController : ControllerBase
     private readonly SqlConnectionFactory _db;
     private readonly EmailService _email;
     private readonly NotificationService _notifications;
-    private readonly LeaseDocumentService _leaseDoc;
-    private readonly IWebHostEnvironment _env;
     private readonly ILogger<ManagementController> _logger;
 
-    public ManagementController(SqlConnectionFactory db, EmailService email, NotificationService notifications, LeaseDocumentService leaseDoc, IWebHostEnvironment env, ILogger<ManagementController> logger)
+    public ManagementController(SqlConnectionFactory db, EmailService email, NotificationService notifications, ILogger<ManagementController> logger)
     {
         _db = db;
         _email = email;
         _notifications = notifications;
-        _leaseDoc = leaseDoc;
-        _env = env;
         _logger = logger;
     }
 
@@ -1176,77 +1172,6 @@ END
                 _logger.LogWarning(ex, "Failed to send approval emails/notifications for applicationId {ApplicationId}", applicationId);
             }
 
-            // Auto-generate lease agreement PDF
-            try
-            {
-                await using var pdfConn = _db.Create();
-                // Get the newly created LeaseId
-                var leaseId = await pdfConn.ExecuteScalarAsync<int?>(@"
-                    SELECT LeaseId FROM dbo.Leases WHERE ApplicationId = @ApplicationId;
-                ", new { ApplicationId = applicationId });
-
-                if (leaseId.HasValue)
-                {
-                    var docData = await pdfConn.QuerySingleOrDefaultAsync<dynamic>(@"
-                        SELECT
-                            le.LeaseId, le.LeaseStartDate, le.LeaseEndDate, le.CreatedAt AS IssuedDate,
-                            t.FullName AS TenantName, t.Email AS TenantEmail, t.Phone AS TenantPhone,
-                            ll.FullName AS LandlordName, ll.Email AS LandlordEmail,
-                            CONCAT(p.AddressLine1, ', ', p.City, ', ', p.Province) AS PropertyAddress,
-                            p.RentAmount,
-                            la.NumberOfOccupants, la.HasPets, la.PetDetails
-                        FROM dbo.Leases le
-                        JOIN dbo.Users t ON t.UserId = le.ClientUserId
-                        JOIN dbo.Users ll ON ll.UserId = le.OwnerUserId
-                        JOIN dbo.Listings l ON l.ListingId = le.ListingId
-                        JOIN dbo.Properties p ON p.PropertyId = l.PropertyId
-                        LEFT JOIN dbo.LeaseApplications la ON la.ApplicationId = le.ApplicationId
-                        WHERE le.LeaseId = @LeaseId;
-                    ", new { LeaseId = leaseId.Value });
-
-                    if (docData != null)
-                    {
-                        var leaseData = new LeaseDocumentData
-                        {
-                            LeaseId = (int)docData.LeaseId,
-                            IssuedDate = docData.IssuedDate ?? DateTime.UtcNow,
-                            TenantName = (string)(docData.TenantName ?? ""),
-                            TenantEmail = (string)(docData.TenantEmail ?? ""),
-                            TenantPhone = docData.TenantPhone as string,
-                            LandlordName = (string)(docData.LandlordName ?? ""),
-                            LandlordEmail = (string)(docData.LandlordEmail ?? ""),
-                            PropertyAddress = (string)(docData.PropertyAddress ?? ""),
-                            LeaseStartDate = (DateTime)docData.LeaseStartDate,
-                            LeaseEndDate = (DateTime)docData.LeaseEndDate,
-                            RentAmount = docData.RentAmount != null ? (decimal)docData.RentAmount : 0m,
-                            NumberOfOccupants = docData.NumberOfOccupants != null ? (int)docData.NumberOfOccupants : 1,
-                            HasPets = docData.HasPets != null && (bool)docData.HasPets,
-                            PetDetails = docData.PetDetails as string
-                        };
-
-                        var pdfBytes = _leaseDoc.GenerateLeaseAgreement(leaseData);
-
-                        var wwwroot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-                        var leaseDir = Path.Combine(wwwroot, "lease-docs");
-                        Directory.CreateDirectory(leaseDir);
-                        var fileName = $"lease-{leaseId.Value}.pdf";
-                        await System.IO.File.WriteAllBytesAsync(Path.Combine(leaseDir, fileName), pdfBytes);
-
-                        await pdfConn.ExecuteAsync(@"
-                            UPDATE dbo.Leases SET LeaseDocumentUrl = @Url WHERE LeaseId = @LeaseId;
-                        ", new { Url = $"/lease-docs/{fileName}", LeaseId = leaseId.Value });
-
-                        // NOTE: Lease agreement is NOT auto-sent.
-                        // Management can review/edit terms and manually send it via the
-                        // "Edit & Send Agreement" button in the management portal.
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Failed to generate lease PDF for applicationId {ApplicationId}", applicationId);
-            }
-
             return Ok();
         }
         catch (Exception ex)
@@ -1323,130 +1248,6 @@ WHERE la.ApplicationId = @ApplicationId;
         catch (Exception ex)
         {
             return StatusCode(500, new ApiError("Unable to reject this application. Please try again."));
-        }
-    }
-
-    // ---------------------------
-    // LEASE TERMS EDIT
-    // ---------------------------
-
-    public sealed class UpdateLeaseTermsRequest
-    {
-        public decimal RentAmount { get; set; }
-        public DateTime LeaseStartDate { get; set; }
-        public DateTime LeaseEndDate { get; set; }
-    }
-
-    [HttpPut("leases/{leaseId:int}")]
-    public async Task<IActionResult> UpdateLeaseTerms(int leaseId, [FromBody] UpdateLeaseTermsRequest req)
-    {
-        if (!Perm.Has(User, "APPROVE_LEASE_APP"))
-            return Forbid();
-
-        if (req == null)
-            return BadRequest(new ApiError("Request body is required."));
-
-        if (req.LeaseEndDate <= req.LeaseStartDate)
-            return BadRequest(new ApiError("End date must be after start date."));
-
-        if (req.RentAmount <= 0)
-            return BadRequest(new ApiError("Rent amount must be greater than zero."));
-
-        try
-        {
-            await using var conn = _db.Create();
-
-            // Verify lease exists
-            var leaseExists = await conn.ExecuteScalarAsync<int?>(@"
-                SELECT le.LeaseId FROM dbo.Leases le WHERE le.LeaseId = @LeaseId;
-            ", new { LeaseId = leaseId });
-
-            if (leaseExists == null)
-                return NotFound(new ApiError("Lease not found."));
-
-            // Update lease terms
-            await conn.ExecuteAsync(@"
-                UPDATE dbo.Leases
-                SET LeaseStartDate = @LeaseStartDate,
-                    LeaseEndDate   = @LeaseEndDate
-                WHERE LeaseId = @LeaseId;
-
-                UPDATE dbo.Properties
-                SET RentAmount = @RentAmount
-                FROM dbo.Properties p
-                JOIN dbo.Listings l ON l.PropertyId = p.PropertyId
-                JOIN dbo.Leases le  ON le.ListingId = l.ListingId
-                WHERE le.LeaseId = @LeaseId;
-            ", new { LeaseId = leaseId, LeaseStartDate = req.LeaseStartDate, LeaseEndDate = req.LeaseEndDate, RentAmount = req.RentAmount });
-
-            // Regenerate PDF with updated terms
-            try
-            {
-                var docData = await conn.QuerySingleOrDefaultAsync<dynamic>(@"
-                    SELECT
-                        le.LeaseId, le.LeaseStartDate, le.LeaseEndDate, le.TenantSignedAt,
-                        le.CreatedAt AS IssuedDate,
-                        t.FullName AS TenantName, t.Email AS TenantEmail, t.Phone AS TenantPhone,
-                        ll.FullName AS LandlordName, ll.Email AS LandlordEmail,
-                        CONCAT(p.AddressLine1, ', ', p.City, ', ', p.Province) AS PropertyAddress,
-                        p.RentAmount,
-                        la.NumberOfOccupants, la.HasPets, la.PetDetails
-                    FROM dbo.Leases le
-                    JOIN dbo.Users t ON t.UserId = le.ClientUserId
-                    JOIN dbo.Users ll ON ll.UserId = le.OwnerUserId
-                    JOIN dbo.Listings l ON l.ListingId = le.ListingId
-                    JOIN dbo.Properties p ON p.PropertyId = l.PropertyId
-                    LEFT JOIN dbo.LeaseApplications la ON la.ApplicationId = le.ApplicationId
-                    WHERE le.LeaseId = @LeaseId;
-                ", new { LeaseId = leaseId });
-
-                if (docData != null)
-                {
-                    var leaseData = new LeaseDocumentData
-                    {
-                        LeaseId         = (int)docData.LeaseId,
-                        IssuedDate      = docData.IssuedDate ?? DateTime.UtcNow,
-                        TenantName      = (string)(docData.TenantName ?? ""),
-                        TenantEmail     = (string)(docData.TenantEmail ?? ""),
-                        TenantPhone     = docData.TenantPhone as string,
-                        LandlordName    = (string)(docData.LandlordName ?? ""),
-                        LandlordEmail   = (string)(docData.LandlordEmail ?? ""),
-                        PropertyAddress = (string)(docData.PropertyAddress ?? ""),
-                        LeaseStartDate  = (DateTime)docData.LeaseStartDate,
-                        LeaseEndDate    = (DateTime)docData.LeaseEndDate,
-                        RentAmount      = docData.RentAmount != null ? (decimal)docData.RentAmount : req.RentAmount,
-                        NumberOfOccupants = docData.NumberOfOccupants != null ? (int)docData.NumberOfOccupants : 1,
-                        HasPets         = docData.HasPets != null && (bool)docData.HasPets,
-                        PetDetails      = docData.PetDetails as string,
-                        TenantSignedAt  = docData.TenantSignedAt != null
-                            ? ((DateTime)docData.TenantSignedAt).ToString("MMMM d, yyyy 'at' h:mm tt 'UTC'")
-                            : null
-                    };
-
-                    var pdfBytes = _leaseDoc.GenerateLeaseAgreement(leaseData);
-                    var wwwroot  = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-                    var leaseDir = Path.Combine(wwwroot, "lease-docs");
-                    Directory.CreateDirectory(leaseDir);
-                    var fileName = $"lease-{leaseId}.pdf";
-                    await System.IO.File.WriteAllBytesAsync(Path.Combine(leaseDir, fileName), pdfBytes);
-
-                    await conn.ExecuteAsync(@"
-                        UPDATE dbo.Leases SET LeaseDocumentUrl = @Url WHERE LeaseId = @LeaseId;
-                    ", new { Url = $"/lease-docs/{fileName}", LeaseId = leaseId });
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Failed to regenerate lease PDF for leaseId {LeaseId}", leaseId);
-                // Non-critical — terms are saved, PDF regeneration failed
-            }
-
-            return Ok(new { message = "Lease terms updated and PDF regenerated." });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to update lease terms for leaseId {LeaseId}", leaseId);
-            return StatusCode(500, new ApiError("Unable to update lease terms. Please try again."));
         }
     }
 
