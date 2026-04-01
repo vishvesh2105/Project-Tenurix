@@ -117,27 +117,41 @@
                                                 Style="{StaticResource LaBtn}"
                                                 Background="{StaticResource AccentSoft}"
                                                 Foreground="{StaticResource Accent}"/>
-                                        <Button Content="Approve" Tag="{Binding}" Click="Approve_Click"
+                                        <Button x:Name="ApproveBtn" Content="Approve" Tag="{Binding}" Click="Approve_Click"
                                                 Height="32" Padding="12,0" Margin="0,0,8,0"
                                                 Style="{StaticResource LaBtn}"
                                                 Background="{StaticResource SuccessSoft}"
                                                 Foreground="{StaticResource Success}"/>
-                                        <Button Content="Reject" Tag="{Binding}" Click="Reject_Click"
-                                                Height="32" Padding="12,0"
+                                        <Button x:Name="RejectBtn" Content="Reject" Tag="{Binding}" Click="Reject_Click"
+                                                Height="32" Padding="12,0" Margin="0,0,8,0"
                                                 Style="{StaticResource LaBtn}"
                                                 Background="{StaticResource DangerSoft}"
                                                 Foreground="{StaticResource Danger}"/>
+                                        <Button x:Name="EditSendBtn" Content="Edit &amp; Send Agreement"
+                                                Tag="{Binding}" Click="EditSend_Click"
+                                                Height="32" Padding="12,0"
+                                                Visibility="Collapsed"
+                                                Style="{StaticResource LaBtn}"
+                                                Background="#EFF6FF"
+                                                Foreground="#1D4ED8"/>
                                     </StackPanel>
                                 </Grid>
                             </Border>
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding Status}" Value="Approved">
-                                    <Setter TargetName="sbadge" Property="Background" Value="#F0FDF4"/>
-                                    <Setter TargetName="stxt"  Property="Foreground" Value="#15803D"/>
+                                    <Setter TargetName="sbadge"     Property="Background"  Value="#F0FDF4"/>
+                                    <Setter TargetName="stxt"       Property="Foreground"  Value="#15803D"/>
+                                    <!-- Hide Approve/Reject, show Edit &amp; Send -->
+                                    <Setter TargetName="ApproveBtn"  Property="Visibility"  Value="Collapsed"/>
+                                    <Setter TargetName="RejectBtn"   Property="Visibility"  Value="Collapsed"/>
+                                    <Setter TargetName="EditSendBtn" Property="Visibility"  Value="Visible"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Status}" Value="Rejected">
-                                    <Setter TargetName="sbadge" Property="Background" Value="#FEF2F2"/>
-                                    <Setter TargetName="stxt"  Property="Foreground" Value="#DC2626"/>
+                                    <Setter TargetName="sbadge"     Property="Background"  Value="#FEF2F2"/>
+                                    <Setter TargetName="stxt"       Property="Foreground"  Value="#DC2626"/>
+                                    <!-- Hide Approve/Reject for rejected apps too -->
+                                    <Setter TargetName="ApproveBtn"  Property="Visibility"  Value="Collapsed"/>
+                                    <Setter TargetName="RejectBtn"   Property="Visibility"  Value="Collapsed"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>

@@ -210,7 +210,6 @@ namespace Tenurix.Management.Views
 
         private void Bell_Click(object sender, RoutedEventArgs e)
         {
-            NavNotifications.IsChecked = true;
             Navigate(new NotificationsPage(_api));
             UpdateBellBadge(0);
         }

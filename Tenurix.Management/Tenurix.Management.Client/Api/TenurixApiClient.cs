@@ -763,7 +763,52 @@ public TenurixApiClient(string baseUrl)
             throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
     }
 
+    // ── Lease Terms Edit & Send ──────────────────────────────────────────────
 
+    public async Task UpdateLeaseTermsAsync(int leaseId, decimal rentAmount, DateTime startDate, DateTime endDate)
+    {
+        var body = new { RentAmount = rentAmount, LeaseStartDate = startDate, LeaseEndDate = endDate };
+        using var res = await _http.PutAsJsonAsync($"management/leases/{leaseId}", body);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode)
+        {
+            try
+            {
+                var apiErr = JsonSerializer.Deserialize<ApiError>(raw, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                throw new Exception(apiErr?.Message ?? $"HTTP {(int)res.StatusCode}: {raw}");
+            }
+            catch (Exception ex) when (ex.Message != raw)
+            {
+                throw;
+            }
+            catch
+            {
+                throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+            }
+        }
+    }
+
+    public async Task SendLeaseToTenantAsync(int leaseId)
+    {
+        using var res = await _http.PostAsync($"lease-documents/{leaseId}/send", null);
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode)
+        {
+            try
+            {
+                var apiErr = JsonSerializer.Deserialize<ApiError>(raw, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                throw new Exception(apiErr?.Message ?? $"HTTP {(int)res.StatusCode}: {raw}");
+            }
+            catch (Exception ex) when (ex.Message != raw)
+            {
+                throw;
+            }
+            catch
+            {
+                throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+            }
+        }
+    }
 
 
 

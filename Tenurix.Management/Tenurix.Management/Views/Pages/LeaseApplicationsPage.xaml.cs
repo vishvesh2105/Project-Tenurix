@@ -51,6 +51,11 @@ public partial class LeaseApplicationsPage : Page
             Owner = Window.GetWindow(this)
         };
         win.ShowDialog();
+
+        // If the review window approved the application, switch to Approved filter
+        // so the "Edit & Send Agreement" button is immediately visible
+        if (win.DialogResult == true)
+            StatusFilter.SelectedIndex = 2; // triggers SelectionChanged → Reload
     }
 
     private async void Approve_Click(object sender, RoutedEventArgs e)
@@ -60,7 +65,9 @@ public partial class LeaseApplicationsPage : Page
         try
         {
             await _api.ApproveLeaseApplicationAsync(row.ApplicationId, note: "Approved by management.");
-            await Reload();
+
+            // Switch filter to "Approved" so the Edit & Send Agreement button is visible
+            StatusFilter.SelectedIndex = 2; // triggers SelectionChanged → Reload automatically
         }
         catch (Exception ex)
         {
@@ -84,5 +91,26 @@ public partial class LeaseApplicationsPage : Page
         {
             MessageBox.Show("Reject failed. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
+    }
+
+    private void EditSend_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not LeaseApplicationDto row) return;
+
+        if (!row.LeaseId.HasValue)
+        {
+            MessageBox.Show(
+                "No lease record found for this application. Please re-approve the application to generate the lease.",
+                "Lease Not Found",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return;
+        }
+
+        var win = new LeaseEditSendWindow(_api, row)
+        {
+            Owner = Window.GetWindow(this)
+        };
+        win.ShowDialog();
     }
 }

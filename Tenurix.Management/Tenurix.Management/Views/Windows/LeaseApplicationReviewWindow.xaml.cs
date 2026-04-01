@@ -107,7 +107,12 @@ namespace Tenurix.Management.Views.Windows
             try
             {
                 await _api.ApproveLeaseApplicationAsync(_applicationId);
-                MessageBox.Show("Approved.");
+                MessageBox.Show(
+                    "Application approved! A lease record has been created.\n\nThe filter will switch to 'Approved' so you can use the 'Edit & Send Agreement' button to set lease terms and send the agreement to the tenant.",
+                    "Approved",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                DialogResult = true; // signals the parent page to switch filter to Approved
                 Close();
             }
             catch (Exception ex)
