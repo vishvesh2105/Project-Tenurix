@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -12,35 +12,6 @@ namespace Tenurix.Management.Views.Pages;
 
 public partial class EmployeesPage : Page
 {
-    private sealed class EmployeeRow
-    {
-        public int UserId { get; set; }
-        public string FullName { get; set; } = "";
-        public string Email { get; set; } = "";
-        public string RoleName { get; set; } = "";
-        public bool IsActive { get; set; }
-        public string Status => IsActive ? "Active" : "Inactive";
-    }
-
-    public Visibility CanViewAttendanceVisibility
-    {
-        get
-        {
-            // Permission-based
-            if (Has("ATTENDANCE_VIEW_ALL")) return Visibility.Visible;
-
-            // Role fallback (for demo / if DB permissions not wired yet)
-            var role = _session.RoleName ?? "";
-            if (role.Equals("Manager", StringComparison.OrdinalIgnoreCase) ||
-                role.Equals("TeamLead", StringComparison.OrdinalIgnoreCase))
-                return Visibility.Visible;
-
-            return Visibility.Collapsed;
-        }
-    }
-
-
-
     private readonly TenurixApiClient _api;
     private readonly LoginResponse _session;
 
@@ -66,18 +37,11 @@ public partial class EmployeesPage : Page
     {
         bool canManageUsers = Has("MANAGE_USERS");
         CreateBtn.IsEnabled = canManageUsers;
-        // Refresh bindings for visibility properties
         DataContext = this;
     }
 
     private void ViewEmployee_Click(object sender, RoutedEventArgs e)
     {
-        if (!Has("ATTENDANCE_VIEW_ALL"))
-        {
-            MessageBox.Show("You do not have permission to view employee attendance.");
-            return;
-        }
-
         if (sender is not Button btn || btn.CommandParameter is not int userId)
             return;
 
@@ -92,21 +56,9 @@ public partial class EmployeesPage : Page
         win.ShowDialog();
     }
 
-
-
     private async void EmployeesPage_Loaded(object sender, RoutedEventArgs e)
     {
         await ReloadEmployees();
-    }
-
-    private static bool IsEmployeeRole(string? roleName)
-    {
-        return roleName != null && (
-            roleName.Equals("Manager", StringComparison.OrdinalIgnoreCase) ||
-            roleName.Equals("AssistantManager", StringComparison.OrdinalIgnoreCase) ||
-            roleName.Equals("TeamLead", StringComparison.OrdinalIgnoreCase) ||
-            roleName.Equals("Staff", StringComparison.OrdinalIgnoreCase)
-        );
     }
 
     private async Task ReloadEmployees()
@@ -115,7 +67,6 @@ public partial class EmployeesPage : Page
         {
             var employees = await _api.GetEmployeesAsync();
 
-            // Safety filter: show only employee roles
             var filtered = employees
                 .Where(e =>
                     e.RoleName.Equals("Manager", StringComparison.OrdinalIgnoreCase) ||
@@ -131,7 +82,6 @@ public partial class EmployeesPage : Page
             MessageBox.Show("Failed to load employees:\n" + ex.Message);
         }
     }
-
 
     private async void Create_Click(object sender, RoutedEventArgs e)
     {
@@ -160,7 +110,6 @@ public partial class EmployeesPage : Page
 
         int userId = 0;
 
-        // Get userId from the button's CommandParameter
         if (sender is Button btn && btn.CommandParameter is int idFromRow)
         {
             userId = idFromRow;
@@ -182,5 +131,4 @@ public partial class EmployeesPage : Page
             MessageBox.Show("Failed to reset password:\n" + ex.Message);
         }
     }
-
 }

@@ -4,6 +4,8 @@ public sealed class CreateEmployeeRequest
 {
     public string FullName { get; set; } = "";
     public string Email { get; set; } = "";
+    public string Phone { get; set; } = "";
+    public string Address { get; set; } = "";
     public string RoleName { get; set; } = ""; // Manager, AssistantManager, TeamLead, Staff
     public string TempPassword { get; set; } = "";
 }

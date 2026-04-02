@@ -95,22 +95,7 @@ public partial class LeaseApplicationsPage : Page
 
     private void EditSend_Click(object sender, RoutedEventArgs e)
     {
-        if ((sender as Button)?.Tag is not LeaseApplicationDto row) return;
-
-        if (!row.LeaseId.HasValue)
-        {
-            MessageBox.Show(
-                "No lease record found for this application. Please re-approve the application to generate the lease.",
-                "Lease Not Found",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-            return;
-        }
-
-        var win = new LeaseEditSendWindow(_api, row)
-        {
-            Owner = Window.GetWindow(this)
-        };
-        win.ShowDialog();
+        MessageBox.Show("This feature has been removed.", "Not Available",
+            MessageBoxButton.OK, MessageBoxImage.Information);
     }
 }

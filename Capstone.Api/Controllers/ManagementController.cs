@@ -1266,11 +1266,14 @@ SELECT DISTINCT
     u.UserId,
     u.FullName,
     u.Email,
+    p.Phone,
+    p.Address,
     u.IsActive,
     r.RoleName
 FROM dbo.Users u
 JOIN dbo.UserRoles ur ON ur.UserId = u.UserId
 JOIN dbo.Roles r ON r.RoleId = ur.RoleId
+LEFT JOIN dbo.UserProfiles p ON p.UserId = u.UserId
 WHERE r.RoleName IN ('Manager','AssistantManager','TeamLead','Staff')
 ORDER BY r.RoleName, u.FullName;
 ";
@@ -1282,6 +1285,57 @@ ORDER BY r.RoleName, u.FullName;
         catch (Exception ex)
         {
             return StatusCode(500, new ApiError("Unable to load employees. Please try again."));
+        }
+    }
+
+    [HttpGet("employees/{userId:int}")]
+    public async Task<ActionResult<EmployeeDetailDto>> GetEmployeeDetail(int userId)
+    {
+        if (!Perm.Has(User, "MANAGE_USERS")) return Forbid();
+
+        try
+        {
+            await using var conn = _db.Create();
+
+            var emp = await conn.QuerySingleOrDefaultAsync<EmployeeDetailDto>(@"
+SELECT
+    u.UserId,
+    u.FullName,
+    u.Email,
+    p.Phone,
+    p.Address,
+    u.IsActive,
+    r.RoleName
+FROM dbo.Users u
+JOIN dbo.UserRoles ur ON ur.UserId = u.UserId
+JOIN dbo.Roles r ON r.RoleId = ur.RoleId
+LEFT JOIN dbo.UserProfiles p ON p.UserId = u.UserId
+WHERE u.UserId = @UserId;
+", new { UserId = userId });
+
+            if (emp == null) return NotFound(new ApiError("Employee not found."));
+
+            var properties = (await conn.QueryAsync<AssignedPropertyDto>(@"
+SELECT
+    PropertyId,
+    AddressLine1,
+    City,
+    Province,
+    PostalCode,
+    PropertyType,
+    SubmissionStatus
+FROM dbo.Properties
+WHERE AssignedToUserId = @UserId
+ORDER BY PropertyId DESC;
+", new { UserId = userId })).ToList();
+
+            emp.AssignedProperties = properties;
+
+            return emp;
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiError("Unable to load employee details. Please try again."));
         }
     }
 
@@ -1339,6 +1393,20 @@ VALUES (@UserId, @RoleId);
             }, tx);
 
             await conn.ExecuteAsync(sqlInsertUserRole, new { UserId = userId, RoleId = roleId.Value }, tx);
+
+            // Store phone and address in UserProfiles
+            if (!string.IsNullOrWhiteSpace(req.Phone) || !string.IsNullOrWhiteSpace(req.Address))
+            {
+                await conn.ExecuteAsync(@"
+INSERT INTO dbo.UserProfiles (UserId, Phone, Address)
+VALUES (@UserId, @Phone, @Address);
+", new
+                {
+                    UserId = userId,
+                    Phone = string.IsNullOrWhiteSpace(req.Phone) ? (string?)null : req.Phone.Trim(),
+                    Address = string.IsNullOrWhiteSpace(req.Address) ? (string?)null : req.Address.Trim()
+                }, tx);
+            }
 
             tx.Commit();
             return Ok(new { userId });

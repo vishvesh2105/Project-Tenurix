@@ -156,12 +156,14 @@ public TenurixApiClient(string baseUrl)
         }
     }
 
-    public async Task CreateEmployeeAsync(string fullName, string email, string role, string tempPassword)
+    public async Task CreateEmployeeAsync(string fullName, string email, string phone, string address, string role, string tempPassword)
     {
         var body = new
         {
             FullName = fullName,
             Email = email,
+            Phone = phone,
+            Address = address,
             RoleName = role,
             TempPassword = tempPassword
         };
@@ -193,9 +195,20 @@ public TenurixApiClient(string baseUrl)
         if (!res.IsSuccessStatusCode)
             throw new Exception(raw);
 
-        return System.Text.Json.JsonSerializer.Deserialize<List<EmployeeDto>>(raw,
-            new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+        return JsonSerializer.Deserialize<List<EmployeeDto>>(raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
             ?? new List<EmployeeDto>();
+    }
+
+    public async Task<EmployeeDetailDto> GetEmployeeDetailAsync(int userId)
+    {
+        var res = await _http.GetAsync($"management/employees/{userId}");
+        var raw = await res.Content.ReadAsStringAsync();
+        if (!res.IsSuccessStatusCode)
+            throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
+        return JsonSerializer.Deserialize<EmployeeDetailDto>(raw,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+            ?? throw new Exception("Failed to parse employee details.");
     }
 
 
@@ -547,95 +560,6 @@ public TenurixApiClient(string baseUrl)
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
     }
 
-
-    public sealed class AttendancePunchRequest
-    {
-        public string EventType { get; set; } = "";
-        public string? BreakType { get; set; }
-        public DateTime? OccurredAtUtc { get; set; }
-        public string Source { get; set; } = "App";
-        public string? Note { get; set; }
-    }
-
-    public sealed class AttendanceTimeBlockDto
-    {
-        public string Type { get; set; } = "";     // Shift / Break
-        public string? BreakType { get; set; }
-        public DateTime StartUtc { get; set; }
-        public DateTime EndUtc { get; set; }
-        public int? StartEventId { get; set; }
-        public int? EndEventId { get; set; }
-    }
-
-    public sealed class AttendanceDailySummaryDto
-    {
-        public string Day { get; set; } = ""; // serialize DateOnly as string easily
-        public int MinutesWorked { get; set; }
-        public int MinutesBreaks { get; set; }
-        public int MinutesShift { get; set; }
-        public int ShortBreakCount { get; set; }
-    }
-
-    public async Task<int> PunchAttendanceAsync(AttendancePunchRequest req)
-    {
-        using var res = await _http.PostAsJsonAsync("management/attendance/punch", req);
-        var raw = await res.Content.ReadAsStringAsync();
-        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
-
-        using var doc = JsonDocument.Parse(raw);
-        return doc.RootElement.GetProperty("eventId").GetInt32();
-    }
-
-    public async Task<List<AttendanceTimeBlockDto>> GetMyAttendanceBlocksAsync(DateTime fromUtc, DateTime toUtc)
-    {
-        var url = $"management/attendance/me/blocks?from={Uri.EscapeDataString(fromUtc.ToString("o"))}&to={Uri.EscapeDataString(toUtc.ToString("o"))}";
-        using var res = await _http.GetAsync(url);
-        var raw = await res.Content.ReadAsStringAsync();
-        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
-
-        return JsonSerializer.Deserialize<List<AttendanceTimeBlockDto>>(raw,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
-    }
-
-    public async Task<List<AttendanceTimeBlockDto>> GetUserAttendanceBlocksAsync(int userId, DateTime fromUtc, DateTime toUtc)
-    {
-        var url = $"management/attendance/users/{userId}/blocks?from={Uri.EscapeDataString(fromUtc.ToString("o"))}&to={Uri.EscapeDataString(toUtc.ToString("o"))}";
-        using var res = await _http.GetAsync(url);
-        var raw = await res.Content.ReadAsStringAsync();
-        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
-
-        return JsonSerializer.Deserialize<List<AttendanceTimeBlockDto>>(raw,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
-    }
-
-    public async Task<List<AttendanceDailySummaryDto>> GetUserAttendanceSummaryAsync(int userId, DateTime fromUtc, DateTime toUtc)
-    {
-        var url = $"management/attendance/users/{userId}/summary?from={Uri.EscapeDataString(fromUtc.ToString("o"))}&to={Uri.EscapeDataString(toUtc.ToString("o"))}";
-        using var res = await _http.GetAsync(url);
-        var raw = await res.Content.ReadAsStringAsync();
-        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
-
-        // Day is DateOnly in API; easiest is string in WPF DTO
-        return JsonSerializer.Deserialize<List<AttendanceDailySummaryDto>>(raw,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
-    }
-
-    public async Task VoidAttendanceEventAsync(int eventId, string reason)
-    {
-        using var res = await _http.PostAsJsonAsync($"management/attendance/events/{eventId}/void", new { Reason = reason });
-        var raw = await res.Content.ReadAsStringAsync();
-        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
-    }
-
-    public async Task<int> AdminPunchAttendanceAsync(int userId, AttendancePunchRequest req)
-    {
-        using var res = await _http.PostAsJsonAsync($"management/attendance/users/{userId}/admin-punch", req);
-        var raw = await res.Content.ReadAsStringAsync();
-        if (!res.IsSuccessStatusCode) throw new Exception($"HTTP {(int)res.StatusCode}: {raw}");
-
-        using var doc = JsonDocument.Parse(raw);
-        return doc.RootElement.GetProperty("eventId").GetInt32();
-    }
 
     public async Task<List<LandlordDocumentDto>> GetLandlordDocumentsAsync(int landlordId, string type = "ID_PROOF", bool includeDeleted = false)
     {
