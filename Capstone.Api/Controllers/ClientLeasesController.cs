@@ -42,7 +42,7 @@ SELECT
     le.LeaseStartDate,
     le.LeaseEndDate,
     le.LeaseStatus,
-    p.RentAmount,
+    p.RentAmount
 FROM dbo.Leases le
 JOIN dbo.Listings l ON l.ListingId = le.ListingId
 JOIN dbo.Properties p ON p.PropertyId = l.PropertyId
