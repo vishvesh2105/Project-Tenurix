@@ -179,24 +179,29 @@ SELECT CASE WHEN EXISTS (
         string role = (string)pending.Role;
         string roleName = role == "landlord" ? "Landlord" : "Client";
 
-        // Create user
-        var userId = await conn.ExecuteScalarAsync<int>(@"
+        // Wrap user creation in transaction so partial state can't occur
+        int userId;
+        using var txn = conn.BeginTransaction();
+        try
+        {
+            // Create user
+            userId = await conn.ExecuteScalarAsync<int>(@"
 INSERT INTO dbo.Users (FullName, Email, PasswordHash, PasswordSalt, TempPassword, IsActive, CreatedAt, AuthProvider, MustChangePassword)
 OUTPUT INSERTED.UserId
 VALUES (@FullName, @Email, @Hash, @Salt, NULL, 1, SYSUTCDATETIME(), 'Email', 0);
 ", new
-        {
-            FullName = fullName,
-            Email = email,
-            Hash = (string)pending.PasswordHash,
-            Salt = (string)pending.PasswordSalt
-        });
+            {
+                FullName = fullName,
+                Email = email,
+                Hash = (string)pending.PasswordHash,
+                Salt = (string)pending.PasswordSalt
+            }, txn);
 
-        // Store phone if provided
-        string? phone = pending.Phone as string;
-        if (!string.IsNullOrWhiteSpace(phone))
-        {
-            await conn.ExecuteAsync(@"
+            // Store phone if provided
+            string? phone = pending.Phone as string;
+            if (!string.IsNullOrWhiteSpace(phone))
+            {
+                await conn.ExecuteAsync(@"
 IF OBJECT_ID('dbo.UserProfiles') IS NOT NULL
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM dbo.UserProfiles WHERE UserId = @UserId)
@@ -204,11 +209,11 @@ BEGIN
     ELSE
         UPDATE dbo.UserProfiles SET Phone = @Phone WHERE UserId = @UserId;
 END
-", new { UserId = userId, Phone = phone });
-        }
+", new { UserId = userId, Phone = phone }, txn);
+            }
 
-        // Assign role
-        await conn.ExecuteAsync(@"
+            // Assign role
+            await conn.ExecuteAsync(@"
 DECLARE @RoleId INT = (SELECT TOP 1 RoleId FROM dbo.Roles WHERE RoleName = @RoleName);
 
 IF @RoleId IS NULL
@@ -223,10 +228,18 @@ IF NOT EXISTS (
 BEGIN
     INSERT INTO dbo.UserRoles (UserId, RoleId) VALUES (@UserId, @RoleId);
 END
-", new { UserId = userId, RoleName = roleName });
+", new { UserId = userId, RoleName = roleName }, txn);
 
-        // Clean up pending registration
-        await conn.ExecuteAsync("DELETE FROM dbo.PendingRegistrations WHERE Email = @Email;", new { Email = email });
+            // Clean up pending registration
+            await conn.ExecuteAsync("DELETE FROM dbo.PendingRegistrations WHERE Email = @Email;", new { Email = email }, txn);
+
+            txn.Commit();
+        }
+        catch
+        {
+            txn.Rollback();
+            return StatusCode(500, new ApiError("Registration failed. Please try again."));
+        }
 
         // Issue JWT
         var (ok, data, error) = await _auth.LoginByUserIdAsync(userId);

@@ -86,7 +86,7 @@ public sealed class PublicListingsController : ControllerBase
         [FromQuery] int pageSize = 12)
     {
         page = Math.Max(1, page);
-        pageSize = Math.Clamp(pageSize, 6, 5000);
+        pageSize = Math.Clamp(pageSize, 6, 500);
 
         var offset = (page - 1) * pageSize;
 

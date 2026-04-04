@@ -33,6 +33,7 @@ namespace Tenurix.Management.Views
             ApplyPermissions();
 
             Loaded += ShellWindow_Loaded;
+            Closed += (_, __) => { _bellTimer?.Stop(); _bellTimer = null; };
 
             // Default landing page
             NavDashboard.IsChecked = true;
@@ -121,13 +122,14 @@ namespace Tenurix.Management.Views
         {
             byte[] bytes = Convert.FromBase64String(base64);
 
-            using var ms = new MemoryStream(bytes);
+            var ms = new MemoryStream(bytes);
             var img = new BitmapImage();
             img.BeginInit();
             img.CacheOption = BitmapCacheOption.OnLoad;
             img.StreamSource = ms;
             img.EndInit();
             img.Freeze();
+            ms.Dispose();
             return img;
         }
 

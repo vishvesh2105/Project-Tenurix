@@ -173,7 +173,7 @@ function ListingsContent() {
       if (bedrooms !== "") p.set("bedrooms", bedrooms);
       if (propertyType) p.set("propertyType", propertyType);
       p.set("page", "1");
-      p.set("pageSize", "5000");
+      p.set("pageSize", "500");
       const res = await fetch(`${API_BASE}/public/listings?${p.toString()}`);
       const text = await res.text();
       const data = text ? JSON.parse(text) : null;

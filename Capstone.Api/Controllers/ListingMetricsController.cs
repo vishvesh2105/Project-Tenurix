@@ -18,6 +18,7 @@ public sealed class ListingMetricsController : ControllerBase
     }
 
     // POST /public/listings/{listingId}/impression
+    [Authorize]
     [HttpPost("public/listings/{listingId:int}/impression")]
     public async Task<IActionResult> TrackImpression([FromRoute] int listingId)
     {
@@ -29,7 +30,7 @@ public sealed class ListingMetricsController : ControllerBase
 SELECT CASE WHEN EXISTS (SELECT 1 FROM dbo.Listings WHERE ListingId = @ListingId) THEN 1 ELSE 0 END
 ", new { ListingId = listingId });
 
-            if (exists == 0) return NotFound(new { message = "Listing not found." });
+            if (exists == 0) return NotFound(new ApiError("Listing not found."));
 
             await conn.ExecuteAsync(@"
 INSERT INTO dbo.ListingMetrics (ListingId, EventType)
@@ -45,6 +46,7 @@ VALUES (@ListingId, 'impression');
     }
 
     // POST /public/listings/{listingId}/click
+    [Authorize]
     [HttpPost("public/listings/{listingId:int}/click")]
     public async Task<IActionResult> TrackClick([FromRoute] int listingId)
     {
@@ -56,7 +58,7 @@ VALUES (@ListingId, 'impression');
 SELECT CASE WHEN EXISTS (SELECT 1 FROM dbo.Listings WHERE ListingId = @ListingId) THEN 1 ELSE 0 END
 ", new { ListingId = listingId });
 
-            if (exists == 0) return NotFound(new { message = "Listing not found." });
+            if (exists == 0) return NotFound(new ApiError("Listing not found."));
 
             await conn.ExecuteAsync(@"
 INSERT INTO dbo.ListingMetrics (ListingId, EventType)

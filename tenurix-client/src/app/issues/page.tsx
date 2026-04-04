@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/shell/AppShell";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/tenurix/StatusBadge";
@@ -46,6 +46,8 @@ export default function IssuesPage() {
   const [formType, setFormType] = useState("");
   const [formDesc, setFormDesc] = useState("");
   const [formImage, setFormImage] = useState<File | null>(null);
+  const formImageUrl = useMemo(() => formImage ? URL.createObjectURL(formImage) : null, [formImage]);
+  useEffect(() => { return () => { if (formImageUrl) URL.revokeObjectURL(formImageUrl); }; }, [formImageUrl]);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
@@ -201,7 +203,7 @@ export default function IssuesPage() {
                   {formImage && (
                     <div className="mt-3 flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-2">
                       <img
-                        src={URL.createObjectURL(formImage)}
+                        src={formImageUrl!}
                         alt={formImage.name}
                         className="h-10 w-10 rounded object-cover"
                       />

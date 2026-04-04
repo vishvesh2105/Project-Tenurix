@@ -10,6 +10,11 @@ import { Eye, EyeOff, Check, X, ArrowLeft, Mail, Lock, User, Phone } from "lucid
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/+$/, "");
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!;
 
+function safeParse(raw: string): any {
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
 declare global {
   interface Window {
     google?: any;
@@ -171,7 +176,7 @@ function AuthPageInner() {
         body: JSON.stringify({ email: loginEmail, password: loginPassword, role }),
       });
       const raw = await res.text();
-      const data = raw ? JSON.parse(raw) : null;
+      const data = safeParse(raw);
       if (!res.ok) throw new Error(data?.message || data?.title || "Login failed. Please try again.");
       if (data?.requiresTwoFactor) {
         setVerifyEmail(data.email);
@@ -211,7 +216,7 @@ function AuthPageInner() {
         }),
       });
       const rawReg = await res.text();
-      const data = rawReg ? JSON.parse(rawReg) : null;
+      const data = safeParse(rawReg);
       if (!res.ok) throw new Error(data?.message || data?.title || "Registration failed. Please try again.");
       if (data?.requiresTwoFactor) {
         setVerifyEmail(data.email);
@@ -245,7 +250,7 @@ function AuthPageInner() {
         body: JSON.stringify(body),
       });
       const rawVerify = await res.text();
-      const data = rawVerify ? JSON.parse(rawVerify) : null;
+      const data = safeParse(rawVerify);
       if (!res.ok) throw new Error(data?.message || data?.title || "Verification failed. Please try again.");
       if (data?.token) {
         handleSuccess(data);
@@ -284,7 +289,7 @@ function AuthPageInner() {
         body: JSON.stringify({ email: forgotEmail }),
       });
       const raw = await res.text();
-      const data = raw ? JSON.parse(raw) : null;
+      const data = safeParse(raw);
       if (!res.ok) throw new Error(data?.message || data?.title || "Failed. Please try again.");
       if (data?.requiresTwoFactor) {
         setVerifyEmail(data.email);
@@ -311,7 +316,7 @@ function AuthPageInner() {
         body: JSON.stringify({ email: verifyEmail, code: verifyCode }),
       });
       const raw = await res.text();
-      const data = raw ? JSON.parse(raw) : null;
+      const data = safeParse(raw);
       if (!res.ok) throw new Error(data?.message || data?.title || "Verification failed.");
       if (data?.verified) {
         setResetPassword("");
@@ -338,7 +343,7 @@ function AuthPageInner() {
         body: JSON.stringify({ email: verifyEmail, newPassword: resetPassword }),
       });
       const raw = await res.text();
-      const data = raw ? JSON.parse(raw) : null;
+      const data = safeParse(raw);
       if (!res.ok) throw new Error(data?.message || data?.title || "Failed to reset password.");
       setResetSuccess(true);
       setTimeout(() => {

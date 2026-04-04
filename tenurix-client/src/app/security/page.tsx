@@ -43,7 +43,8 @@ export default function SecurityPage() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
+        const raw = await res.text();
+        const data = raw ? JSON.parse(raw) : null;
         throw new Error(data?.message || data?.title || "Failed to change password");
       }
 

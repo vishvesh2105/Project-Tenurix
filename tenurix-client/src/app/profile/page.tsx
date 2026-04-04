@@ -49,7 +49,9 @@ export default function ProfilePage() {
         setLoading(true);
         const res = await apiFetch("/account/me");
         if (!res.ok) throw new Error("Failed to load profile");
-        const data: Profile = await res.json();
+        const raw = await res.text();
+        const data: Profile = raw ? JSON.parse(raw) : null;
+        if (!data) throw new Error("Empty response");
         setProfile(data);
         setFullName(data.fullName || "");
         setPhone(data.phone || "");

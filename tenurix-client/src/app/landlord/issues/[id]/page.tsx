@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { AppShell } from "@/components/shell/AppShell";
 import { Button } from "@/components/ui/button";
@@ -73,6 +73,8 @@ export default function LandlordIssueDetailPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [commentImage, setCommentImage] = useState<File | null>(null);
+  const commentImageUrl = useMemo(() => commentImage ? URL.createObjectURL(commentImage) : null, [commentImage]);
+  useEffect(() => { return () => { if (commentImageUrl) URL.revokeObjectURL(commentImageUrl); }; }, [commentImageUrl]);
   const [sending, setSending] = useState(false);
 
   async function loadIssue() {
@@ -266,7 +268,7 @@ export default function LandlordIssueDetailPage() {
           <div className="border-t border-slate-100 p-4">
             {commentImage && (
               <div className="mb-3 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2">
-                <img src={URL.createObjectURL(commentImage)} alt="" className="h-10 w-10 rounded object-cover" />
+                <img src={commentImageUrl!} alt="" className="h-10 w-10 rounded object-cover" />
                 <span className="flex-1 truncate text-xs text-slate-600">{commentImage.name}</span>
                 <button onClick={() => setCommentImage(null)} className="p-1 text-red-400 hover:text-red-600"><X className="h-3.5 w-3.5" /></button>
               </div>

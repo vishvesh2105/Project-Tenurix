@@ -154,13 +154,15 @@ namespace Tenurix.Management.Views.Windows
             try
             {
                 var bytes = Convert.FromBase64String(base64);
-                using var ms = new MemoryStream(bytes);
+                var ms = new MemoryStream(bytes);
 
                 var bmp = new BitmapImage();
                 bmp.BeginInit();
                 bmp.CacheOption = BitmapCacheOption.OnLoad;
                 bmp.StreamSource = ms;
                 bmp.EndInit();
+                bmp.Freeze();
+                ms.Dispose();
 
                 PhotoImage.Source = bmp;
                 NoPhotoText.Visibility = Visibility.Collapsed;

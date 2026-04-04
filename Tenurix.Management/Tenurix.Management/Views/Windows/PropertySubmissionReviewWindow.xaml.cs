@@ -337,13 +337,14 @@ namespace Tenurix.Management.Views.Windows
 
         private static BitmapImage BitmapFromBytes(byte[] bytes)
         {
-            using var ms = new MemoryStream(bytes);
+            var ms = new MemoryStream(bytes);
             var bmp = new BitmapImage();
             bmp.BeginInit();
             bmp.CacheOption  = BitmapCacheOption.OnLoad;
             bmp.StreamSource = ms;
             bmp.EndInit();
             bmp.Freeze();
+            ms.Dispose();
             return bmp;
         }
 

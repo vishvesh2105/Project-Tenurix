@@ -52,8 +52,17 @@ function ApplyPageInner() {
   const { token, isReady } = useAuth();
 
   // Lease dates
-  const [startDate, setStartDate] = useState("2026-03-01");
-  const [endDate, setEndDate] = useState("2027-02-28");
+  // Default: 1st of next month → 1 year later
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1, 1);
+    return d.toISOString().slice(0, 10);
+  });
+  const [endDate, setEndDate] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 13, 0);
+    return d.toISOString().slice(0, 10);
+  });
 
   // Personal info
   const [fullName, setFullName] = useState("");
