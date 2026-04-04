@@ -86,7 +86,7 @@ public sealed class PublicListingsController : ControllerBase
         [FromQuery] int pageSize = 12)
     {
         page = Math.Max(1, page);
-        pageSize = Math.Clamp(pageSize, 6, 48);
+        pageSize = Math.Clamp(pageSize, 6, 5000);
 
         var offset = (page - 1) * pageSize;
 
@@ -159,6 +159,43 @@ WHERE
         catch (Exception ex)
         {
             return StatusCode(500, new ApiError("Unable to load listings. Please try again later."));
+        }
+    }
+
+    // PUT /public/listings/geocode — save geocoded coordinates back to Properties table
+    public sealed class GeocodeEntry
+    {
+        public int PropertyId { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+    }
+
+    [HttpPut("geocode")]
+    public async Task<ActionResult> SaveGeocodedCoordinates([FromBody] List<GeocodeEntry> entries)
+    {
+        if (entries == null || entries.Count == 0)
+            return BadRequest(new ApiError("No entries provided."));
+
+        // Limit batch size
+        if (entries.Count > 200)
+            entries = entries.Take(200).ToList();
+
+        const string sql = @"
+UPDATE dbo.Properties
+SET Latitude = @Latitude, Longitude = @Longitude
+WHERE PropertyId = @PropertyId
+  AND (Latitude IS NULL OR Longitude IS NULL);
+";
+
+        try
+        {
+            await using var conn = _db.Create();
+            await conn.ExecuteAsync(sql, entries);
+            return Ok(new { saved = entries.Count });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiError("Failed to save coordinates."));
         }
     }
 

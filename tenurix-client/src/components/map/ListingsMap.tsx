@@ -7,6 +7,7 @@ import "leaflet/dist/leaflet.css";
 
 type MapListing = {
   listingId: number;
+  propertyId?: number;
   addressLine1: string;
   city: string;
   province: string;
@@ -40,6 +41,20 @@ function createIcon(color: string = "#4f46e5") {
   });
 }
 
+// Save geocoded coordinates back to the database so we don't have to geocode again
+async function saveCoordinatesToDb(apiBase: string, entries: { propertyId: number; latitude: number; longitude: number }[]) {
+  if (entries.length === 0) return;
+  try {
+    await fetch(`${apiBase}/public/listings/geocode`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entries),
+    });
+  } catch {
+    // silent — best effort
+  }
+}
+
 export default function ListingsMap({ listings, apiBase }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
@@ -47,7 +62,7 @@ export default function ListingsMap({ listings, apiBase }: Props) {
   const [geocoded, setGeocoded] = useState<Map<number, [number, number]>>(new Map());
   const geocodeCache = useRef<Map<string, [number, number] | null>>(new Map());
 
-  // Geocode addresses that don't have lat/lng
+  // Geocode addresses that don't have lat/lng — progressively update state
   useEffect(() => {
     const toGeocode = listings.filter(
       (l) => l.latitude == null && l.longitude == null && !geocoded.has(l.listingId)
@@ -57,20 +72,32 @@ export default function ListingsMap({ listings, apiBase }: Props) {
 
     let cancelled = false;
 
-    async function geocodeAll() {
-      const newCoords = new Map(geocoded);
+    // First pass: resolve from cache instantly
+    const fromCache = new Map(geocoded);
+    const needApi: typeof toGeocode = [];
+    for (const listing of toGeocode) {
+      const address = `${listing.addressLine1}, ${listing.city}, ${listing.province}, Canada`;
+      const cacheKey = address.toLowerCase();
+      if (geocodeCache.current.has(cacheKey)) {
+        const cached = geocodeCache.current.get(cacheKey);
+        if (cached) fromCache.set(listing.listingId, cached);
+      } else {
+        needApi.push(listing);
+      }
+    }
+    if (fromCache.size > geocoded.size) setGeocoded(new Map(fromCache));
 
-      for (const listing of toGeocode) {
+    if (needApi.length === 0) return;
+
+    // Second pass: geocode via API — show pin + save to DB immediately per result
+    async function geocodeRemaining() {
+      const batch = new Map(fromCache);
+
+      for (const listing of needApi) {
         if (cancelled) break;
 
         const address = `${listing.addressLine1}, ${listing.city}, ${listing.province}, Canada`;
         const cacheKey = address.toLowerCase();
-
-        if (geocodeCache.current.has(cacheKey)) {
-          const cached = geocodeCache.current.get(cacheKey);
-          if (cached) newCoords.set(listing.listingId, cached);
-          continue;
-        }
 
         try {
           const res = await fetch(
@@ -82,7 +109,15 @@ export default function ListingsMap({ listings, apiBase }: Props) {
           if (data && data.length > 0) {
             const coords: [number, number] = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
             geocodeCache.current.set(cacheKey, coords);
-            newCoords.set(listing.listingId, coords);
+            batch.set(listing.listingId, coords);
+
+            // Show pin on map immediately
+            if (!cancelled) setGeocoded(new Map(batch));
+
+            // Save to database immediately (fire and forget)
+            if (listing.propertyId) {
+              saveCoordinatesToDb(apiBase, [{ propertyId: listing.propertyId, latitude: coords[0], longitude: coords[1] }]);
+            }
           } else {
             geocodeCache.current.set(cacheKey, null);
           }
@@ -93,11 +128,9 @@ export default function ListingsMap({ listings, apiBase }: Props) {
           geocodeCache.current.set(cacheKey, null);
         }
       }
-
-      if (!cancelled) setGeocoded(newCoords);
     }
 
-    geocodeAll();
+    geocodeRemaining();
     return () => { cancelled = true; };
   }, [listings]); // eslint-disable-line react-hooks/exhaustive-deps
 

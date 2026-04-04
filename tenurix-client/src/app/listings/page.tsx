@@ -51,6 +51,7 @@ function ListingsContent() {
   const [err, setErr] = useState("");
   const [showFilters, setShowFilters] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
+  const [mapListings, setMapListings] = useState<ListingCard[]>([]);
 
   // Pagination
   const PAGE_SIZE = 12;
@@ -161,6 +162,35 @@ function ListingsContent() {
     const clamped = Math.max(1, Math.min(p, totalPages));
     if (clamped !== currentPage) setCurrentPage(clamped);
   }
+
+  // Fetch ALL listings for map view (no pagination)
+  const loadMapListings = useCallback(async () => {
+    try {
+      const p = new URLSearchParams();
+      if (city.trim()) p.set("city", city.trim());
+      if (minRent) p.set("minRent", minRent);
+      if (maxRent) p.set("maxRent", maxRent);
+      if (bedrooms !== "") p.set("bedrooms", bedrooms);
+      if (propertyType) p.set("propertyType", propertyType);
+      p.set("page", "1");
+      p.set("pageSize", "5000");
+      const res = await fetch(`${API_BASE}/public/listings?${p.toString()}`);
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : null;
+      if (res.ok && Array.isArray(data?.items)) {
+        setMapListings(data.items);
+      }
+    } catch {
+      // fall back to current page rows
+    }
+  }, [city, minRent, maxRent, bedrooms, propertyType]);
+
+  // Load all listings when switching to map view or when filters change while in map view
+  useEffect(() => {
+    if (viewMode === "map") {
+      loadMapListings();
+    }
+  }, [viewMode, loadMapListings]);
 
   return (
     <PublicShell>
@@ -352,10 +382,10 @@ function ListingsContent() {
               )}
 
               {/* Map view */}
-              {!loading && !err && rows.length > 0 && viewMode === "map" && (
+              {!loading && !err && viewMode === "map" && (
                 <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden" style={{ height: 600 }}>
                   <Suspense fallback={<div className="h-full flex items-center justify-center text-sm text-slate-400">Loading map...</div>}>
-                    <ListingsMap listings={rows} apiBase={API_BASE} />
+                    <ListingsMap listings={mapListings.length > 0 ? mapListings : rows} apiBase={API_BASE} />
                   </Suspense>
                 </div>
               )}
