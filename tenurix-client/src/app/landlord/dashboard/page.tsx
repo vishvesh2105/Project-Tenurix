@@ -88,7 +88,7 @@ export default function LandlordDashboard() {
             { label: t("pendingSubmissions"), value: pendingSubmissions,  Icon: Clock,        bg: "bg-amber-50",   color: "text-amber-600"   },
             { label: t("approved"),           value: approvedCount,      Icon: CheckCircle2, bg: "bg-indigo-50",  color: "text-indigo-600"  },
           ].map((s) => (
-            <div key={s.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div key={s.label} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
               <div className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${s.bg} mb-3`}>
                 <s.Icon className={`h-5 w-5 ${s.color}`} />
               </div>

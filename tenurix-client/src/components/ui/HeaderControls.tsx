@@ -24,7 +24,7 @@ export function HeaderControls() {
 
 
       <button
-        className="rounded-full border border-white/15 bg-white/5 p-2 text-white/80 hover:bg-white/10"
+        className="rounded-full border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50"
         onClick={toggleTheme}
         type="button"
         aria-label="Toggle theme"

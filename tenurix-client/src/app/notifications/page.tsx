@@ -131,7 +131,7 @@ export default function NotificationsPage() {
               <button
                 key={n.notificationId}
                 onClick={() => markRead(n)}
-                className={`w-full text-left rounded-xl border px-5 py-4 transition-all hover:shadow-md ${
+                className={`w-full text-left rounded-xl border px-5 py-4 transition-all hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 ${
                   n.isRead
                     ? "border-slate-100 bg-white hover:border-slate-200"
                     : "border-indigo-200 bg-indigo-50/60 hover:border-indigo-300"

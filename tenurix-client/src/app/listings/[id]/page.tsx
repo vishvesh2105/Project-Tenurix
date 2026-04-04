@@ -229,13 +229,15 @@ export default function ListingDetailPage() {
                       <>
                         <button
                           onClick={prevPhoto}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg backdrop-blur-sm hover:bg-white hover:scale-105 transition-all"
+                          aria-label="Previous photo"
+                          className="absolute left-3 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg backdrop-blur-sm hover:bg-white hover:scale-105 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
                         >
                           <ChevronLeft className="h-5 w-5" />
                         </button>
                         <button
                           onClick={nextPhoto}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg backdrop-blur-sm hover:bg-white hover:scale-105 transition-all"
+                          aria-label="Next photo"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg backdrop-blur-sm hover:bg-white hover:scale-105 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
                         >
                           <ChevronRight className="h-5 w-5" />
                         </button>

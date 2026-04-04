@@ -371,7 +371,7 @@ function ApplyPageInner() {
               <button
                 type="button"
                 onClick={() => setHasPets(!hasPets)}
-                className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 ${
                   hasPets
                     ? "border-indigo-600 bg-indigo-50 text-indigo-700"
                     : "border-slate-200 bg-white text-slate-600 hover:border-indigo-300"

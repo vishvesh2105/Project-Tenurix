@@ -415,7 +415,7 @@ function AuthPageInner() {
           <div className="relative px-6 py-8 sm:px-10 sm:py-10">
             <div className="mb-6 flex items-start justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FFFFFF] shadow-lg shadow-indigo-600/25 overflow-hidden">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-lg shadow-indigo-600/25 overflow-hidden">
                   <Image src="/home-logo.svg" alt="Tenurix" width={36} height={36} />
                 </div>
                 <div>

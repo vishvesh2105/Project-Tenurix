@@ -84,7 +84,7 @@ export default function PaymentsPage() {
         {!loading && !error && rows.length === 0 && (
           <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 mb-5">
-              <CreditCard className="h-7 w-7 text-indigo-300" />
+              <CreditCard className="h-7 w-7 text-indigo-500" />
             </div>
             <h2 className="text-lg font-bold text-slate-900">{t("noPayments")}</h2>
             <p className="mt-2 text-sm text-slate-500">Payment records will appear here once the payment system is activated.</p>
