@@ -43,7 +43,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="flex items-center gap-2.5 group">
             <Image src="/home-logo.svg" alt="Tenurix" width={50} height={50} className="transition-transform group-hover:scale-105" />
             <div>
-              <div className="text-sm font-bold text-[#153050]-600 leading-tight">Tenurix</div>
+              <div className="text-sm font-bold text-slate-800 leading-tight">Tenurix</div>
               <div className="text-[10px] text-[#B48E6A] leading-tight font-medium">Find your home</div>
             </div>
           </Link>

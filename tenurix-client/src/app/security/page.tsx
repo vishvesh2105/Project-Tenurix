@@ -162,7 +162,7 @@ export default function SecurityPage() {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={inputClass.replace("pr-10 ", "")}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition placeholder:text-slate-400"
                 placeholder="Confirm new password"
               />
               {confirmPassword && !passwordsMatch && (

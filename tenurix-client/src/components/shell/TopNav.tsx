@@ -79,7 +79,7 @@ export function TopNav() {
               {user?.photoBase64 ? (
                 <img
                   src={`data:${user.photoContentType};base64,${user.photoBase64}`}
-                  alt=""
+                  alt="Profile"
                   className="h-7 w-7 rounded-full object-cover ring-2 ring-amber-300"
                 />
               ) : initials ? (

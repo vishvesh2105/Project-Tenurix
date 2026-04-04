@@ -216,6 +216,7 @@ export default function ListingDetailPage() {
                         src={photos[activePhoto]}
                         alt={`${row.addressLine1} photo ${activePhoto + 1}`}
                         className="h-full w-full object-cover animate-[fadeIn_0.3s_ease]"
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                       />
                     ) : (
                       <div className="h-full w-full flex flex-col items-center justify-center gap-3">
@@ -264,7 +265,7 @@ export default function ListingDetailPage() {
                               : "border-transparent opacity-60 hover:opacity-100 hover:border-slate-300"
                           }`}
                         >
-                          <img src={src} alt={`Thumb ${i + 1}`} className="h-full w-full object-cover" />
+                          <img src={src} alt={`Thumb ${i + 1}`} className="h-full w-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0.3"; }} />
                         </button>
                       ))}
                     </div>

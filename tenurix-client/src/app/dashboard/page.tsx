@@ -102,7 +102,7 @@ export default function DashboardPage() {
             {profile?.photoBase64 ? (
               <img
                 src={`data:${profile.photoContentType};base64,${profile.photoBase64}`}
-                alt=""
+                alt="Profile picture"
                 className="h-14 w-14 rounded-full object-cover ring-2 ring-amber-300"
               />
             ) : (

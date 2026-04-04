@@ -201,7 +201,7 @@ export default function IssueDetailPage() {
     );
   }
 
-  const statusColor = issue.status === "Resolved" ? "emerald" : issue.status === "InProgress" ? "amber" : "blue";
+  const statusBg = issue.status === "Resolved" ? "bg-emerald-50 border-emerald-100" : issue.status === "InProgress" ? "bg-amber-50 border-amber-100" : "bg-blue-50 border-blue-100";
 
   return (
     <AppShell>
@@ -229,7 +229,7 @@ export default function IssueDetailPage() {
         {/* Issue Details Card */}
         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
           {/* Status Timeline */}
-          <div className={`px-5 py-3 bg-${statusColor}-50 border-b border-${statusColor}-100`}>
+          <div className={`px-5 py-3 border-b ${statusBg}`}>
             <div className="flex items-center gap-4 text-xs">
               <span className="flex items-center gap-1.5 text-slate-600">
                 <Clock className="h-3.5 w-3.5" /> Submitted {fmtDateTime(issue.createdAt)}
