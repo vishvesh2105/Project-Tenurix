@@ -110,12 +110,13 @@ function ListingsContent() {
 
   // Load on filter changes with debounce (skip debounce on first load)
   useEffect(() => {
-    const qs = buildQuery();
-
     // Reset to page 1 when filters change (not on first mount)
+    const effectivePage = mountedRef.current ? 1 : currentPage;
     if (mountedRef.current) {
       setCurrentPage(1);
     }
+
+    const qs = buildQuery(effectivePage);
 
     // Update URL
     if (typeof window !== "undefined") {
@@ -173,7 +174,7 @@ function ListingsContent() {
       if (bedrooms !== "") p.set("bedrooms", bedrooms);
       if (propertyType) p.set("propertyType", propertyType);
       p.set("page", "1");
-      p.set("pageSize", "500");
+      p.set("pageSize", "2000");
       const res = await fetch(`${API_BASE}/public/listings?${p.toString()}`);
       const text = await res.text();
       const data = text ? JSON.parse(text) : null;

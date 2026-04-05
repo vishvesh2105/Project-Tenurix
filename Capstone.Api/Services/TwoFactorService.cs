@@ -32,28 +32,44 @@ public sealed class TwoFactorService
     /// Generate a 6-digit code, persist it in the database for 5 minutes, and email it.
     /// Resets failed attempts so the user gets a fresh window after requesting a new code.
     /// </summary>
-    public async Task SendCodeAsync(string email)
+    /// <param name="purpose">Ties the code to a specific flow: "login", "register", "reset". Prevents cross-flow reuse.</param>
+    public async Task SendCodeAsync(string email, string purpose = "login")
     {
         var code = Random.Shared.Next(100000, 999999).ToString();
         var key = email.Trim().ToLowerInvariant();
+        var purposeKey = purpose.Trim().ToLowerInvariant();
 
         await EnsureTableAsync();
 
         await using var conn = _db.Create();
 
+        // Clean up expired codes opportunistically on each send (fire-and-forget)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await using var cleanConn = _db.Create();
+                await cleanConn.ExecuteAsync(
+                    "DELETE FROM dbo.TwoFactorCodes WHERE ExpiresUtc < @Now;",
+                    new { Now = DateTime.UtcNow });
+            }
+            catch { /* Non-critical */ }
+        });
+
         // Upsert — reset failed attempts and lockout when a new code is issued
         await conn.ExecuteAsync(@"
             MERGE dbo.TwoFactorCodes AS target
-            USING (SELECT @Email AS Email) AS source ON target.Email = source.Email
+            USING (SELECT @Email AS Email, @Purpose AS Purpose) AS source
+                ON target.Email = source.Email AND target.Purpose = source.Purpose
             WHEN MATCHED THEN
                 UPDATE SET Code = @Code,
                            ExpiresUtc = @ExpiresUtc,
                            FailedAttempts = 0,
                            LockedUntil = NULL
             WHEN NOT MATCHED THEN
-                INSERT (Email, Code, ExpiresUtc, FailedAttempts, LockedUntil)
-                VALUES (@Email, @Code, @ExpiresUtc, 0, NULL);",
-            new { Email = key, Code = code, ExpiresUtc = DateTime.UtcNow.AddMinutes(5) });
+                INSERT (Email, Code, ExpiresUtc, FailedAttempts, LockedUntil, Purpose)
+                VALUES (@Email, @Code, @ExpiresUtc, 0, NULL, @Purpose);",
+            new { Email = key, Code = code, ExpiresUtc = DateTime.UtcNow.AddMinutes(5), Purpose = purposeKey });
 
         _logger.LogInformation("2FA code generated for {Email}, expires in 5 min", email);
 
@@ -66,9 +82,11 @@ public sealed class TwoFactorService
     /// Returns (false, errorMessage) on failure — includes lockout and expiry reasons.
     /// Increments failed attempts and locks the account after MaxFailedAttempts.
     /// </summary>
-    public async Task<(bool Success, string? Error)> VerifyCodeAsync(string email, string code)
+    /// <param name="purpose">Must match the purpose used when sending the code. Prevents cross-flow code reuse.</param>
+    public async Task<(bool Success, string? Error)> VerifyCodeAsync(string email, string code, string purpose = "login")
     {
         var key = email.Trim().ToLowerInvariant();
+        var purposeKey = purpose.Trim().ToLowerInvariant();
 
         await EnsureTableAsync();
 
@@ -77,8 +95,8 @@ public sealed class TwoFactorService
         var row = await conn.QuerySingleOrDefaultAsync(@"
             SELECT Code, ExpiresUtc, FailedAttempts, LockedUntil
             FROM dbo.TwoFactorCodes
-            WHERE Email = @Email;",
-            new { Email = key });
+            WHERE Email = @Email AND Purpose = @Purpose;",
+            new { Email = key, Purpose = purposeKey });
 
         if (row == null)
             return (false, "Invalid or expired verification code.");
@@ -95,7 +113,7 @@ public sealed class TwoFactorService
         DateTime expiresUtc = row.ExpiresUtc;
         if (DateTime.UtcNow > expiresUtc)
         {
-            await conn.ExecuteAsync("DELETE FROM dbo.TwoFactorCodes WHERE Email = @Email;", new { Email = key });
+            await conn.ExecuteAsync("DELETE FROM dbo.TwoFactorCodes WHERE Email = @Email AND Purpose = @Purpose;", new { Email = key, Purpose = purposeKey });
             return (false, "Verification code has expired. Please request a new one.");
         }
 
@@ -112,8 +130,8 @@ public sealed class TwoFactorService
                 await conn.ExecuteAsync(@"
                     UPDATE dbo.TwoFactorCodes
                     SET FailedAttempts = @Failed, LockedUntil = @LockUntil
-                    WHERE Email = @Email;",
-                    new { Failed = failed, LockUntil = lockUntil, Email = key });
+                    WHERE Email = @Email AND Purpose = @Purpose;",
+                    new { Failed = failed, LockUntil = lockUntil, Email = key, Purpose = purposeKey });
 
                 _logger.LogWarning("2FA account locked for {Email} after {Max} failed attempts", email, MaxFailedAttempts);
                 return (false, $"Too many failed attempts. Your account is locked for {LockoutMinutes} minutes.");
@@ -122,17 +140,19 @@ public sealed class TwoFactorService
             await conn.ExecuteAsync(@"
                 UPDATE dbo.TwoFactorCodes
                 SET FailedAttempts = @Failed
-                WHERE Email = @Email;",
-                new { Failed = failed, Email = key });
+                WHERE Email = @Email AND Purpose = @Purpose;",
+                new { Failed = failed, Email = key, Purpose = purposeKey });
 
             int remaining = MaxFailedAttempts - failed;
             return (false, $"Invalid verification code. {remaining} attempt{(remaining == 1 ? "" : "s")} remaining.");
         }
 
+        // Valid — atomic delete so concurrent requests with same code cannot both succeed
         var deleted = await conn.ExecuteAsync(
-            "DELETE FROM dbo.TwoFactorCodes WHERE Email = @Email AND Code = @Code;",
-            new { Email = key, Code = code.Trim() });
-        if (deleted == 0) return (false, "Invalid or expired verification code.");
+            "DELETE FROM dbo.TwoFactorCodes WHERE Email = @Email AND Purpose = @Purpose AND Code = @Code;",
+            new { Email = key, Purpose = purposeKey, Code = storedCode });
+        if (deleted == 0)
+            return (false, "Invalid or expired verification code.");
         return (true, null);
     }
 
@@ -154,12 +174,24 @@ public sealed class TwoFactorService
             BEGIN
                 CREATE TABLE dbo.TwoFactorCodes (
                     Email          NVARCHAR(256) NOT NULL,
+                    Purpose        NVARCHAR(20)  NOT NULL DEFAULT 'login',
                     Code           NVARCHAR(10)  NOT NULL,
                     ExpiresUtc     DATETIME2     NOT NULL,
                     FailedAttempts INT           NOT NULL DEFAULT 0,
                     LockedUntil    DATETIME2     NULL,
-                    CONSTRAINT PK_TwoFactorCodes PRIMARY KEY (Email)
+                    CONSTRAINT PK_TwoFactorCodes PRIMARY KEY (Email, Purpose)
                 )
+            END
+            ELSE
+            BEGIN
+                -- Add Purpose column if it doesn't exist yet (migration)
+                IF NOT EXISTS (
+                    SELECT 1 FROM sys.columns
+                    WHERE object_id = OBJECT_ID(N'dbo.TwoFactorCodes') AND name = 'Purpose'
+                )
+                BEGIN
+                    ALTER TABLE dbo.TwoFactorCodes ADD Purpose NVARCHAR(20) NOT NULL DEFAULT 'login';
+                END
             END");
     }
 
@@ -175,7 +207,7 @@ public sealed class TwoFactorService
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(_smtp.FromName, _smtp.FromEmail));
         message.To.Add(new MailboxAddress(toEmail, toEmail));
-        message.Subject = "Tenurix Verification Code";
+        message.Subject = "Your Tenurix Verification Code";
 
         var html = $@"
 <div style='font-family:Segoe UI,Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;'>

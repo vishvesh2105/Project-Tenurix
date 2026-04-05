@@ -108,8 +108,12 @@ public sealed class ClientApplicationsController : ControllerBase
     private async Task<IActionResult> InsertApplication(CreateLeaseApplicationDto req, string? documentsUrl)
     {
         if (req.ListingId <= 0) return BadRequest(new ApiError("Please select a listing to apply for."));
+        if (req.RequestedStartDate.Date < DateTime.UtcNow.Date)
+            return BadRequest(new ApiError("The start date cannot be in the past."));
         if (req.RequestedEndDate.Date <= req.RequestedStartDate.Date)
             return BadRequest(new ApiError("The end date must be after the start date."));
+        if (!string.IsNullOrWhiteSpace(req.AdditionalNotes) && req.AdditionalNotes.Length > 2000)
+            return BadRequest(new ApiError("Additional notes must be 2000 characters or fewer."));
 
         try
         {
@@ -331,8 +335,13 @@ ORDER BY la.SubmittedAt DESC;
     private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
         { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".pdf" };
 
+    private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB per file
+
     private async Task<(string? url, string? error)> SaveUpload(IFormFile file, string folder)
     {
+        if (file.Length > MaxFileSizeBytes)
+            return (null, "Each file must be 5 MB or smaller.");
+
         var ext = Path.GetExtension(file.FileName)?.ToLowerInvariant();
         if (string.IsNullOrWhiteSpace(ext)) ext = ".jpg";
 

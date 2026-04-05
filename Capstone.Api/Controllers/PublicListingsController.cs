@@ -86,7 +86,10 @@ public sealed class PublicListingsController : ControllerBase
         [FromQuery] int pageSize = 12)
     {
         page = Math.Max(1, page);
-        pageSize = Math.Clamp(pageSize, 6, 500);
+        pageSize = Math.Clamp(pageSize, 1, 2000);
+        if (minRent.HasValue && minRent.Value < 0) minRent = 0;
+        if (maxRent.HasValue && maxRent.Value < 0) maxRent = null;
+        if (bedrooms.HasValue && bedrooms.Value < 0) bedrooms = 0;
 
         var offset = (page - 1) * pageSize;
 

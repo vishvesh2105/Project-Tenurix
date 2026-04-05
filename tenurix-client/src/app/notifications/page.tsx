@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/shell/AppShell";
 import { useAuth } from "@/lib/useAuth";
 import { apiFetch } from "@/lib/api";
@@ -18,6 +19,7 @@ type Notification = {
 };
 
 export default function NotificationsPage() {
+  const router = useRouter();
   const { isReady } = useAuth();
   const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +61,7 @@ export default function NotificationsPage() {
         return;
       }
     }
-    if (n.linkUrl) window.location.href = n.linkUrl;
+    if (n.linkUrl) router.push(n.linkUrl);
   };
 
   const markAllRead = async () => {

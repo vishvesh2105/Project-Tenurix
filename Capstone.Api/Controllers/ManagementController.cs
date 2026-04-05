@@ -441,7 +441,7 @@ WHERE i.IssueId = @IssueId;
             var whereClause = conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : "";
 
             var sql = $@"
-SELECT TOP 200
+SELECT TOP 500
     p.PropertyId,
     p.OwnerUserId,
     u.FullName AS LandlordName,
@@ -934,7 +934,7 @@ LEFT JOIN dbo.Properties p ON p.PropertyId = la.PropertyId
                 : "NULL AS LeaseEndDate";
 
             var sql = $@"
-SELECT TOP 200
+SELECT TOP 500
     la.ApplicationId,
     {(listingCol.Equals("ListingId", StringComparison.OrdinalIgnoreCase) ? "la.ListingId" : "NULL AS ListingId")},
     la.{applicantCol} AS ClientUserId,
@@ -1109,10 +1109,12 @@ END
                 return NotFound(new ApiError("This application is no longer available."));
             }
 
-            if ((DateTime)app.RequestedStartDate < DateTime.Today.AddDays(-30))
+            // Reject if requested start date is more than 30 days in the past
+            DateTime requestedStart = (DateTime)app.RequestedStartDate;
+            if (requestedStart < DateTime.UtcNow.AddDays(-30))
             {
                 tx.Rollback();
-                return BadRequest(new ApiError("Cannot approve a lease with a start date more than 30 days in the past."));
+                return BadRequest(new ApiError("The requested lease start date is too far in the past."));
             }
 
             string listingStatus = (string)app.ListingStatus;
@@ -1132,7 +1134,7 @@ END
             if (rows == 0)
             {
                 tx.Rollback();
-                return Conflict(new ApiError("Application has already been processed."));
+                return NotFound(new ApiError("This application is no longer available."));
             }
 
             await conn.ExecuteAsync(sqlRejectOthers, new { ListingId = (int)app.ListingId, ApplicationId = applicationId }, tx);
@@ -1276,7 +1278,7 @@ WHERE la.ApplicationId = @ApplicationId;
         try
         {
             const string sql = @"
-SELECT DISTINCT TOP 200
+SELECT DISTINCT TOP 500
     u.UserId,
     u.FullName,
     u.Email,
@@ -1330,7 +1332,7 @@ WHERE u.UserId = @UserId;
             if (emp == null) return NotFound(new ApiError("Employee not found."));
 
             var properties = (await conn.QueryAsync<AssignedPropertyDto>(@"
-SELECT
+SELECT TOP 200
     PropertyId,
     AddressLine1,
     City,
@@ -1447,7 +1449,7 @@ VALUES (@UserId, @Phone, @Address);
             var staffFilter = staffUserId.HasValue ? " AND p.AssignedToUserId = @StaffUserId" : "";
 
             var sql = $@"
-SELECT TOP 200
+SELECT TOP 500
     l.ListingId,
     l.PropertyId,
     CONCAT(p.AddressLine1, ', ', p.City) AS Address,
@@ -1483,7 +1485,7 @@ ORDER BY l.CreatedAt DESC;
             var staffFilter = staffUserId.HasValue ? " AND p.AssignedToUserId = @StaffUserId" : "";
 
             var sql = $@"
-SELECT TOP 200
+SELECT TOP 500
     le.LeaseId,
     le.ListingId,
     CONCAT(p.AddressLine1, ', ', p.City) AS Address,
@@ -1553,7 +1555,7 @@ ORDER BY le.LeaseStartDate DESC;
             var priorityExpr = priorityCol == null ? "CAST('' AS NVARCHAR(50))" : $"CAST(i.[{priorityCol}] AS NVARCHAR(50))";
 
             var sql = $@"
-SELECT TOP 200
+SELECT TOP 500
     i.IssueId,
     CONCAT(p.AddressLine1, ', ', p.City) AS PropertyAddress,
     {titleExpr}    AS Title,
@@ -1658,7 +1660,7 @@ WHERE UserId = @UserId AND IsActive = 1;
             var staffWhere = staffUserId.HasValue ? "WHERE p.AssignedToUserId = @StaffUserId" : "";
 
             var sql = $@"
-SELECT TOP 200
+SELECT TOP 500
     l.ListingId,
     l.PropertyId,
     CONCAT(p.AddressLine1, ', ', p.City) AS Address,
@@ -1742,7 +1744,7 @@ WHERE ListingId = @ListingId;
             var whereClause = issueConditions.Count > 0 ? "WHERE " + string.Join(" AND ", issueConditions) : "";
 
             var sql = $@"
-SELECT TOP 200
+SELECT TOP 500
     i.IssueId,
     i.IssueType,
     i.Description,
@@ -2046,7 +2048,7 @@ WHERE DocumentId = @DocumentId
         await using var conn = _db.Create();
 
         var sql = $@"
-SELECT TOP 200
+SELECT TOP 500
     p.PropertyId,
     CONCAT(p.AddressLine1, ', ', p.City) AS Address,
     p.SubmissionStatus,

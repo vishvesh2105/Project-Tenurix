@@ -1,4 +1,3 @@
-using System.Linq;
 using Capstone.Api.Data;
 using Capstone.Api.Models;
 using Capstone.Api.Security;
@@ -19,14 +18,16 @@ public sealed class WebAuthController : ControllerBase
     private readonly SqlConnectionFactory _db;
     private readonly AuthService _auth;
     private readonly TwoFactorService _twoFactor;
+    private readonly AuditService _audit;
     private readonly ILogger<WebAuthController> _logger;
 
     public WebAuthController(SqlConnectionFactory db, AuthService auth,
-        TwoFactorService twoFactor, ILogger<WebAuthController> logger)
+        TwoFactorService twoFactor, AuditService audit, ILogger<WebAuthController> logger)
     {
         _db = db;
         _auth = auth;
         _twoFactor = twoFactor;
+        _audit = audit;
         _logger = logger;
     }
 
@@ -57,17 +58,18 @@ public sealed class WebAuthController : ControllerBase
             return BadRequest(new ApiError("Last name is required."));
         if (string.IsNullOrWhiteSpace(req.Email))
             return BadRequest(new ApiError("Email is required."));
-        var pwError = ValidatePasswordStrength(req.Password);
-        if (pwError != null) return BadRequest(new ApiError(pwError));
+        if (!IsValidEmail(req.Email))
+            return BadRequest(new ApiError("Please enter a valid email address."));
+        if (string.IsNullOrWhiteSpace(req.Password) || req.Password.Length < 8)
+            return BadRequest(new ApiError("Password must be at least 8 characters."));
+        if (!IsStrongPassword(req.Password))
+            return BadRequest(new ApiError("Password must contain uppercase, lowercase, and a number."));
 
         var role = req.Role?.Trim().ToLowerInvariant();
         if (role != "client" && role != "landlord")
             return BadRequest(new ApiError("Please select a valid role (Tenant or Landlord)."));
 
         var email = req.Email.Trim().ToLowerInvariant();
-
-        if (!IsValidEmail(email))
-            return BadRequest(new ApiError("Please enter a valid email address."));
 
         // ── Duplicate check across Users table ──
         await using var conn = _db.Create();
@@ -79,14 +81,18 @@ SELECT CASE WHEN EXISTS (
 ", new { Email = email });
 
         if (exists == 1)
+        {
+            // Still send 2FA code to avoid leaking whether the email is registered
+            try { await _twoFactor.SendCodeAsync(email, "register"); } catch { }
             return Ok(new { requiresTwoFactor = true, maskedEmail = MaskEmail(email), email });
+        }
 
         // ── Store pending registration in session (TwoFactorCodes table) ──
         // We temporarily store the registration data as JSON in the TwoFactorCodes table
         // so we can retrieve it after 2FA verification
         try
         {
-            await _twoFactor.SendCodeAsync(email);
+            await _twoFactor.SendCodeAsync(email, "register");
         }
         catch (Exception ex)
         {
@@ -150,17 +156,22 @@ WHEN NOT MATCHED THEN
         var email = req.Email.Trim().ToLowerInvariant();
 
         // Verify 2FA code
-        var (codeOk, codeError) = await _twoFactor.VerifyCodeAsync(email, req.Code);
+        var (codeOk, codeError) = await _twoFactor.VerifyCodeAsync(email, req.Code, "register");
         if (!codeOk)
             return Unauthorized(new ApiError(codeError ?? "Invalid or expired verification code."));
 
         await using var conn = _db.Create();
 
+        // Clean up expired pending registrations (older than 30 minutes)
+        await conn.ExecuteAsync(@"
+IF OBJECT_ID('dbo.PendingRegistrations') IS NOT NULL
+    DELETE FROM dbo.PendingRegistrations WHERE CreatedAt < DATEADD(MINUTE, -30, SYSUTCDATETIME());");
+
         // Get pending registration
         var pending = await conn.QuerySingleOrDefaultAsync<dynamic>(@"
 SELECT FirstName, LastName, Phone, PasswordHash, PasswordSalt, Role
 FROM dbo.PendingRegistrations
-WHERE Email = @Email AND CreatedAt > DATEADD(HOUR, -1, SYSUTCDATETIME());
+WHERE Email = @Email;
 ", new { Email = email });
 
         if (pending == null)
@@ -277,14 +288,13 @@ END
 
         var email = req.Email.Trim().ToLowerInvariant();
 
-        if (!IsValidEmail(email))
-            return BadRequest(new ApiError("Please enter a valid email address."));
-
         await using var conn = _db.Create();
 
-        // Find user
+        // Find user (also fetch failed attempt tracking)
         var user = await conn.QuerySingleOrDefaultAsync<dynamic>(@"
-SELECT TOP 1 u.UserId, u.PasswordHash, u.PasswordSalt, u.TempPassword, u.IsActive
+SELECT TOP 1 u.UserId, u.PasswordHash, u.PasswordSalt, u.TempPassword, u.IsActive,
+    ISNULL(u.FailedLoginAttempts, 0) AS FailedLoginAttempts,
+    u.LockedUntil
 FROM dbo.Users u
 WHERE LOWER(u.Email) = @Email AND u.IsActive = 1;
 ", new { Email = email });
@@ -293,6 +303,14 @@ WHERE LOWER(u.Email) = @Email AND u.IsActive = 1;
             return Unauthorized(new ApiError("The email or password you entered is incorrect."));
 
         int userId = (int)user.UserId;
+
+        // Check account lockout
+        DateTime? lockedUntil = user.LockedUntil as DateTime?;
+        if (lockedUntil.HasValue && DateTime.UtcNow < lockedUntil.Value)
+        {
+            var mins = (int)Math.Ceiling((lockedUntil.Value - DateTime.UtcNow).TotalMinutes);
+            return Unauthorized(new ApiError($"Account locked. Try again in {mins} minute{(mins == 1 ? "" : "s")}."));
+        }
 
         // Verify password
         bool okPassword = false;
@@ -307,11 +325,32 @@ WHERE LOWER(u.Email) = @Email AND u.IsActive = 1;
         {
             string? temp = user.TempPassword as string;
             if (!string.IsNullOrWhiteSpace(temp))
-                okPassword = (req.Password == temp);
+                okPassword = CryptographicEquals(req.Password, temp);
         }
 
         if (!okPassword)
+        {
+            // Increment failed login attempts with lockout after 10 failures
+            await conn.ExecuteAsync(@"
+IF COL_LENGTH('dbo.Users', 'FailedLoginAttempts') IS NOT NULL
+BEGIN
+    DECLARE @fails INT = ISNULL((SELECT FailedLoginAttempts FROM dbo.Users WHERE UserId = @UserId), 0) + 1;
+    UPDATE dbo.Users
+    SET FailedLoginAttempts = @fails,
+        LockedUntil = CASE WHEN @fails >= 10 THEN DATEADD(MINUTE, 30, SYSUTCDATETIME()) ELSE NULL END
+    WHERE UserId = @UserId;
+END
+", new { UserId = userId });
+            _ = _audit.LogAsync("LOGIN_FAILED", "User", userId, userId, $"Failed login attempt for {email} (wrong password)");
+            _logger.LogWarning("Failed login attempt for {Email} from {IP}", email, HttpContext.Connection.RemoteIpAddress);
             return Unauthorized(new ApiError("The email or password you entered is incorrect."));
+        }
+
+        // Reset failed attempts on success
+        await conn.ExecuteAsync(@"
+IF COL_LENGTH('dbo.Users', 'FailedLoginAttempts') IS NOT NULL
+    UPDATE dbo.Users SET FailedLoginAttempts = 0, LockedUntil = NULL WHERE UserId = @UserId;
+", new { UserId = userId });
 
         // Verify user has the correct role
         var userRole = await conn.QuerySingleOrDefaultAsync<string>(@"
@@ -332,7 +371,7 @@ WHERE ur.UserId = @UserId;
         // Send 2FA code
         try
         {
-            await _twoFactor.SendCodeAsync(email);
+            await _twoFactor.SendCodeAsync(email, "login");
         }
         catch (Exception ex)
         {
@@ -359,7 +398,7 @@ WHERE ur.UserId = @UserId;
         var email = req.Email.Trim().ToLowerInvariant();
 
         // Verify 2FA code
-        var (codeOk, codeError) = await _twoFactor.VerifyCodeAsync(email, req.Code);
+        var (codeOk, codeError) = await _twoFactor.VerifyCodeAsync(email, req.Code, "login");
         if (!codeOk)
             return Unauthorized(new ApiError(codeError ?? "Invalid or expired verification code."));
 
@@ -397,6 +436,7 @@ WHERE LOWER(u.Email) = @Email AND u.IsActive = 1;
         var (ok, data, error) = await _auth.LoginByUserIdAsync(userId);
         if (!ok) return Unauthorized(new ApiError(error));
 
+        _ = _audit.LogAsync("LOGIN_SUCCESS", "User", userId, userId, $"Successful login for {email}");
         return Ok(data);
     }
 
@@ -451,11 +491,11 @@ SELECT CASE WHEN EXISTS (
 ", new { Email = email });
 
         if (exists == 0)
-            return Ok(new { requiresTwoFactor = true, maskedEmail = MaskEmail(email), email });
+            return NotFound(new ApiError("No account found with this email address."));
 
         try
         {
-            await _twoFactor.SendCodeAsync(email);
+            await _twoFactor.SendCodeAsync(email, "reset");
         }
         catch (Exception ex)
         {
@@ -474,7 +514,7 @@ SELECT CASE WHEN EXISTS (
     }
 
     /// <summary>
-    /// Step 2: Verify 2FA code. Returns a reset token (email) to allow password change.
+    /// Step 2: Verify 2FA code. Issues a short-lived reset token that is required for the actual password change.
     /// </summary>
     [HttpPost("forgot-password/verify")]
     [EnableRateLimiting("verify2fa")]
@@ -485,61 +525,67 @@ SELECT CASE WHEN EXISTS (
 
         var email = req.Email.Trim().ToLowerInvariant();
 
-        var (codeOk, codeError) = await _twoFactor.VerifyCodeAsync(email, req.Code);
+        var (codeOk, codeError) = await _twoFactor.VerifyCodeAsync(email, req.Code, "reset");
         if (!codeOk)
             return Unauthorized(new ApiError(codeError ?? "Invalid or expired verification code."));
 
+        // Issue a single-use reset token (10-minute expiry) stored server-side
+        var resetToken = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
         await using var conn = _db.Create();
-
         await conn.ExecuteAsync(@"
 IF OBJECT_ID('dbo.PasswordResetTokens') IS NULL
-CREATE TABLE dbo.PasswordResetTokens (
-    Email NVARCHAR(256) NOT NULL PRIMARY KEY,
-    Token NVARCHAR(64) NOT NULL,
-    ExpiresUtc DATETIME2 NOT NULL
-);");
+BEGIN
+    CREATE TABLE dbo.PasswordResetTokens (
+        Token      NVARCHAR(100) NOT NULL PRIMARY KEY,
+        Email      NVARCHAR(256) NOT NULL,
+        ExpiresUtc DATETIME2     NOT NULL
+    )
+END
 
-        var resetToken = Guid.NewGuid().ToString("N");
-        await conn.ExecuteAsync(@"
-MERGE dbo.PasswordResetTokens AS target
-USING (SELECT @Email AS Email) AS source ON target.Email = source.Email
-WHEN MATCHED THEN UPDATE SET Token = @Token, ExpiresUtc = @Expires
-WHEN NOT MATCHED THEN INSERT (Email, Token, ExpiresUtc) VALUES (@Email, @Token, @Expires);",
-            new { Email = email, Token = resetToken, Expires = DateTime.UtcNow.AddMinutes(10) });
+INSERT INTO dbo.PasswordResetTokens (Token, Email, ExpiresUtc)
+VALUES (@Token, @Email, @ExpiresUtc);
+", new { Token = resetToken, Email = email, ExpiresUtc = DateTime.UtcNow.AddMinutes(10) });
 
-        return Ok(new { verified = true, email, resetToken });
+        return Ok(new { verified = true, resetToken });
     }
 
     public sealed class ResetPasswordRequest
     {
-        public string Email { get; set; } = "";
-        public string NewPassword { get; set; } = "";
         public string ResetToken { get; set; } = "";
+        public string NewPassword { get; set; } = "";
     }
 
     /// <summary>
-    /// Step 3: Set the new password (only after 2FA verified).
+    /// Step 3: Set the new password. Requires the reset token issued by forgot-password/verify.
     /// </summary>
     [HttpPost("reset-password")]
     [EnableRateLimiting("login")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
     {
-        if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.NewPassword))
+        if (string.IsNullOrWhiteSpace(req.ResetToken) || string.IsNullOrWhiteSpace(req.NewPassword))
             return BadRequest(new ApiError("Please enter a new password."));
 
-        var pwError = ValidatePasswordStrength(req.NewPassword);
-        if (pwError != null) return BadRequest(new ApiError(pwError));
-
-        var email = req.Email.Trim().ToLowerInvariant();
+        if (req.NewPassword.Length < 8)
+            return BadRequest(new ApiError("Password must be at least 8 characters."));
+        if (!IsStrongPassword(req.NewPassword))
+            return BadRequest(new ApiError("Password must contain uppercase, lowercase, and a number."));
 
         await using var conn = _db.Create();
 
-        var tokenRow = await conn.QuerySingleOrDefaultAsync(@"
-SELECT Token, ExpiresUtc FROM dbo.PasswordResetTokens WHERE Email = @Email;",
-            new { Email = email });
-        if (tokenRow == null || (string)tokenRow.Token != req.ResetToken || DateTime.UtcNow > (DateTime)tokenRow.ExpiresUtc)
-            return Unauthorized(new ApiError("Invalid or expired reset session. Please start over."));
+        // Validate and consume the reset token atomically
+        var tokenRow = await conn.QuerySingleOrDefaultAsync<dynamic>(@"
+DELETE FROM dbo.PasswordResetTokens
+OUTPUT DELETED.Email, DELETED.ExpiresUtc
+WHERE Token = @Token;
+", new { Token = req.ResetToken });
 
+        if (tokenRow == null)
+            return BadRequest(new ApiError("Invalid or expired reset link. Please request a new one."));
+
+        if (DateTime.UtcNow > (DateTime)tokenRow.ExpiresUtc)
+            return BadRequest(new ApiError("Reset link has expired. Please request a new one."));
+
+        var email = (string)tokenRow.Email;
         var (pwHash, pwSalt) = PinHasher.Hash(req.NewPassword);
 
         var rows = await conn.ExecuteAsync(@"
@@ -554,9 +600,42 @@ WHERE LOWER(Email) = @Email AND IsActive = 1;
         if (rows == 0)
             return NotFound(new ApiError("Account not found."));
 
-        await conn.ExecuteAsync("DELETE FROM dbo.PasswordResetTokens WHERE Email = @Email;", new { Email = email });
+        // Log password reset for audit trail
+        var resetUserId = await conn.ExecuteScalarAsync<int?>(
+            "SELECT UserId FROM dbo.Users WHERE LOWER(Email) = @Email AND IsActive = 1;", new { Email = email });
+        if (resetUserId.HasValue)
+            _ = _audit.LogAsync("PASSWORD_RESET", "User", resetUserId.Value, resetUserId.Value, $"Password reset for {email}");
 
+        _logger.LogInformation("Password reset completed for {Email}", email);
         return Ok(new { success = true });
+    }
+
+    private static bool IsStrongPassword(string password)
+    {
+        return password.Any(char.IsUpper)
+            && password.Any(char.IsLower)
+            && password.Any(char.IsDigit);
+    }
+
+    /// <summary>Constant-time string comparison to prevent timing attacks.</summary>
+    private static bool CryptographicEquals(string a, string b)
+    {
+        var aBytes = System.Text.Encoding.UTF8.GetBytes(a);
+        var bBytes = System.Text.Encoding.UTF8.GetBytes(b);
+        return System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(aBytes, bBytes);
+    }
+
+    private static bool IsValidEmail(string email)
+    {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email.Trim();
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     // ─── Request models ─────────────────────────────────────────────
@@ -587,26 +666,6 @@ WHERE LOWER(Email) = @Email AND IsActive = 1;
         if (value is string s) return string.IsNullOrWhiteSpace(s) ? null : s;
         if (value is byte[] b && b.Length > 0) return Convert.ToBase64String(b);
         return null;
-    }
-
-    private static string? ValidatePasswordStrength(string password)
-    {
-        if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
-            return "Password must be at least 8 characters.";
-        if (!password.Any(char.IsUpper))
-            return "Password must contain at least one uppercase letter.";
-        if (!password.Any(char.IsLower))
-            return "Password must contain at least one lowercase letter.";
-        if (!password.Any(char.IsDigit))
-            return "Password must contain at least one number.";
-        return null;
-    }
-
-    private static bool IsValidEmail(string email)
-    {
-        return !string.IsNullOrWhiteSpace(email) &&
-               System.Text.RegularExpressions.Regex.IsMatch(email,
-               @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
     }
 
     private static string MaskEmail(string email)

@@ -51,10 +51,8 @@ public sealed class ClientAuthController : ControllerBase
             return Unauthorized(new ApiError("Google sign-in failed. Please try again."));
         }
 
-        if (!payload.EmailVerified)
-            return BadRequest(new ApiError("Your Google email must be verified before signing in."));
-
-        var googleSub = payload.Subject;
+        // Google identity info
+        var googleSub = payload.Subject;     // stable unique id
         var email = payload.Email ?? "";
         var name = payload.Name ?? payload.GivenName ?? "Client";
 
@@ -75,17 +73,6 @@ WHERE GoogleSub = @GoogleSub AND IsActive = 1;
         if (existingBySub.HasValue)
         {
             userId = existingBySub.Value;
-
-            // Portal-lock: verify user has Client role
-            var subRoles = (await conn.QueryAsync<string>(@"
-SELECT r.RoleName
-FROM dbo.UserRoles ur
-JOIN dbo.Roles r ON r.RoleId = ur.RoleId
-WHERE ur.UserId = @UserId;
-", new { UserId = userId })).ToList();
-
-            if (subRoles.Any(r => string.Equals(r, "Landlord", StringComparison.OrdinalIgnoreCase)))
-                return Conflict(new ApiError("This account is registered as a Landlord. Please use the Landlord portal to sign in."));
         }
         else
         {

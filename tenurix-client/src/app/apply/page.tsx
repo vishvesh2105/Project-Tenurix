@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState, useRef } from "react";
+import { Suspense, useCallback, useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/shell/AppShell";
@@ -96,6 +96,14 @@ function ApplyPageInner() {
   const [additionalNotes, setAdditionalNotes] = useState("");
   const [documents, setDocuments] = useState<File[]>([]);
   const docInputRef = useRef<HTMLInputElement>(null);
+
+  const previewUrlsRef = useRef<string[]>([]);
+  const getPreviewUrl = useCallback((file: File) => {
+    const url = URL.createObjectURL(file);
+    previewUrlsRef.current.push(url);
+    return url;
+  }, []);
+  useEffect(() => () => { previewUrlsRef.current.forEach(URL.revokeObjectURL); }, []);
 
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string>("");
@@ -505,7 +513,7 @@ function ApplyPageInner() {
                     <div key={`${file.name}-${idx}`} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-2">
                       {file.type.startsWith("image/") ? (
                         <img
-                          src={URL.createObjectURL(file)}
+                          src={getPreviewUrl(file)}
                           alt={file.name}
                           className="h-10 w-10 rounded object-cover"
                         />

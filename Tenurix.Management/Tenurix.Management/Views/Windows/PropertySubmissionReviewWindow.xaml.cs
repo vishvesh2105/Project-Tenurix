@@ -36,6 +36,8 @@ namespace Tenurix.Management.Views.Windows
         private int _idIdx   = 0;
 
         // Highlight colour for selected thumbnail
+        private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(15) };
+
         private static readonly Brush HighlightBrush =
             new SolidColorBrush(Color.FromRgb(59, 130, 246)); // blue-500
 
@@ -284,9 +286,6 @@ namespace Tenurix.Management.Views.Windows
             var items = new List<PhotoItem>();
             int index = 0;
 
-            using var http = new HttpClient();
-            http.Timeout = TimeSpan.FromSeconds(15);
-
             foreach (var url in urls)
             {
                 if (string.IsNullOrWhiteSpace(url)) continue;
@@ -298,7 +297,7 @@ namespace Tenurix.Management.Views.Windows
                 {
                     try
                     {
-                        var bytes = await http.GetByteArrayAsync(url);
+                        var bytes = await _http.GetByteArrayAsync(url);
                         bmp = BitmapFromBytes(bytes);
                     }
                     catch { /* fall through */ }

@@ -18,11 +18,14 @@ public class AuthController : ControllerBase
     private readonly TwoFactorService _twoFactor;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(AuthService auth, SqlConnectionFactory db, TwoFactorService twoFactor, ILogger<AuthController> logger)
+    private readonly AuditService _audit;
+
+    public AuthController(AuthService auth, SqlConnectionFactory db, TwoFactorService twoFactor, AuditService audit, ILogger<AuthController> logger)
     {
         _auth = auth;
         _db = db;
         _twoFactor = twoFactor;
+        _audit = audit;
         _logger = logger;
     }
 
@@ -79,6 +82,20 @@ public class AuthController : ControllerBase
         var (ok, data, error) = await _auth.ManagementLoginAsync(loginReq);
         if (!ok) return Unauthorized(new ApiError("Session expired. Please sign in again."));
 
+        // Audit successful management login
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await using var auditConn = _db.Create();
+                var uid = await auditConn.ExecuteScalarAsync<int?>(
+                    "SELECT TOP 1 UserId FROM dbo.Users WHERE LOWER(Email) = @Email AND IsActive = 1;",
+                    new { Email = req.Email.Trim().ToLowerInvariant() });
+                if (uid.HasValue)
+                    await _audit.LogAsync("LOGIN_SUCCESS", "User", uid.Value, uid.Value, $"Management login for {req.Email.Trim()}");
+            }
+            catch { }
+        });
         return Ok(data);
     }
 
@@ -152,6 +169,7 @@ WHERE UserId=@UserId;
 ";
         await conn.ExecuteAsync(sqlUpdate, new { Hash = newHash, Salt = newSalt, UserId = userId });
 
+        _ = _audit.LogAsync("PASSWORD_CHANGED", "User", userId, userId, "Management user changed password");
         return Ok();
     }
 

@@ -72,7 +72,7 @@ WHERE u.UserId = @LandlordUserId;
 ";
 
         var sqlProps = $@"
-SELECT
+SELECT TOP 500
     PropertyId, AddressLine1, City, Province, PostalCode,
     PropertyType, Bedrooms, Bathrooms, RentAmount, MediaUrl, CreatedAt
 FROM dbo.Properties
@@ -81,7 +81,7 @@ ORDER BY CreatedAt DESC;
 ";
 
         var sqlListings = $@"
-SELECT
+SELECT TOP 500
     l.ListingId, l.PropertyId, l.ListingStatus, l.CreatedByMgmtId, l.CreatedAt, l.UpdatedAt
 FROM dbo.Listings l
 JOIN dbo.Properties p ON p.PropertyId = l.PropertyId
@@ -90,7 +90,7 @@ ORDER BY l.CreatedAt DESC;
 ";
 
         var sqlLeases = $@"
-SELECT
+SELECT TOP 500
     le.LeaseId, le.ListingId, le.OwnerUserId, le.ClientUserId,
     le.LeaseStartDate, le.LeaseEndDate, le.LeaseStatus
 FROM dbo.Leases le
@@ -101,7 +101,7 @@ ORDER BY le.LeaseStartDate DESC;
 ";
 
         var sqlIssues = $@"
-SELECT
+SELECT TOP 500
     i.IssueId, i.PropertyId, i.Title, i.Priority, i.Status, i.CreatedAt
 FROM dbo.Issues i
 JOIN dbo.Properties p ON p.PropertyId = i.PropertyId

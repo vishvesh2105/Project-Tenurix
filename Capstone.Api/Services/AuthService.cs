@@ -66,10 +66,14 @@ WHERE u.Email = @Email AND u.IsActive = 1;
         }
         else
         {
-            // fallback: TempPassword (plain text) support
+            // fallback: TempPassword — use constant-time comparison to prevent timing attacks
             string? temp = user.TempPassword as string;
             if (!string.IsNullOrWhiteSpace(temp))
-                okPassword = (req.Password == temp);
+            {
+                var a = System.Text.Encoding.UTF8.GetBytes(req.Password);
+                var b = System.Text.Encoding.UTF8.GetBytes(temp);
+                okPassword = System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(a, b);
+            }
         }
 
         if (!okPassword)
@@ -133,30 +137,6 @@ WHERE r.RoleName = @RoleName;
 
 
 
-
-    private static bool LooksLikeBase64(string s)
-    {
-        if (string.IsNullOrWhiteSpace(s)) return false;
-        s = s.Trim();
-
-        // common quick checks
-        if (s.Length < 8) return false;
-        if (s.Length % 4 != 0) return false;
-
-        try
-        {
-            Convert.FromBase64String(s);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-
-
-
     //JWT
     private string CreateJwt(int userId, string email, string roleName, List<string> perms)
     {
@@ -187,7 +167,7 @@ WHERE r.RoleName = @RoleName;
             issuer: issuer,
             audience: audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(6),
+            expires: DateTime.UtcNow.AddHours(2),
             signingCredentials: creds
         );
 

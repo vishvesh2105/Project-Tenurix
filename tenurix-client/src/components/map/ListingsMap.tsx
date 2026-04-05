@@ -50,8 +50,8 @@ async function saveCoordinatesToDb(apiBase: string, entries: { propertyId: numbe
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(entries),
     });
-  } catch {
-    // silent — best effort
+  } catch (err) {
+    console.warn("Failed to save coordinates:", err);
   }
 }
 
