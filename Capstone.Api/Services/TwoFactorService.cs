@@ -129,8 +129,10 @@ public sealed class TwoFactorService
             return (false, $"Invalid verification code. {remaining} attempt{(remaining == 1 ? "" : "s")} remaining.");
         }
 
-        // Valid — remove so it cannot be reused
-        await conn.ExecuteAsync("DELETE FROM dbo.TwoFactorCodes WHERE Email = @Email;", new { Email = key });
+        var deleted = await conn.ExecuteAsync(
+            "DELETE FROM dbo.TwoFactorCodes WHERE Email = @Email AND Code = @Code;",
+            new { Email = key, Code = code.Trim() });
+        if (deleted == 0) return (false, "Invalid or expired verification code.");
         return (true, null);
     }
 
@@ -173,7 +175,7 @@ public sealed class TwoFactorService
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(_smtp.FromName, _smtp.FromEmail));
         message.To.Add(new MailboxAddress(toEmail, toEmail));
-        message.Subject = $"Tenurix Verification Code: {code}";
+        message.Subject = "Tenurix Verification Code";
 
         var html = $@"
 <div style='font-family:Segoe UI,Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;'>

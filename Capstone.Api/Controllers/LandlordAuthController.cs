@@ -51,6 +51,9 @@ public sealed class LandlordAuthController : ControllerBase
             return Unauthorized(new ApiError("Google sign-in failed. Please try again."));
         }
 
+        if (!payload.EmailVerified)
+            return BadRequest(new ApiError("Your Google email must be verified before signing in."));
+
         var googleSub = payload.Subject;
         var email = payload.Email ?? "";
         var name = payload.Name ?? payload.GivenName ?? "Landlord";
@@ -72,6 +75,17 @@ WHERE GoogleSub = @GoogleSub AND IsActive = 1;
         if (existingBySub.HasValue)
         {
             userId = existingBySub.Value;
+
+            // Portal-lock: verify user has Landlord role
+            var subRoles = (await conn.QueryAsync<string>(@"
+SELECT r.RoleName
+FROM dbo.UserRoles ur
+JOIN dbo.Roles r ON r.RoleId = ur.RoleId
+WHERE ur.UserId = @UserId;
+", new { UserId = userId })).ToList();
+
+            if (subRoles.Any(r => string.Equals(r, "Client", StringComparison.OrdinalIgnoreCase)))
+                return Conflict(new ApiError("This account is registered as a tenant. Please use the tenant portal to sign in."));
         }
         else
         {

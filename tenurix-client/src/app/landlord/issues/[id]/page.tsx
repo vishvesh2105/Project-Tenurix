@@ -76,6 +76,7 @@ export default function LandlordIssueDetailPage() {
   const commentImageUrl = useMemo(() => commentImage ? URL.createObjectURL(commentImage) : null, [commentImage]);
   useEffect(() => { return () => { if (commentImageUrl) URL.revokeObjectURL(commentImageUrl); }; }, [commentImageUrl]);
   const [sending, setSending] = useState(false);
+  const [actionError, setActionError] = useState("");
 
   async function loadIssue() {
     try {
@@ -123,7 +124,7 @@ export default function LandlordIssueDetailPage() {
       if (commentsRes.ok && Array.isArray(commentsData)) setComments(commentsData);
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
     } catch (e: any) {
-      alert(e?.message || "Failed to post comment.");
+      setActionError(e?.message || "Failed to post comment.");
     } finally {
       setSending(false);
     }
@@ -266,6 +267,11 @@ export default function LandlordIssueDetailPage() {
           </div>
 
           <div className="border-t border-slate-100 p-4">
+            {actionError && (
+              <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {actionError}
+              </div>
+            )}
             {commentImage && (
               <div className="mb-3 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2">
                 <img src={commentImageUrl!} alt="" className="h-10 w-10 rounded object-cover" />

@@ -441,7 +441,7 @@ WHERE i.IssueId = @IssueId;
             var whereClause = conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : "";
 
             var sql = $@"
-SELECT
+SELECT TOP 200
     p.PropertyId,
     p.OwnerUserId,
     u.FullName AS LandlordName,
@@ -934,7 +934,7 @@ LEFT JOIN dbo.Properties p ON p.PropertyId = la.PropertyId
                 : "NULL AS LeaseEndDate";
 
             var sql = $@"
-SELECT
+SELECT TOP 200
     la.ApplicationId,
     {(listingCol.Equals("ListingId", StringComparison.OrdinalIgnoreCase) ? "la.ListingId" : "NULL AS ListingId")},
     la.{applicantCol} AS ClientUserId,
@@ -1109,6 +1109,12 @@ END
                 return NotFound(new ApiError("This application is no longer available."));
             }
 
+            if ((DateTime)app.RequestedStartDate < DateTime.Today.AddDays(-30))
+            {
+                tx.Rollback();
+                return BadRequest(new ApiError("Cannot approve a lease with a start date more than 30 days in the past."));
+            }
+
             string listingStatus = (string)app.ListingStatus;
             if (string.Equals(listingStatus, "Inactive", StringComparison.OrdinalIgnoreCase))
             {
@@ -1126,7 +1132,7 @@ END
             if (rows == 0)
             {
                 tx.Rollback();
-                return NotFound(new ApiError("This application is no longer available."));
+                return Conflict(new ApiError("Application has already been processed."));
             }
 
             await conn.ExecuteAsync(sqlRejectOthers, new { ListingId = (int)app.ListingId, ApplicationId = applicationId }, tx);
@@ -1270,7 +1276,7 @@ WHERE la.ApplicationId = @ApplicationId;
         try
         {
             const string sql = @"
-SELECT DISTINCT
+SELECT DISTINCT TOP 200
     u.UserId,
     u.FullName,
     u.Email,
@@ -1441,7 +1447,7 @@ VALUES (@UserId, @Phone, @Address);
             var staffFilter = staffUserId.HasValue ? " AND p.AssignedToUserId = @StaffUserId" : "";
 
             var sql = $@"
-SELECT
+SELECT TOP 200
     l.ListingId,
     l.PropertyId,
     CONCAT(p.AddressLine1, ', ', p.City) AS Address,
@@ -1477,7 +1483,7 @@ ORDER BY l.CreatedAt DESC;
             var staffFilter = staffUserId.HasValue ? " AND p.AssignedToUserId = @StaffUserId" : "";
 
             var sql = $@"
-SELECT
+SELECT TOP 200
     le.LeaseId,
     le.ListingId,
     CONCAT(p.AddressLine1, ', ', p.City) AS Address,
@@ -1547,7 +1553,7 @@ ORDER BY le.LeaseStartDate DESC;
             var priorityExpr = priorityCol == null ? "CAST('' AS NVARCHAR(50))" : $"CAST(i.[{priorityCol}] AS NVARCHAR(50))";
 
             var sql = $@"
-SELECT
+SELECT TOP 200
     i.IssueId,
     CONCAT(p.AddressLine1, ', ', p.City) AS PropertyAddress,
     {titleExpr}    AS Title,
@@ -1652,7 +1658,7 @@ WHERE UserId = @UserId AND IsActive = 1;
             var staffWhere = staffUserId.HasValue ? "WHERE p.AssignedToUserId = @StaffUserId" : "";
 
             var sql = $@"
-SELECT
+SELECT TOP 200
     l.ListingId,
     l.PropertyId,
     CONCAT(p.AddressLine1, ', ', p.City) AS Address,
@@ -1736,7 +1742,7 @@ WHERE ListingId = @ListingId;
             var whereClause = issueConditions.Count > 0 ? "WHERE " + string.Join(" AND ", issueConditions) : "";
 
             var sql = $@"
-SELECT
+SELECT TOP 200
     i.IssueId,
     i.IssueType,
     i.Description,
@@ -1879,7 +1885,7 @@ WHERE i.IssueId = @IssueId;
         }
 
         var sql = @"
-SELECT
+SELECT TOP 200
     DocumentId,
     LandlordUserId,
     DocType,
@@ -2040,7 +2046,7 @@ WHERE DocumentId = @DocumentId
         await using var conn = _db.Create();
 
         var sql = $@"
-SELECT
+SELECT TOP 200
     p.PropertyId,
     CONCAT(p.AddressLine1, ', ', p.City) AS Address,
     p.SubmissionStatus,

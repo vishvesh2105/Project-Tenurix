@@ -55,7 +55,13 @@ public partial class LeaseApplicationsPage : Page
         // If the review window approved the application, switch to Approved filter
         // so the "Edit & Send Agreement" button is immediately visible
         if (win.DialogResult == true)
-            StatusFilter.SelectedIndex = 2; // triggers SelectionChanged → Reload
+        {
+            for (int i = 0; i < StatusFilter.Items.Count; i++)
+            {
+                if (StatusFilter.Items[i] is ComboBoxItem ci && ci.Content?.ToString() == "Approved")
+                { StatusFilter.SelectedIndex = i; break; }
+            }
+        }
     }
 
     private async void Approve_Click(object sender, RoutedEventArgs e)
@@ -66,8 +72,11 @@ public partial class LeaseApplicationsPage : Page
         {
             await _api.ApproveLeaseApplicationAsync(row.ApplicationId, note: "Approved by management.");
 
-            // Switch filter to "Approved" so the Edit & Send Agreement button is visible
-            StatusFilter.SelectedIndex = 2; // triggers SelectionChanged → Reload automatically
+            for (int i = 0; i < StatusFilter.Items.Count; i++)
+            {
+                if (StatusFilter.Items[i] is ComboBoxItem ci && ci.Content?.ToString() == "Approved")
+                { StatusFilter.SelectedIndex = i; break; }
+            }
         }
         catch (Exception ex)
         {

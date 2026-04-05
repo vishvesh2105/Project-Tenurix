@@ -96,7 +96,7 @@ public partial class ListingsPage : Page
 
     private void StatusFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_all == null || _all.Count == 0 && ListingsGrid == null) return;
+        if (_all == null || _all.Count == 0 || ListingsGrid == null) return;
         try
         {
             var filtered = ApplyFilters();

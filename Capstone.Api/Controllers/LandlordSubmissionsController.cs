@@ -64,11 +64,24 @@ public sealed class LandlordSubmissionsController : ControllerBase
     public async Task<IActionResult> Create([FromForm] CreateSubmissionForm form)
     {
         if (string.IsNullOrWhiteSpace(form.AddressLine1)) return BadRequest(new ApiError("Please enter a street address."));
+        if (form.AddressLine1.Length > 200) return BadRequest(new ApiError("Address must be 200 characters or less."));
         if (string.IsNullOrWhiteSpace(form.City)) return BadRequest(new ApiError("Please enter a city."));
         if (string.IsNullOrWhiteSpace(form.Province)) return BadRequest(new ApiError("Please enter a province."));
         if (string.IsNullOrWhiteSpace(form.PostalCode)) return BadRequest(new ApiError("Please enter a postal code."));
         if (string.IsNullOrWhiteSpace(form.PropertyType)) return BadRequest(new ApiError("Please select a property type."));
         if (form.RentAmount <= 0) return BadRequest(new ApiError("Please enter a valid rent amount."));
+        if (form.RentAmount > 999999) return BadRequest(new ApiError("Rent amount must be $999,999 or less."));
+        if (!string.IsNullOrWhiteSpace(form.Description) && form.Description.Length > 5000) return BadRequest(new ApiError("Description must be 5000 characters or less."));
+        if (!string.IsNullOrWhiteSpace(form.UtilitiesJson))
+        {
+            try { System.Text.Json.JsonDocument.Parse(form.UtilitiesJson); }
+            catch { return BadRequest(new ApiError("Invalid utilities data.")); }
+        }
+        if (!string.IsNullOrWhiteSpace(form.AmenitiesJson))
+        {
+            try { System.Text.Json.JsonDocument.Parse(form.AmenitiesJson); }
+            catch { return BadRequest(new ApiError("Invalid amenities data.")); }
+        }
 
         var ownerIdPhotos = (form.OwnerIdPhotos ?? new List<IFormFile>())
             .Where(f => f != null && f.Length > 0)
@@ -265,6 +278,20 @@ VALUES
 
         if (!AllowedExtensions.Contains(ext))
             return (null, "This file type is not allowed. Please upload an image or PDF.");
+
+        using var checkStream = file.OpenReadStream();
+        var header = new byte[8];
+        await checkStream.ReadAsync(header, 0, 8);
+
+        bool validMagic = false;
+        if (header[0] == 0xFF && header[1] == 0xD8) validMagic = true;
+        else if (header[0] == 0x89 && header[1] == 0x50) validMagic = true;
+        else if (header[0] == 0x47 && header[1] == 0x49) validMagic = true;
+        else if (header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46) validMagic = true;
+        else if (header[0] == 0x42 && header[1] == 0x4D) validMagic = true;
+        else if (header[0] == 0x25 && header[1] == 0x50 && header[2] == 0x44 && header[3] == 0x46) validMagic = true;
+        if (!validMagic)
+            return (null, "File content does not match expected format.");
 
         var webRoot = _env.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot");
         var uploadsDir = Path.Combine(webRoot, "uploads", folder);

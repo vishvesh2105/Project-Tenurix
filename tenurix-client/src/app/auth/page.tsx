@@ -110,8 +110,15 @@ function AuthPageInner() {
     return () => clearTimeout(timer);
   }, [resendCooldown]);
 
-  // Success handler — store token and redirect
+  // Success handler — verify role matches portal, store token, redirect
   function handleSuccess(data: any) {
+    const expectedRole = role === "landlord" ? "Landlord" : "Client";
+    if (data.roleName && data.roleName.toLowerCase() !== expectedRole.toLowerCase()) {
+      const otherPortal = role === "landlord" ? "Tenant" : "Landlord";
+      setError(`This account is registered as a ${otherPortal}. Please use the ${otherPortal} portal to sign in.`);
+      setBusy(false);
+      return;
+    }
     localStorage.setItem("tenurix_token", data.token);
     localStorage.setItem("tenurix_portal", role);
     window.location.href = next;

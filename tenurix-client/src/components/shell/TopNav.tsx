@@ -28,7 +28,7 @@ export function TopNav() {
     const token = localStorage.getItem("tenurix_token");
     if (token) {
       apiFetch("/account/me")
-        .then((res) => (res.ok ? res.json() : null))
+        .then((res) => res.ok ? res.text().then(t => { try { return JSON.parse(t); } catch { return null; } }) : null)
         .then((data) => { if (data) setUser(data); })
         .catch(() => {});
     }

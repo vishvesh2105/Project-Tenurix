@@ -9,7 +9,24 @@ export function useAuth() {
 
   const token = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return localStorage.getItem("tenurix_token") || "";
+    const t = localStorage.getItem("tenurix_token") || "";
+    if (!t) return "";
+    const parts = t.split(".");
+    if (parts.length !== 3) {
+      localStorage.removeItem("tenurix_token");
+      return "";
+    }
+    try {
+      const payload = JSON.parse(atob(parts[1]));
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem("tenurix_token");
+        return "";
+      }
+    } catch {
+      localStorage.removeItem("tenurix_token");
+      return "";
+    }
+    return t;
   }, []);
 
   const portal = useMemo(() => {

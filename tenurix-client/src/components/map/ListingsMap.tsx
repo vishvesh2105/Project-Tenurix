@@ -64,6 +64,13 @@ export default function ListingsMap({ listings, apiBase }: Props) {
 
   // Geocode addresses that don't have lat/lng — progressively update state
   useEffect(() => {
+    setGeocoded(prev => {
+      const validIds = new Set(listings.map(l => l.listingId));
+      const next = new Map<number, [number, number]>();
+      prev.forEach((v, k) => { if (validIds.has(k)) next.set(k, v); });
+      return next.size !== prev.size ? next : prev;
+    });
+
     const toGeocode = listings.filter(
       (l) => l.latitude == null && l.longitude == null && !geocoded.has(l.listingId)
     );

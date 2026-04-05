@@ -1,3 +1,4 @@
+using System.Linq;
 using Capstone.Api.Data;
 using Capstone.Api.Models;
 using Capstone.Api.Security;
@@ -56,14 +57,17 @@ public sealed class WebAuthController : ControllerBase
             return BadRequest(new ApiError("Last name is required."));
         if (string.IsNullOrWhiteSpace(req.Email))
             return BadRequest(new ApiError("Email is required."));
-        if (string.IsNullOrWhiteSpace(req.Password) || req.Password.Length < 8)
-            return BadRequest(new ApiError("Password must be at least 8 characters."));
+        var pwError = ValidatePasswordStrength(req.Password);
+        if (pwError != null) return BadRequest(new ApiError(pwError));
 
         var role = req.Role?.Trim().ToLowerInvariant();
         if (role != "client" && role != "landlord")
             return BadRequest(new ApiError("Please select a valid role (Tenant or Landlord)."));
 
         var email = req.Email.Trim().ToLowerInvariant();
+
+        if (!IsValidEmail(email))
+            return BadRequest(new ApiError("Please enter a valid email address."));
 
         // ── Duplicate check across Users table ──
         await using var conn = _db.Create();
@@ -75,7 +79,7 @@ SELECT CASE WHEN EXISTS (
 ", new { Email = email });
 
         if (exists == 1)
-            return Conflict(new ApiError("An account with this email already exists. Please log in."));
+            return Ok(new { requiresTwoFactor = true, maskedEmail = MaskEmail(email), email });
 
         // ── Store pending registration in session (TwoFactorCodes table) ──
         // We temporarily store the registration data as JSON in the TwoFactorCodes table
@@ -156,7 +160,7 @@ WHEN NOT MATCHED THEN
         var pending = await conn.QuerySingleOrDefaultAsync<dynamic>(@"
 SELECT FirstName, LastName, Phone, PasswordHash, PasswordSalt, Role
 FROM dbo.PendingRegistrations
-WHERE Email = @Email;
+WHERE Email = @Email AND CreatedAt > DATEADD(HOUR, -1, SYSUTCDATETIME());
 ", new { Email = email });
 
         if (pending == null)
@@ -272,6 +276,9 @@ END
             return BadRequest(new ApiError("Please select a valid portal."));
 
         var email = req.Email.Trim().ToLowerInvariant();
+
+        if (!IsValidEmail(email))
+            return BadRequest(new ApiError("Please enter a valid email address."));
 
         await using var conn = _db.Create();
 
@@ -444,7 +451,7 @@ SELECT CASE WHEN EXISTS (
 ", new { Email = email });
 
         if (exists == 0)
-            return NotFound(new ApiError("No account found with this email address."));
+            return Ok(new { requiresTwoFactor = true, maskedEmail = MaskEmail(email), email });
 
         try
         {
@@ -482,13 +489,32 @@ SELECT CASE WHEN EXISTS (
         if (!codeOk)
             return Unauthorized(new ApiError(codeError ?? "Invalid or expired verification code."));
 
-        return Ok(new { verified = true, email });
+        await using var conn = _db.Create();
+
+        await conn.ExecuteAsync(@"
+IF OBJECT_ID('dbo.PasswordResetTokens') IS NULL
+CREATE TABLE dbo.PasswordResetTokens (
+    Email NVARCHAR(256) NOT NULL PRIMARY KEY,
+    Token NVARCHAR(64) NOT NULL,
+    ExpiresUtc DATETIME2 NOT NULL
+);");
+
+        var resetToken = Guid.NewGuid().ToString("N");
+        await conn.ExecuteAsync(@"
+MERGE dbo.PasswordResetTokens AS target
+USING (SELECT @Email AS Email) AS source ON target.Email = source.Email
+WHEN MATCHED THEN UPDATE SET Token = @Token, ExpiresUtc = @Expires
+WHEN NOT MATCHED THEN INSERT (Email, Token, ExpiresUtc) VALUES (@Email, @Token, @Expires);",
+            new { Email = email, Token = resetToken, Expires = DateTime.UtcNow.AddMinutes(10) });
+
+        return Ok(new { verified = true, email, resetToken });
     }
 
     public sealed class ResetPasswordRequest
     {
         public string Email { get; set; } = "";
         public string NewPassword { get; set; } = "";
+        public string ResetToken { get; set; } = "";
     }
 
     /// <summary>
@@ -501,14 +527,20 @@ SELECT CASE WHEN EXISTS (
         if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.NewPassword))
             return BadRequest(new ApiError("Please enter a new password."));
 
-        if (req.NewPassword.Length < 8)
-            return BadRequest(new ApiError("Password must be at least 8 characters."));
+        var pwError = ValidatePasswordStrength(req.NewPassword);
+        if (pwError != null) return BadRequest(new ApiError(pwError));
 
         var email = req.Email.Trim().ToLowerInvariant();
 
-        var (pwHash, pwSalt) = PinHasher.Hash(req.NewPassword);
-
         await using var conn = _db.Create();
+
+        var tokenRow = await conn.QuerySingleOrDefaultAsync(@"
+SELECT Token, ExpiresUtc FROM dbo.PasswordResetTokens WHERE Email = @Email;",
+            new { Email = email });
+        if (tokenRow == null || (string)tokenRow.Token != req.ResetToken || DateTime.UtcNow > (DateTime)tokenRow.ExpiresUtc)
+            return Unauthorized(new ApiError("Invalid or expired reset session. Please start over."));
+
+        var (pwHash, pwSalt) = PinHasher.Hash(req.NewPassword);
 
         var rows = await conn.ExecuteAsync(@"
 UPDATE dbo.Users
@@ -521,6 +553,8 @@ WHERE LOWER(Email) = @Email AND IsActive = 1;
 
         if (rows == 0)
             return NotFound(new ApiError("Account not found."));
+
+        await conn.ExecuteAsync("DELETE FROM dbo.PasswordResetTokens WHERE Email = @Email;", new { Email = email });
 
         return Ok(new { success = true });
     }
@@ -553,6 +587,26 @@ WHERE LOWER(Email) = @Email AND IsActive = 1;
         if (value is string s) return string.IsNullOrWhiteSpace(s) ? null : s;
         if (value is byte[] b && b.Length > 0) return Convert.ToBase64String(b);
         return null;
+    }
+
+    private static string? ValidatePasswordStrength(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
+            return "Password must be at least 8 characters.";
+        if (!password.Any(char.IsUpper))
+            return "Password must contain at least one uppercase letter.";
+        if (!password.Any(char.IsLower))
+            return "Password must contain at least one lowercase letter.";
+        if (!password.Any(char.IsDigit))
+            return "Password must contain at least one number.";
+        return null;
+    }
+
+    private static bool IsValidEmail(string email)
+    {
+        return !string.IsNullOrWhiteSpace(email) &&
+               System.Text.RegularExpressions.Regex.IsMatch(email,
+               @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
     }
 
     private static string MaskEmail(string email)

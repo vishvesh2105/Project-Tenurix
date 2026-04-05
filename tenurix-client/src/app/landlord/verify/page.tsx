@@ -8,6 +8,9 @@ const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/+$/, ""
 export default function LandlordVerifyPage() {
   const [verificationId, setVerificationId] = useState("");
   const [phone, setPhone] = useState("");
+  const [code, setCode] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const id = sessionStorage.getItem("ll_verify_id") || "";
@@ -16,10 +19,6 @@ export default function LandlordVerifyPage() {
     setPhone(ph);
     if (!id) setError("Verification session expired. Please register again.");
   }, []);
-
-  const [code, setCode] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
 
   async function verify() {
     try {

@@ -100,6 +100,7 @@ namespace Tenurix.Management.Views.Windows
                 bmp.CacheOption = BitmapCacheOption.OnLoad;
                 bmp.UriSource = new Uri(_selectedPhotoPath);
                 bmp.EndInit();
+                bmp.Freeze();
 
                 PhotoImage.Source = bmp;
                 NoPhotoText.Visibility = Visibility.Collapsed;

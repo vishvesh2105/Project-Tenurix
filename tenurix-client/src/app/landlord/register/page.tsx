@@ -14,6 +14,9 @@ export default function LandlordRegisterPage() {
   const [error, setError] = useState("");
 
   async function register() {
+    if (!fullName.trim() || !email.trim() || !phone.trim() || !password.trim()) {
+      return setError("Please fill in all fields.");
+    }
     try {
       setBusy(true);
       setError("");
@@ -55,7 +58,7 @@ export default function LandlordRegisterPage() {
 
         <button
           onClick={register}
-          disabled={busy}
+          disabled={busy || !fullName.trim() || !email.trim() || !phone.trim() || !password.trim()}
           className="mt-2 w-full rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60 transition-colors"
         >
           {busy ? "Creating…" : "Create & Send OTP"}

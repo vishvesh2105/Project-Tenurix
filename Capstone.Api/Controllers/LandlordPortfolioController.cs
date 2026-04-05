@@ -366,6 +366,20 @@ WHERE LandlordUserId = @UserId
                 if (!allowed.Contains(ext))
                     return BadRequest(new ApiError($"File type {ext} is not allowed."));
 
+                using var checkStream = file.OpenReadStream();
+                var header = new byte[8];
+                await checkStream.ReadAsync(header, 0, 8);
+
+                bool validMagic = false;
+                if (header[0] == 0xFF && header[1] == 0xD8) validMagic = true;
+                else if (header[0] == 0x89 && header[1] == 0x50) validMagic = true;
+                else if (header[0] == 0x47 && header[1] == 0x49) validMagic = true;
+                else if (header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46) validMagic = true;
+                else if (header[0] == 0x42 && header[1] == 0x4D) validMagic = true;
+                else if (header[0] == 0x25 && header[1] == 0x50 && header[2] == 0x44 && header[3] == 0x46) validMagic = true;
+                if (!validMagic)
+                    return BadRequest(new ApiError("File content does not match expected format."));
+
                 var webRoot = _env.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot");
                 var uploadsDir = Path.Combine(webRoot, "uploads", "owner-id");
                 Directory.CreateDirectory(uploadsDir);

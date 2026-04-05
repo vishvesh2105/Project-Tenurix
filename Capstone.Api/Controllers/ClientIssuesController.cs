@@ -114,8 +114,14 @@ ORDER BY i.CreatedAt DESC;
             return BadRequest(new ApiError("Please select a lease to report an issue for."));
         if (string.IsNullOrWhiteSpace(issueType))
             return BadRequest(new ApiError("Please select an issue type."));
+        var validTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            { "Plumbing", "Electrical", "Heating/Cooling", "Appliance", "Pest Control", "Structural", "Other" };
+        if (!validTypes.Contains(issueType))
+            return BadRequest(new ApiError("Invalid issue type."));
         if (string.IsNullOrWhiteSpace(description))
             return BadRequest(new ApiError("Please describe the issue."));
+        if (description.Length > 5000)
+            return BadRequest(new ApiError("Description must be 5000 characters or less."));
 
         try
         {
@@ -205,6 +211,20 @@ WHERE le.LeaseId = @LeaseId;
 
         if (!AllowedExtensions.Contains(ext))
             return (null, "This file type is not allowed. Please upload an image or PDF.");
+
+        using var checkStream = file.OpenReadStream();
+        var header = new byte[8];
+        await checkStream.ReadAsync(header, 0, 8);
+
+        bool validMagic = false;
+        if (header[0] == 0xFF && header[1] == 0xD8) validMagic = true;
+        else if (header[0] == 0x89 && header[1] == 0x50) validMagic = true;
+        else if (header[0] == 0x47 && header[1] == 0x49) validMagic = true;
+        else if (header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46) validMagic = true;
+        else if (header[0] == 0x42 && header[1] == 0x4D) validMagic = true;
+        else if (header[0] == 0x25 && header[1] == 0x50 && header[2] == 0x44 && header[3] == 0x46) validMagic = true;
+        if (!validMagic)
+            return (null, "File content does not match expected format.");
 
         var webRoot = _env.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot");
         var uploadsDir = Path.Combine(webRoot, "uploads", folder);
