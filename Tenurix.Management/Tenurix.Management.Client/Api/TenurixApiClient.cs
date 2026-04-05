@@ -410,7 +410,9 @@ public TenurixApiClient(string baseUrl)
         using var stream = await res.Content.ReadAsStreamAsync();
         using var doc = await System.Text.Json.JsonDocument.ParseAsync(stream);
 
-        return doc.RootElement.GetProperty("tempPassword").GetString() ?? "";
+        if (doc.RootElement.TryGetProperty("tempPassword", out var prop))
+            return prop.GetString() ?? "";
+        return "";
     }
 
 

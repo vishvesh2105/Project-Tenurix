@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Capstone.Api.Data;
+using Capstone.Api.Models;
 using Capstone.Api.Security;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
@@ -116,20 +117,20 @@ WHERE UserId=@UserId AND IsVoided=0 AND EventType='BreakStart'
 
             // Rules
             if (req.EventType.Equals("ShiftStart", StringComparison.OrdinalIgnoreCase) && openShift > 0)
-            { tx.Rollback(); return BadRequest(new { message = "Shift already started." }); }
+            { tx.Rollback(); return BadRequest(new ApiError("Shift already started.")); }
 
             if (req.EventType.Equals("ShiftEnd", StringComparison.OrdinalIgnoreCase) && openShift == 0)
-            { tx.Rollback(); return BadRequest(new { message = "No open shift to end." }); }
+            { tx.Rollback(); return BadRequest(new ApiError("No open shift to end.")); }
 
             if (req.EventType.StartsWith("Break", StringComparison.OrdinalIgnoreCase))
             {
-                if (openShift == 0) { tx.Rollback(); return BadRequest(new { message = "Start a shift first." }); }
+                if (openShift == 0) { tx.Rollback(); return BadRequest(new ApiError("Start a shift first.")); }
 
                 if (req.EventType.Equals("BreakStart", StringComparison.OrdinalIgnoreCase) && openBreak > 0)
-                { tx.Rollback(); return BadRequest(new { message = "Break already started." }); }
+                { tx.Rollback(); return BadRequest(new ApiError("Break already started.")); }
 
                 if (req.EventType.Equals("BreakEnd", StringComparison.OrdinalIgnoreCase) && openBreak == 0)
-                { tx.Rollback(); return BadRequest(new { message = "No open break to end." }); }
+                { tx.Rollback(); return BadRequest(new ApiError("No open break to end.")); }
             }
 
             // Break limits
@@ -147,7 +148,7 @@ WHERE UserId=@UserId AND IsVoided=0
   AND OccurredAt >= @Start AND OccurredAt < @End;", new { UserId = userId, Start = todayUtcStart, End = todayUtcEnd }, tx);
 
                 if (shortBreakStarts >= 2)
-                { tx.Rollback(); return BadRequest(new { message = "Short break limit reached for today (2)." }); }
+                { tx.Rollback(); return BadRequest(new ApiError("Short break limit reached for today (2).")); }
             }
 
             // Insert punch
@@ -210,9 +211,9 @@ VALUES ('PUNCH', @EventId, @TargetUserId, @ActorUserId, @Detail);",
     private async Task<ActionResult<List<TimeBlockDto>>> BlocksForUserInternal(int userId, string from, string to, bool allowAnyUser)
     {
         if (!DateTime.TryParse(from, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var fromUtc))
-            return BadRequest(new { message = "Please enter a valid start date." });
+            return BadRequest(new ApiError("Please enter a valid start date."));
         if (!DateTime.TryParse(to, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var toUtc))
-            return BadRequest(new { message = "Please enter a valid end date." });
+            return BadRequest(new ApiError("Please enter a valid end date."));
 
         // widen slightly so block pairing works
         var qFrom = fromUtc.AddDays(-1);
@@ -293,9 +294,9 @@ ORDER BY OccurredAt ASC;", new { UserId = userId, From = qFrom, To = qTo }))
         if (!isSelf && !Perm.Has(User, "ATTENDANCE_VIEW_ALL")) return Forbid();
 
         if (!DateTime.TryParse(from, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var fromUtc))
-            return BadRequest(new { message = "Please enter a valid start date." });
+            return BadRequest(new ApiError("Please enter a valid start date."));
         if (!DateTime.TryParse(to, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var toUtc))
-            return BadRequest(new { message = "Please enter a valid end date." });
+            return BadRequest(new ApiError("Please enter a valid end date."));
 
         // We compute summary from blocks (simple + consistent)
         var blocksRes = await BlocksForUserInternal(userId, from, to, allowAnyUser: true);
@@ -341,7 +342,7 @@ ORDER BY OccurredAt ASC;", new { UserId = userId, From = qFrom, To = qTo }))
     public async Task<ActionResult> VoidEvent(int eventId, [FromBody] VoidRequest req)
     {
         if (!Perm.Has(User, "ATTENDANCE_EDIT")) return Forbid();
-        if (string.IsNullOrWhiteSpace(req.Reason)) return BadRequest(new { message = "Please provide a reason." });
+        if (string.IsNullOrWhiteSpace(req.Reason)) return BadRequest(new ApiError("Please provide a reason."));
 
         var actorId = Perm.UserId(User);
 
@@ -353,8 +354,8 @@ SELECT TOP 1 EventId, UserId, IsVoided
 FROM dbo.AttendanceEvents
 WHERE EventId=@EventId;", new { EventId = eventId });
 
-        if (target is null) return NotFound(new { message = "This record could not be found." });
-        if ((bool)target.IsVoided) return BadRequest(new { message = "This record has already been removed." });
+        if (target is null) return NotFound(new ApiError("This record could not be found."));
+        if ((bool)target.IsVoided) return BadRequest(new ApiError("This record has already been removed."));
 
         await conn.ExecuteAsync(@"
 UPDATE dbo.AttendanceEvents

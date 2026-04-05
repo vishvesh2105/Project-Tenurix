@@ -30,7 +30,7 @@ export function Sidebar() {
     { href: "/applications", label: t("applications"), icon: FileText },
     { href: "/leases", label: t("leases"), icon: ScrollText },
     { href: "/issues", label: t("issues"), icon: AlertCircle },
-    { href: "/notifications", label: "Notifications", icon: Bell },
+    { href: "/notifications", label: t("notifications"), icon: Bell },
     { href: "/profile", label: t("profile"), icon: User },
     { href: "/security", label: t("security"), icon: Shield },
   ];
@@ -41,7 +41,7 @@ export function Sidebar() {
     { href: "/landlord/properties", label: t("properties"), icon: Building2 },
     { href: "/landlord/leases", label: t("leases"), icon: ScrollText },
     { href: "/landlord/issues", label: t("issues"), icon: AlertCircle },
-    { href: "/notifications", label: "Notifications", icon: Bell },
+    { href: "/notifications", label: t("notifications"), icon: Bell },
     { href: "/profile", label: t("profile"), icon: User },
     { href: "/security", label: t("security"), icon: Shield },
   ];

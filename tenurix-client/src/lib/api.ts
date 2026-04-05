@@ -27,9 +27,10 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
   if (res.status === 401) {
     if (typeof window !== "undefined") {
       const portal = localStorage.getItem("tenurix_portal") || "client";
+      const validPortal = portal === "landlord" ? "landlord" : "client";
       localStorage.removeItem("tenurix_token");
       localStorage.removeItem("tenurix_portal");
-      window.location.href = `/auth?role=${portal}`;
+      window.location.href = `/auth?role=${validPortal}`;
     }
     throw new Error("Session expired. Please sign in again.");
   }

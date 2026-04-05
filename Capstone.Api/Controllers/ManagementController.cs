@@ -84,6 +84,15 @@ SELECT Email, ISNULL(FullName, Email) AS FullName FROM dbo.Users WHERE UserId = 
 
         try
         {
+            await using var conn = _db.Create();
+
+            // Validate assignee exists
+            var userExists = await conn.ExecuteScalarAsync<int>(
+                "SELECT CASE WHEN EXISTS (SELECT 1 FROM dbo.Users WHERE UserId = @UserId AND IsActive = 1) THEN 1 ELSE 0 END;",
+                new { UserId = req.AssignedToUserId });
+            if (userExists == 0)
+                return BadRequest(new ApiError("The selected staff member does not exist."));
+
             const string sql = @"
 UPDATE dbo.Properties
 SET AssignedToUserId = @AssignedToUserId,
@@ -91,7 +100,6 @@ SET AssignedToUserId = @AssignedToUserId,
 WHERE PropertyId = @PropertyId;
 ";
 
-            await using var conn = _db.Create();
             var rows = await conn.ExecuteAsync(sql, new
             {
                 PropertyId = propertyId,

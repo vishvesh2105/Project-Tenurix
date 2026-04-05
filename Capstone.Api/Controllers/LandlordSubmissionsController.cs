@@ -60,7 +60,7 @@ public sealed class LandlordSubmissionsController : ControllerBase
     }
 
     [HttpPost]
-    [RequestSizeLimit(100_000_000)]
+    [RequestSizeLimit(30_000_000)] // 30MB total
     public async Task<IActionResult> Create([FromForm] CreateSubmissionForm form)
     {
         if (string.IsNullOrWhiteSpace(form.AddressLine1)) return BadRequest(new ApiError("Please enter a street address."));

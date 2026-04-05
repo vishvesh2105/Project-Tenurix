@@ -38,6 +38,7 @@ public partial class VerificationWindow : Window
         StartResendTimer();
 
         Loaded += (_, _) => Code1.Focus();
+        Closed += (_, _) => { _timer?.Stop(); _timer = null; };
     }
 
     private void StartResendTimer()

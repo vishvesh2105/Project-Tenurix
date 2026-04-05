@@ -108,20 +108,22 @@ WHERE UserId = @UserId;
             }
             else
             {
-                // 3) create new client user
-                userId = await conn.ExecuteScalarAsync<int>(@"
+                // 3) create new client user + assign role in transaction
+                using var txn = conn.BeginTransaction();
+                try
+                {
+                    userId = await conn.ExecuteScalarAsync<int>(@"
 INSERT INTO dbo.Users (FullName, Email, PasswordHash, PasswordSalt, TempPassword, IsActive, CreatedAt, AuthProvider, GoogleSub, MustChangePassword)
 OUTPUT INSERTED.UserId
 VALUES (@FullName, @Email, NULL, NULL, NULL, 1, SYSUTCDATETIME(), 'Google', @GoogleSub, 0);
 ", new
-                {
-                    FullName = name.Trim(),
-                    Email = email.Trim(),
-                    GoogleSub = googleSub
-                });
+                    {
+                        FullName = name.Trim(),
+                        Email = email.Trim(),
+                        GoogleSub = googleSub
+                    }, txn);
 
-                // assign role Client (must exist in Roles table)
-                await conn.ExecuteAsync(@"
+                    await conn.ExecuteAsync(@"
 DECLARE @RoleId INT = (SELECT TOP 1 RoleId FROM dbo.Roles WHERE RoleName = 'Client');
 
 IF @RoleId IS NULL
@@ -137,7 +139,15 @@ IF NOT EXISTS (
 BEGIN
     INSERT INTO dbo.UserRoles (UserId, RoleId) VALUES (@UserId, @RoleId);
 END
-", new { UserId = userId });
+", new { UserId = userId }, txn);
+
+                    txn.Commit();
+                }
+                catch
+                {
+                    txn.Rollback();
+                    return StatusCode(500, new ApiError("Account creation failed. Please try again."));
+                }
             }
         }
 

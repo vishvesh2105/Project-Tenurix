@@ -318,7 +318,8 @@ WHERE ur.UserId = @UserId;
         if (!string.Equals(userRole, expectedRole, StringComparison.OrdinalIgnoreCase))
         {
             var otherPortal = role == "landlord" ? "Tenant" : "Landlord";
-            return Conflict(new ApiError($"This account is registered as a {otherPortal}. Please use the {otherPortal} portal to sign in."));
+            // Use Unauthorized (not Conflict) with generic message to avoid leaking account info
+            return Unauthorized(new ApiError($"The email or password you entered is incorrect. If you have a {otherPortal} account, please use the {otherPortal} portal."));
         }
 
         // Send 2FA code

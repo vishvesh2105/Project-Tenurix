@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/shell/AppShell";
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,7 @@ export default function ApplyPage() {
 
 function ApplyPageInner() {
   const sp = useSearchParams();
+  const router = useRouter();
   const listingId = Number(sp.get("listingId") || "0");
 
   const { token, isReady } = useAuth();
@@ -150,7 +151,7 @@ function ApplyPageInner() {
     if (!phone.trim()) { setErr("Phone number is required."); return; }
     if (!currentAddress.trim()) { setErr("Current address is required."); return; }
     if (!employmentStatus) { setErr("Please select your employment status."); return; }
-    if (!annualIncome || Number(annualIncome) <= 0) { setErr("Please enter your annual income."); return; }
+    if (annualIncome === "" || Number(annualIncome) < 0) { setErr("Please enter your annual income."); return; }
     if (!startDate || !endDate) { setErr("Start date and end date are required."); return; }
     if (endDate <= startDate) { setErr("End date must be after start date."); return; }
     if (!emergencyContactName.trim() || !emergencyContactPhone.trim()) {
@@ -233,7 +234,7 @@ function ApplyPageInner() {
       }
 
       setMsg("Application submitted successfully.");
-      window.location.href = "/applications";
+      router.push("/applications");
     } catch (e: any) {
       setErr(e?.message ?? "Failed to submit application.");
       setMsg("");

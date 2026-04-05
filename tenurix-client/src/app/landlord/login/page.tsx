@@ -12,7 +12,9 @@ export default function LandlordLoginRedirect() {
 
 function LandlordLoginRedirectInner() {
   const sp = useSearchParams();
-  const next = sp.get("next");
+  const rawNext = sp.get("next");
+  // Only allow relative URLs to prevent open redirect
+  const next = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : null;
   useEffect(() => {
     const url = next ? `/auth?role=landlord&next=${encodeURIComponent(next)}` : `/auth?role=landlord`;
     window.location.replace(url);

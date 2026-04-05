@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AuthShell from "@/components/auth/AuthShell";
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/+$/, "");
 
 export default function LandlordVerifyPage() {
-  const verificationId = sessionStorage.getItem("ll_verify_id") || "";
-  const phone = sessionStorage.getItem("ll_verify_phone") || "";
+  const [verificationId, setVerificationId] = useState("");
+  const [phone, setPhone] = useState("");
+
+  useEffect(() => {
+    const id = sessionStorage.getItem("ll_verify_id") || "";
+    const ph = sessionStorage.getItem("ll_verify_phone") || "";
+    setVerificationId(id);
+    setPhone(ph);
+    if (!id) setError("Verification session expired. Please register again.");
+  }, []);
 
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);

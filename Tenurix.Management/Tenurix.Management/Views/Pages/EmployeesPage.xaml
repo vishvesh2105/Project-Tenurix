@@ -55,7 +55,7 @@
         <!-- Card List -->
         <Border Grid.Row="4" Background="{StaticResource Panel}" CornerRadius="14" Padding="12">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl x:Name="Grid">
+                <ItemsControl x:Name="EmployeeGrid">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border Background="{StaticResource Panel2}" CornerRadius="12"

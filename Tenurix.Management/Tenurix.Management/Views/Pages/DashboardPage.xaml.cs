@@ -40,47 +40,55 @@ public partial class DashboardPage : Page
 
     private void ViewProp_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement fe) return;
-        if (fe.DataContext is null) return;
+        if (sender is not FrameworkElement fe || fe.DataContext is null) return;
 
-        // expects RecentPropertySubmissionDto with PropertyId inside (not displayed)
-        dynamic row = fe.DataContext;
-        int propertyId = row.PropertyId;
-
-        var win = new PropertySubmissionReviewWindow(_api, propertyId)
+        try
         {
-            Owner = Window.GetWindow(this)
-        };
-        win.ShowDialog();
+            dynamic row = fe.DataContext;
+            int propertyId = (int)row.PropertyId;
+
+            var win = new PropertySubmissionReviewWindow(_api, propertyId)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            win.ShowDialog();
+        }
+        catch { /* DataContext missing expected property */ }
     }
 
     private void ViewApp_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement fe) return;
-        if (fe.DataContext is null) return;
+        if (sender is not FrameworkElement fe || fe.DataContext is null) return;
 
-        dynamic row = fe.DataContext;
-        int appId = row.ApplicationId;
-
-        var win = new LeaseApplicationReviewWindow(_api, appId)
+        try
         {
-            Owner = Window.GetWindow(this)
-        };
-        win.ShowDialog();
+            dynamic row = fe.DataContext;
+            int appId = (int)row.ApplicationId;
+
+            var win = new LeaseApplicationReviewWindow(_api, appId)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            win.ShowDialog();
+        }
+        catch { /* DataContext missing expected property */ }
     }
 
     private void ViewIssue_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement fe) return;
-        if (fe.DataContext is null) return;
+        if (sender is not FrameworkElement fe || fe.DataContext is null) return;
 
-        dynamic row = fe.DataContext;
-        int issueId = row.IssueId;
-
-        var win = new IssueDetailWindow(_api, issueId)
+        try
         {
-            Owner = Window.GetWindow(this)
-        };
-        win.ShowDialog();
+            dynamic row = fe.DataContext;
+            int issueId = (int)row.IssueId;
+
+            var win = new IssueDetailWindow(_api, issueId)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            win.ShowDialog();
+        }
+        catch { /* DataContext missing expected property */ }
     }
 }

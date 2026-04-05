@@ -45,7 +45,7 @@ public partial class EmployeesPage : Page
         if (sender is not Button btn || btn.CommandParameter is not int userId)
             return;
 
-        var selected = Grid.ItemsSource is IEnumerable<Tenurix.Management.Client.Models.EmployeeDto> rows2
+        var selected = EmployeeGrid.ItemsSource is IEnumerable<Tenurix.Management.Client.Models.EmployeeDto> rows2
             ? rows2.FirstOrDefault(x => x.UserId == userId)
             : null;
 
@@ -75,7 +75,7 @@ public partial class EmployeesPage : Page
                     e.RoleName.Equals("Staff", StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
-            Grid.ItemsSource = filtered;
+            EmployeeGrid.ItemsSource = filtered;
         }
         catch (Exception ex)
         {

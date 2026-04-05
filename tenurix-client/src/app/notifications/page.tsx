@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/shell/AppShell";
 import { useAuth } from "@/lib/useAuth";
 import { apiFetch } from "@/lib/api";
-import { Bell, Check, CheckCheck } from "lucide-react";
+import { Bell, Check, CheckCheck, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Notification = {
@@ -23,6 +23,7 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [actionError, setActionError] = useState("");
 
   const fetchPage = async (p: number) => {
     try {
@@ -34,7 +35,9 @@ export default function NotificationsPage() {
         } else {
           setItems((prev) => [...prev, ...data]);
         }
-        setHasMore(data.length === 20);
+        // Only show load more if we got a full page (could be more)
+        // If we got less than 20, we know there are no more
+        setHasMore(data.length >= 20);
       }
     } catch {}
     setLoading(false);
@@ -45,16 +48,29 @@ export default function NotificationsPage() {
   }, [isReady]);
 
   const markRead = async (n: Notification) => {
+    setActionError("");
     if (!n.isRead) {
-      await apiFetch(`/notifications/${n.notificationId}/read`, { method: "POST" }).catch(() => {});
-      setItems((prev) => prev.map((x) => x.notificationId === n.notificationId ? { ...x, isRead: true } : x));
+      try {
+        const res = await apiFetch(`/notifications/${n.notificationId}/read`, { method: "POST" });
+        if (!res.ok) throw new Error();
+        setItems((prev) => prev.map((x) => x.notificationId === n.notificationId ? { ...x, isRead: true } : x));
+      } catch {
+        setActionError("Failed to mark notification as read. Please try again.");
+        return;
+      }
     }
     if (n.linkUrl) window.location.href = n.linkUrl;
   };
 
   const markAllRead = async () => {
-    await apiFetch("/notifications/read-all", { method: "POST" }).catch(() => {});
-    setItems((prev) => prev.map((x) => ({ ...x, isRead: true })));
+    setActionError("");
+    try {
+      const res = await apiFetch("/notifications/read-all", { method: "POST" });
+      if (!res.ok) throw new Error();
+      setItems((prev) => prev.map((x) => ({ ...x, isRead: true })));
+    } catch {
+      setActionError("Failed to mark all as read. Please try again.");
+    }
   };
 
   const loadMore = () => {
@@ -109,6 +125,13 @@ export default function NotificationsPage() {
             </Button>
           )}
         </div>
+
+        {/* Error */}
+        {actionError && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0" /> {actionError}
+          </div>
+        )}
 
         {/* List */}
         {loading ? (

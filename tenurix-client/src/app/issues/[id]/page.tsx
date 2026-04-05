@@ -88,6 +88,7 @@ export default function IssueDetailPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
 
   // Comment form
   const [message, setMessage] = useState("");
@@ -150,9 +151,10 @@ export default function IssueDetailPage() {
       const commentsData = await safeJson<any>(commentsRes);
       if (commentsRes.ok && Array.isArray(commentsData)) setComments(commentsData);
 
+      setActionError("");
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
     } catch (e: any) {
-      alert(e?.message || "Failed to post comment.");
+      setActionError(e?.message || "Failed to post comment.");
     } finally {
       setSending(false);
     }
@@ -170,9 +172,10 @@ export default function IssueDetailPage() {
         throw new Error(data?.message || "Failed to re-open issue.");
       }
       setShowReopen(false); setReopenReason("");
+      setActionError("");
       await loadIssue();
     } catch (e: any) {
-      alert(e?.message || "Failed to re-open.");
+      setActionError(e?.message || "Failed to re-open issue.");
     } finally {
       setReopening(false);
     }
@@ -349,7 +352,7 @@ export default function IssueDetailPage() {
             )}
 
             {comments.map((c) => (
-              <div key={c.commentId} className={`px-5 py-3 ${c.authorRole && ["Manager", "AssistantManager", "TeamLead"].includes(c.authorRole) ? "bg-indigo-50/30" : ""}`}>
+              <div key={c.commentId} className={`px-5 py-3 ${c.authorRole && ["manager", "assistantmanager", "teamlead"].includes(c.authorRole.toLowerCase()) ? "bg-indigo-50/30" : ""}`}>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs font-semibold text-slate-700">{c.authorName}</span>
                   {roleBadge(c.authorRole)}
@@ -365,6 +368,11 @@ export default function IssueDetailPage() {
             ))}
             <div ref={bottomRef} />
           </div>
+
+          {/* Action error */}
+          {actionError && (
+            <div className="mx-4 mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{actionError}</div>
+          )}
 
           {/* Comment input */}
           {issue.status !== "Resolved" && (
