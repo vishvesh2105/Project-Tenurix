@@ -25,6 +25,12 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 768) setMenuOpen(false); };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   const dashboardHref = portal === "landlord" ? "/landlord/dashboard" : "/dashboard";
 
   function getListPropertyHref() {

@@ -25,7 +25,8 @@ public class NotificationsController : ControllerBase
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         var userId = Perm.UserId(User);
-        if (pageSize > 50) pageSize = 50;
+        pageSize = Math.Clamp(pageSize, 1, 50);
+        page = Math.Max(1, page);
         var items = await _notifications.GetByUserAsync(userId, page, pageSize);
         return Ok(items);
     }

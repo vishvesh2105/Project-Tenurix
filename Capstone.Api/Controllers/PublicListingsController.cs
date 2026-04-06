@@ -85,6 +85,8 @@ public sealed class PublicListingsController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 12)
     {
+        if (city?.Length > 100) return BadRequest(new ApiError("City name is too long."));
+        if (propertyType?.Length > 50) return BadRequest(new ApiError("Property type is too long."));
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 2000);
         if (minRent.HasValue && minRent.Value < 0) minRent = 0;

@@ -74,6 +74,10 @@ public sealed class LandlordSubmissionsController : ControllerBase
         if (string.IsNullOrWhiteSpace(form.PropertyType)) return BadRequest(new ApiError("Please select a property type."));
         if (form.RentAmount <= 0) return BadRequest(new ApiError("Please enter a valid rent amount."));
         if (form.RentAmount > 99999) return BadRequest(new ApiError("Rent amount seems too high."));
+        if (form.Bedrooms.HasValue && (form.Bedrooms < 0 || form.Bedrooms > 50))
+            return BadRequest(new ApiError("Bedrooms must be between 0 and 50."));
+        if (form.Bathrooms.HasValue && (form.Bathrooms < 0 || form.Bathrooms > 50))
+            return BadRequest(new ApiError("Bathrooms must be between 0 and 50."));
         if (!string.IsNullOrWhiteSpace(form.UtilitiesJson) && !IsValidJson(form.UtilitiesJson))
             return BadRequest(new ApiError("UtilitiesJson must be valid JSON."));
         if (!string.IsNullOrWhiteSpace(form.AmenitiesJson) && !IsValidJson(form.AmenitiesJson))

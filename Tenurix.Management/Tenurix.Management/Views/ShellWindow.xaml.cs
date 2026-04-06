@@ -118,8 +118,9 @@ namespace Tenurix.Management.Views
             return parts.Length == 0 ? "U" : new string(parts);
         }
 
-        private static BitmapImage Base64ToImage(string base64)
+        private static BitmapImage? Base64ToImage(string? base64)
         {
+            if (string.IsNullOrWhiteSpace(base64)) return null;
             byte[] bytes = Convert.FromBase64String(base64);
 
             var ms = new MemoryStream(bytes);

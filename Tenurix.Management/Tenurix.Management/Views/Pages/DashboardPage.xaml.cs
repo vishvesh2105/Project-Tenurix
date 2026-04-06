@@ -53,7 +53,7 @@ public partial class DashboardPage : Page
             };
             win.ShowDialog();
         }
-        catch { /* DataContext missing expected property */ }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"Navigation error: {ex.Message}"); }
     }
 
     private void ViewApp_Click(object sender, RoutedEventArgs e)
@@ -71,7 +71,7 @@ public partial class DashboardPage : Page
             };
             win.ShowDialog();
         }
-        catch { /* DataContext missing expected property */ }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"Navigation error: {ex.Message}"); }
     }
 
     private void ViewIssue_Click(object sender, RoutedEventArgs e)
@@ -89,6 +89,6 @@ public partial class DashboardPage : Page
             };
             win.ShowDialog();
         }
-        catch { /* DataContext missing expected property */ }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"Navigation error: {ex.Message}"); }
     }
 }

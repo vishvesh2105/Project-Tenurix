@@ -267,7 +267,7 @@ export default function ListingDetailPage() {
                               : "border-transparent opacity-60 hover:opacity-100 hover:border-slate-300"
                           }`}
                         >
-                          <img src={src} alt={`Thumb ${i + 1}`} className="h-full w-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0.3"; }} />
+                          <img src={src} alt={`Property photo ${i + 1}`} className="h-full w-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0.3"; }} />
                         </button>
                       ))}
                     </div>

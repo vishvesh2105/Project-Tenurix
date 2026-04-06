@@ -40,8 +40,12 @@ export default function NotificationsPage() {
         // Only show load more if we got a full page (could be more)
         // If we got less than 20, we know there are no more
         setHasMore(data.length >= 20);
+      } else {
+        setActionError("Failed to load notifications. Please try again.");
       }
-    } catch {}
+    } catch {
+      setActionError("Failed to load notifications. Please try again.");
+    }
     setLoading(false);
   };
 

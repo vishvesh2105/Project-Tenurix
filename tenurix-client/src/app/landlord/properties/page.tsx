@@ -104,7 +104,7 @@ export default function LandlordPropertiesPage() {
         )}
 
         {/* NEW ID NEEDED Banner */}
-        {hasIdRequest && (
+        {hasIdRequest && rows.length > 0 && (
           <Link href={rows.length > 0 ? `/landlord/properties/${rows[0].propertyId}` : "#"}>
             <div className="rounded-2xl border-2 border-amber-400 bg-amber-50 p-4 flex items-center gap-3 hover:bg-amber-100 transition cursor-pointer">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100">

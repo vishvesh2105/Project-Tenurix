@@ -137,11 +137,14 @@ function ApplyPageInner() {
     (async () => {
       try {
         const res = await fetch(`${API_BASE}/public/listings/${listingId}`);
-        if (!res.ok) return;
+        if (!res.ok) {
+          setErr("Failed to load listing details. Please check the listing ID and try again.");
+          return;
+        }
         const data = await res.json();
         setListing(data);
       } catch {
-        // ignore
+        setErr("Failed to load listing details. Please check your connection and try again.");
       }
     })();
   }, [listingId]);

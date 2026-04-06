@@ -316,6 +316,8 @@ function ListingsContent() {
                   <div className="flex rounded-lg border border-slate-200 overflow-hidden">
                     <button
                       onClick={() => setViewMode("grid")}
+                      aria-label="Grid view"
+                      aria-pressed={viewMode === "grid"}
                       className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
                         viewMode === "grid" ? "bg-indigo-600 text-white" : "bg-white text-slate-600 hover:bg-slate-50"
                       }`}
@@ -324,6 +326,8 @@ function ListingsContent() {
                     </button>
                     <button
                       onClick={() => setViewMode("map")}
+                      aria-label="Map view"
+                      aria-pressed={viewMode === "map"}
                       className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
                         viewMode === "map" ? "bg-indigo-600 text-white" : "bg-white text-slate-600 hover:bg-slate-50"
                       }`}

@@ -14,6 +14,7 @@ public partial class NotificationsPage : Page
     private const int PageSize = 20;
     private int _totalCount = 0;
     private readonly List<NotificationDto> _items = new();
+    private bool _loadingMore = false;
 
     public NotificationsPage(TenurixApiClient api)
     {
@@ -105,7 +106,16 @@ public partial class NotificationsPage : Page
 
     private async void LoadMore_Click(object sender, RoutedEventArgs e)
     {
-        _currentPage++;
-        await LoadAsync(reset: false);
+        if (_loadingMore) return;
+        _loadingMore = true;
+        try
+        {
+            _currentPage++;
+            await LoadAsync(reset: false);
+        }
+        finally
+        {
+            _loadingMore = false;
+        }
     }
 }

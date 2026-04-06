@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopNav } from "./TopNav";
 
@@ -10,7 +10,11 @@ export function AppShell({ children }: { children: ReactNode }) {
       <TopNav />
       <div className="mx-auto flex w-full max-w-7xl gap-6 px-4 pb-12 pt-6">
         <Sidebar />
-        <main className="min-w-0 flex-1">{children}</main>
+        <main className="min-w-0 flex-1">
+          <Suspense fallback={<div className="animate-pulse p-8"><div className="h-8 w-48 rounded bg-slate-200" /></div>}>
+            {children}
+          </Suspense>
+        </main>
       </div>
     </div>
   );

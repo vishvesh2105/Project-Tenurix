@@ -111,6 +111,10 @@ export default function ListingsMap({ listings, apiBase }: Props) {
             `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
             { headers: { "User-Agent": "Tenurix/1.0" } }
           );
+          if (res.status === 429) {
+            await new Promise((r) => setTimeout(r, 5000));
+            continue;
+          }
           const data = await res.json();
 
           if (data && data.length > 0) {

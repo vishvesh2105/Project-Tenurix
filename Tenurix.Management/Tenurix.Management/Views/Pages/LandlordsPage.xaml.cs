@@ -86,8 +86,9 @@ public partial class LandlordsPage : Page
             PropsItems.ItemsSource = props;
             PropsCountBadge.Text = $"({props.Count})";
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Failed to load landlord properties: {ex.Message}");
             PropsCountBadge.Text = "(error)";
         }
 
@@ -98,8 +99,9 @@ public partial class LandlordsPage : Page
             LeasesItems.ItemsSource = leases;
             LeasesCountBadge.Text = $"({leases.Count})";
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Failed to load landlord leases: {ex.Message}");
             LeasesCountBadge.Text = "(error)";
         }
     }
