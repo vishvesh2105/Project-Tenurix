@@ -475,6 +475,7 @@ function AuthPageInner() {
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <input type="email" placeholder="Email address" value={loginEmail}
+                        aria-label="Email address"
                         onChange={(e) => setLoginEmail(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                         className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
@@ -483,10 +484,12 @@ function AuthPageInner() {
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <input type={showLoginPw ? "text" : "password"} placeholder="Password" value={loginPassword}
+                        aria-label="Password"
                         onChange={(e) => setLoginPassword(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                         className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
                       <button type="button" onClick={() => setShowLoginPw(!showLoginPw)}
+                        aria-label={showLoginPw ? "Hide password" : "Show password"}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                         {showLoginPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -556,12 +559,14 @@ function AuthPageInner() {
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <input type="text" placeholder="First name" value={firstName}
+                        aria-label="First name"
                         onChange={(e) => setFirstName(e.target.value)}
                         className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
                     </div>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <input type="text" placeholder="Last name" value={lastName}
+                        aria-label="Last name"
                         onChange={(e) => setLastName(e.target.value)}
                         className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
                     </div>
@@ -571,6 +576,7 @@ function AuthPageInner() {
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input type="email" placeholder="Email address" value={regEmail}
+                      aria-label="Email address"
                       onChange={(e) => setRegEmail(e.target.value)}
                       className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
                   </div>
@@ -579,6 +585,7 @@ function AuthPageInner() {
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input type="tel" placeholder="Phone number (optional)" value={regPhone}
+                      aria-label="Phone number"
                       onChange={(e) => setRegPhone(e.target.value)}
                       className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
                   </div>
@@ -587,9 +594,11 @@ function AuthPageInner() {
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input type={showRegPw ? "text" : "password"} placeholder="Password" value={regPassword}
+                      aria-label="Password"
                       onChange={(e) => setRegPassword(e.target.value)}
                       className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
                     <button type="button" onClick={() => setShowRegPw(!showRegPw)}
+                      aria-label={showRegPw ? "Hide password" : "Show password"}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                       {showRegPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -611,6 +620,7 @@ function AuthPageInner() {
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input type={showConfirmPw ? "text" : "password"} placeholder="Confirm password" value={confirmPassword}
+                      aria-label="Confirm password"
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleRegister()}
                       className={`w-full rounded-xl border bg-white py-3 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all ${
@@ -619,6 +629,7 @@ function AuthPageInner() {
                         "border-slate-200 focus:border-indigo-400 focus:ring-indigo-100"
                       } focus:ring-2`} />
                     <button type="button" onClick={() => setShowConfirmPw(!showConfirmPw)}
+                      aria-label={showConfirmPw ? "Hide confirm password" : "Show confirm password"}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                       {showConfirmPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -668,6 +679,7 @@ function AuthPageInner() {
                   {/* Code input */}
                   <div className="flex justify-center">
                     <input type="text" maxLength={6} value={verifyCode}
+                      aria-label="Verification code"
                       onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                       onKeyDown={(e) => e.key === "Enter" && handleVerify()}
                       placeholder="000000"
@@ -713,6 +725,7 @@ function AuthPageInner() {
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input type="email" placeholder="Email address" value={forgotEmail}
+                      aria-label="Email address"
                       onChange={(e) => setForgotEmail(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleForgotPassword()}
                       className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
@@ -753,6 +766,7 @@ function AuthPageInner() {
                 <div className="space-y-4">
                   <div className="flex justify-center">
                     <input type="text" maxLength={6} value={verifyCode}
+                      aria-label="Verification code"
                       onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                       onKeyDown={(e) => e.key === "Enter" && handleForgotVerify()}
                       placeholder="000000"
@@ -800,9 +814,11 @@ function AuthPageInner() {
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <input type={showResetPw ? "text" : "password"} placeholder="New password" value={resetPassword}
+                        aria-label="New password"
                         onChange={(e) => setResetPassword(e.target.value)}
                         className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
                       <button type="button" onClick={() => setShowResetPw(!showResetPw)}
+                        aria-label={showResetPw ? "Hide password" : "Show password"}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                         {showResetPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -822,6 +838,7 @@ function AuthPageInner() {
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <input type={showResetConfirm ? "text" : "password"} placeholder="Confirm new password" value={resetConfirm}
+                        aria-label="Confirm new password"
                         onChange={(e) => setResetConfirm(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleResetPassword()}
                         className={`w-full rounded-xl border bg-white py-3 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all ${
@@ -830,6 +847,7 @@ function AuthPageInner() {
                           "border-slate-200 focus:border-indigo-400 focus:ring-indigo-100"
                         } focus:ring-2`} />
                       <button type="button" onClick={() => setShowResetConfirm(!showResetConfirm)}
+                        aria-label={showResetConfirm ? "Hide confirm password" : "Show confirm password"}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                         {showResetConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>

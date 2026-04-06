@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/shell/AppShell";
 import { useAuth } from "@/lib/useAuth";
 import { apiFetch } from "@/lib/api";
-import { Bell, Check, CheckCheck, AlertCircle } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
+import { Bell, BellOff, Check, CheckCheck, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Notification = {
@@ -21,6 +22,7 @@ type Notification = {
 export default function NotificationsPage() {
   const router = useRouter();
   const { isReady } = useAuth();
+  const { toast } = useToast();
   const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -74,8 +76,9 @@ export default function NotificationsPage() {
       const res = await apiFetch("/notifications/read-all", { method: "POST" });
       if (!res.ok) throw new Error();
       setItems((prev) => prev.map((x) => ({ ...x, isRead: true })));
+      toast("All notifications marked as read", "success");
     } catch {
-      setActionError("Failed to mark all as read. Please try again.");
+      toast("Failed to mark all as read", "error");
     }
   };
 
@@ -117,7 +120,7 @@ export default function NotificationsPage() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Bell className="h-6 w-6 text-indigo-600" />
-            <h1 className="text-2xl font-bold text-slate-800">Notifications</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Notifications</h1>
             {unreadCount > 0 && (
               <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-600">
                 {unreadCount} unread
@@ -147,12 +150,12 @@ export default function NotificationsPage() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
-            <Bell className="mx-auto h-12 w-12 text-slate-300" />
-            <p className="mt-4 text-slate-500">No notifications yet</p>
-            <p className="mt-1 text-sm text-slate-400">
-              You will be notified when something important happens.
-            </p>
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="rounded-full bg-indigo-50 p-4 mb-4">
+              <BellOff className="h-8 w-8 text-indigo-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-slate-700 mb-1">No notifications yet</h3>
+            <p className="text-sm text-slate-500">You will be notified when something important happens.</p>
           </div>
         ) : (
           <div className="space-y-2">

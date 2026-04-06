@@ -3,11 +3,14 @@
 import React from "react";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { I18nProvider } from "@/components/providers/I18nProvider";
+import { ToastProvider } from "@/components/ui/Toast";
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      <I18nProvider>{children}</I18nProvider>
+      <I18nProvider>
+        <ToastProvider>{children}</ToastProvider>
+      </I18nProvider>
     </ThemeProvider>
   );
 }

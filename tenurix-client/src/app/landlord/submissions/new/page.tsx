@@ -52,6 +52,12 @@ export default function NewSubmission() {
   const [err, setErr] = useState("");
   const [ok, setOk] = useState("");
 
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const handleBlur = (field: string) => setTouched(prev => ({ ...prev, [field]: true }));
+  const isFieldError = (field: string, value: string) => touched[field] && !value.trim();
+  const fieldErrorClass = (field: string, value: string) =>
+    isFieldError(field, value) ? "border-red-400 focus:border-red-400 focus:ring-red-100" : "";
+
   // Landlord personal details
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -345,24 +351,28 @@ export default function NewSubmission() {
           <h2 className="text-sm font-bold text-slate-800 mb-4">Property Address</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Address Line 1 *</label>
-              <input className={inputClass} value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Address Line 1 <span className="text-red-500">*</span></label>
+              <input className={`${inputClass} ${fieldErrorClass("addressLine1", addressLine1)}`} value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} onBlur={() => handleBlur("addressLine1")} />
+              {isFieldError("addressLine1", addressLine1) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Address Line 2</label>
               <input className={inputClass} value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">City *</label>
-              <input className={inputClass} value={city} onChange={(e) => setCity(e.target.value)} />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">City <span className="text-red-500">*</span></label>
+              <input className={`${inputClass} ${fieldErrorClass("city", city)}`} value={city} onChange={(e) => setCity(e.target.value)} onBlur={() => handleBlur("city")} />
+              {isFieldError("city", city) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Province *</label>
-              <input className={inputClass} value={province} onChange={(e) => setProvince(e.target.value)} />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Province <span className="text-red-500">*</span></label>
+              <input className={`${inputClass} ${fieldErrorClass("province", province)}`} value={province} onChange={(e) => setProvince(e.target.value)} onBlur={() => handleBlur("province")} />
+              {isFieldError("province", province) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Postal Code *</label>
-              <input className={inputClass} value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Postal Code <span className="text-red-500">*</span></label>
+              <input className={`${inputClass} ${fieldErrorClass("postalCode", postalCode)}`} value={postalCode} onChange={(e) => setPostalCode(e.target.value)} onBlur={() => handleBlur("postalCode")} />
+              {isFieldError("postalCode", postalCode) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
           </div>
         </div>
@@ -372,17 +382,19 @@ export default function NewSubmission() {
           <h2 className="text-sm font-bold text-slate-800 mb-4">Property Details</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Property Type *</label>
-              <select className={inputClass} value={propertyType} onChange={(e) => setPropertyType(e.target.value)}>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Property Type <span className="text-red-500">*</span></label>
+              <select className={`${inputClass} ${fieldErrorClass("propertyType", propertyType)}`} value={propertyType} onChange={(e) => setPropertyType(e.target.value)} onBlur={() => handleBlur("propertyType")}>
                 <option value="">Select type...</option>
                 {PROPERTY_TYPES.map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </select>
+              {isFieldError("propertyType", propertyType) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Monthly Rent ($) *</label>
-              <input className={inputClass} inputMode="numeric" value={rentAmount} onChange={(e) => setRentAmount(e.target.value)} />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Monthly Rent ($) <span className="text-red-500">*</span></label>
+              <input className={`${inputClass} ${fieldErrorClass("rentAmount", rentAmount)}`} inputMode="numeric" value={rentAmount} onChange={(e) => setRentAmount(e.target.value)} onBlur={() => handleBlur("rentAmount")} />
+              {isFieldError("rentAmount", rentAmount) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Bedrooms</label>

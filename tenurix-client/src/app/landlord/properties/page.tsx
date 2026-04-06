@@ -136,7 +136,7 @@ export default function LandlordPropertiesPage() {
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 mb-5">
               <Building2 className="h-7 w-7 text-indigo-300" />
             </div>
-            <h2 className="text-lg font-bold text-slate-900">{t("noProperties")}</h2>
+            <h2 className="text-lg font-semibold text-slate-800">{t("noProperties")}</h2>
             <p className="mt-2 text-sm text-slate-500">Submit a property to get started.</p>
             <div className="mt-6 flex justify-center">
               <Link href="/landlord/submissions/new">

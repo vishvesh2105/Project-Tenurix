@@ -207,14 +207,23 @@ export default function ListingDetailPage() {
               <div className="lg:col-span-2 space-y-6">
 
                 {/* Photo Gallery */}
-                <div className="rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                <div
+                  className="rounded-2xl overflow-hidden shadow-md border border-slate-200"
+                  role="region"
+                  aria-label="Photo gallery"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowLeft") { prevPhoto(); e.preventDefault(); }
+                    if (e.key === "ArrowRight") { nextPhoto(); e.preventDefault(); }
+                  }}
+                >
                   {/* Main image */}
                   <div className="relative h-72 md:h-[460px] bg-gradient-to-br from-slate-100 to-slate-50">
                     {photos.length > 0 ? (
                       <img
                         key={activePhoto}
                         src={photos[activePhoto]}
-                        alt={`${row.addressLine1} photo ${activePhoto + 1}`}
+                        alt={`Property photo ${activePhoto + 1} of ${photos.length}`}
                         className="h-full w-full object-cover animate-[fadeIn_0.3s_ease]"
                         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                       />
@@ -267,7 +276,7 @@ export default function ListingDetailPage() {
                               : "border-transparent opacity-60 hover:opacity-100 hover:border-slate-300"
                           }`}
                         >
-                          <img src={src} alt={`Property photo ${i + 1}`} className="h-full w-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0.3"; }} />
+                          <img src={src} alt={`Property photo ${i + 1} of ${photos.length}`} className="h-full w-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0.3"; }} />
                         </button>
                       ))}
                     </div>

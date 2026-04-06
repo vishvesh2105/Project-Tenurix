@@ -17,7 +17,7 @@ export function HeaderControls() {
   className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700 hover:bg-slate-50"
   onClick={() => setLang(lang === "en" ? "fr" : "en")}
   type="button"
-  aria-label="Toggle language"
+  aria-label="Switch language"
 >
   {lang === "en" ? "FR" : "EN"}
 </button>
@@ -27,7 +27,7 @@ export function HeaderControls() {
         className="rounded-full border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50"
         onClick={toggleTheme}
         type="button"
-        aria-label="Toggle theme"
+        aria-label="Toggle dark mode"
       >
         {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
       </button>

@@ -92,6 +92,13 @@ function ApplyPageInner() {
   const [referencePhone, setReferencePhone] = useState("");
   const [referenceRelation, setReferenceRelation] = useState("");
 
+  // Validation
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const handleBlur = (field: string) => setTouched(prev => ({ ...prev, [field]: true }));
+  const isFieldError = (field: string, value: string) => touched[field] && !value.trim();
+  const fieldErrorClass = (field: string, value: string) =>
+    isFieldError(field, value) ? "border-red-400 focus:border-red-400 focus:ring-red-100" : "";
+
   // Additional
   const [additionalNotes, setAdditionalNotes] = useState("");
   const [documents, setDocuments] = useState<File[]>([]);
@@ -324,20 +331,24 @@ function ApplyPageInner() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Full Name *</label>
-              <input value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass} placeholder="Your full legal name" />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Full legal name <span className="text-red-500">*</span></label>
+              <input value={fullName} onChange={(e) => setFullName(e.target.value)} onBlur={() => handleBlur("fullName")} className={`${inputClass} ${fieldErrorClass("fullName", fullName)}`} placeholder="Your full legal name" />
+              {isFieldError("fullName", fullName) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Phone Number *</label>
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} placeholder="(416) 555-1234" />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Phone Number <span className="text-red-500">*</span></label>
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} onBlur={() => handleBlur("phone")} className={`${inputClass} ${fieldErrorClass("phone", phone)}`} placeholder="(416) 555-1234" />
+              {isFieldError("phone", phone) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
+              {touched["phone"] && phone.trim() && !/^[\d\s()+-]{7,20}$/.test(phone.trim()) && <p className="mt-1 text-xs text-red-500">Please enter a valid phone number</p>}
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Date of Birth</label>
               <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} className={inputClass} />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Current Address *</label>
-              <input value={currentAddress} onChange={(e) => setCurrentAddress(e.target.value)} className={inputClass} placeholder="Your current home address" />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Current Address <span className="text-red-500">*</span></label>
+              <input value={currentAddress} onChange={(e) => setCurrentAddress(e.target.value)} onBlur={() => handleBlur("currentAddress")} className={`${inputClass} ${fieldErrorClass("currentAddress", currentAddress)}`} placeholder="Your current home address" />
+              {isFieldError("currentAddress", currentAddress) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
           </div>
         </div>
@@ -423,12 +434,14 @@ function ApplyPageInner() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Name *</label>
-              <input value={emergencyContactName} onChange={(e) => setEmergencyContactName(e.target.value)} className={inputClass} placeholder="Contact name" />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Name <span className="text-red-500">*</span></label>
+              <input value={emergencyContactName} onChange={(e) => setEmergencyContactName(e.target.value)} onBlur={() => handleBlur("emergencyName")} className={`${inputClass} ${fieldErrorClass("emergencyName", emergencyContactName)}`} placeholder="Contact name" />
+              {isFieldError("emergencyName", emergencyContactName) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Phone *</label>
-              <input value={emergencyContactPhone} onChange={(e) => setEmergencyContactPhone(e.target.value)} className={inputClass} placeholder="(416) 555-0000" />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Phone <span className="text-red-500">*</span></label>
+              <input value={emergencyContactPhone} onChange={(e) => setEmergencyContactPhone(e.target.value)} onBlur={() => handleBlur("emergencyPhone")} className={`${inputClass} ${fieldErrorClass("emergencyPhone", emergencyContactPhone)}`} placeholder="(416) 555-0000" />
+              {isFieldError("emergencyPhone", emergencyContactPhone) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Relationship</label>
@@ -471,12 +484,14 @@ function ApplyPageInner() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Requested Start Date *</label>
-              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={inputClass} />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Requested Start Date <span className="text-red-500">*</span></label>
+              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} onBlur={() => handleBlur("requestedStartDate")} className={`${inputClass} ${fieldErrorClass("requestedStartDate", startDate)}`} />
+              {isFieldError("requestedStartDate", startDate) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Requested End Date *</label>
-              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className={inputClass} />
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Requested End Date <span className="text-red-500">*</span></label>
+              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} onBlur={() => handleBlur("requestedEndDate")} className={`${inputClass} ${fieldErrorClass("requestedEndDate", endDate)}`} />
+              {isFieldError("requestedEndDate", endDate) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
           </div>
 
@@ -498,6 +513,7 @@ function ApplyPageInner() {
                 type="file"
                 accept="image/*,.pdf"
                 multiple
+                aria-label="Upload supporting documents"
                 className="text-xs text-slate-500"
                 onChange={(e) => {
                   const newFiles = e.target.files ? Array.from(e.target.files) : [];
@@ -528,6 +544,7 @@ function ApplyPageInner() {
                       <span className="flex-1 truncate text-xs text-slate-700">{file.name}</span>
                       <button
                         type="button"
+                        aria-label={`Remove ${file.name}`}
                         onClick={() => setDocuments((prev) => prev.filter((_, i) => i !== idx))}
                         className="rounded-full p-1 text-red-400 hover:bg-red-50 hover:text-red-600 transition"
                       >

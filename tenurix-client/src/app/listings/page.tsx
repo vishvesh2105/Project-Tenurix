@@ -9,7 +9,7 @@ import {
   SlidersHorizontal, Building2, BedDouble, Bath,
   MapPin, ArrowRight, RefreshCw, ChevronDown,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-  LayoutGrid, Map,
+  LayoutGrid, Map, X,
 } from "lucide-react";
 
 const ListingsMap = lazy(() => import("@/components/map/ListingsMap"));
@@ -50,6 +50,7 @@ function ListingsContent() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [showFilters, setShowFilters] = useState(true);
+  const [mobileFilters, setMobileFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
   const [mapListings, setMapListings] = useState<ListingCard[]>([]);
 
@@ -209,8 +210,113 @@ function ListingsContent() {
         <div className="mx-auto max-w-7xl px-4 py-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
 
+            {/* Mobile filter button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setMobileFilters(true)}
+                className="flex items-center gap-2 rounded-xl bg-white border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm"
+              >
+                <SlidersHorizontal className="h-4 w-4 text-amber-500" />
+                Filters
+                {activeFilters > 0 && (
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">
+                    {activeFilters}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* Mobile filter bottom sheet */}
+            {mobileFilters && (
+              <div className="fixed inset-0 z-[90] md:hidden">
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileFilters(false)} />
+                <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-white shadow-2xl animate-in slide-in-from-bottom">
+                  <div className="sticky top-0 bg-white border-b border-slate-100 px-5 py-4 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                      <SlidersHorizontal className="h-4 w-4 text-amber-500" />
+                      Filters
+                    </span>
+                    <button onClick={() => setMobileFilters(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <div className="px-5 pb-5 space-y-4">
+                    <div className="pt-4">
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">City</label>
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                        <input
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                          placeholder="e.g. Toronto"
+                          className="w-full pl-9 pr-3 py-2.5 text-sm border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition bg-white text-slate-900 placeholder:text-slate-400"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Rent Range</label>
+                      <div className="flex gap-2">
+                        <input
+                          value={minRent}
+                          onChange={(e) => setMinRent(digitsOnly(e.target.value))}
+                          placeholder="Min $"
+                          inputMode="numeric"
+                          className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition bg-white text-slate-900 placeholder:text-slate-400"
+                        />
+                        <input
+                          value={maxRent}
+                          onChange={(e) => setMaxRent(digitsOnly(e.target.value))}
+                          placeholder="Max $"
+                          inputMode="numeric"
+                          className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition bg-white text-slate-900 placeholder:text-slate-400"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Bedrooms</label>
+                      <input
+                        value={bedrooms}
+                        onChange={(e) => setBedrooms(digitsOnly(e.target.value))}
+                        placeholder="Any"
+                        inputMode="numeric"
+                        className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition bg-white text-slate-900 placeholder:text-slate-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Property Type</label>
+                      <select
+                        value={propertyType}
+                        onChange={(e) => setPropertyType(e.target.value)}
+                        className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 bg-white text-slate-900 transition"
+                      >
+                        {PROPERTY_TYPES.map((t) => (
+                          <option key={t} value={t}>{t || "Any type"}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {activeFilters > 0 && (
+                      <button
+                        onClick={() => { clearFilters(); setMobileFilters(false); }}
+                        className="w-full text-xs text-indigo-600 hover:text-indigo-700 font-semibold py-1.5 transition-colors text-center"
+                      >
+                        Clear all filters
+                      </button>
+                    )}
+                  </div>
+                  <div className="sticky bottom-0 bg-white border-t border-slate-100 px-5 py-4">
+                    <button
+                      onClick={() => setMobileFilters(false)}
+                      className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
+                    >
+                      Apply Filters
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Filters sidebar */}
-            <aside className="lg:w-68 shrink-0">
+            <aside className="hidden md:block lg:w-68 shrink-0">
               <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-sm">
                 <button
                   className="w-full flex items-center justify-between px-5 py-4 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
@@ -309,7 +415,7 @@ function ListingsContent() {
               {/* Toolbar */}
               <div className="flex items-center justify-between mb-5">
                 <span className="text-sm text-slate-500">
-                  {loading ? "Searching..." : `Showing ${rows.length} of ${totalItems} listing${totalItems !== 1 ? "s" : ""}${totalPages > 1 ? ` · Page ${currentPage} of ${totalPages}` : ""}`}
+                  {loading ? "Searching..." : totalItems > 0 ? `Showing ${(currentPage - 1) * PAGE_SIZE + 1}-${Math.min(currentPage * PAGE_SIZE, totalItems)} of ${totalItems} listing${totalItems !== 1 ? "s" : ""}${totalPages > 1 ? ` · Page ${currentPage} of ${totalPages}` : ""}` : "0 listings"}
                 </span>
                 <div className="flex items-center gap-2">
                   {/* View toggle */}

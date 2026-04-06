@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/useAuth";
 import { apiFetch, safeJson } from "@/lib/api";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { useRouter } from "next/navigation";
-import { AlertCircle, RefreshCw, Plus, X, Send, ImagePlus, ChevronRight, MessageSquare } from "lucide-react";
+import { AlertCircle, RefreshCw, Plus, X, Send, ImagePlus, ChevronRight, MessageSquare, Wrench } from "lucide-react";
 
 type IssueRow = {
   issueId: number;
@@ -117,8 +117,42 @@ export default function IssuesPage() {
   if (!isReady) {
     return (
       <AppShell>
-        <div className="animate-pulse rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="h-6 w-32 rounded-lg bg-slate-200" />
+        <div className="animate-pulse flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <div className="h-7 w-28 rounded-lg bg-slate-200" />
+              <div className="h-4 w-56 rounded-lg bg-slate-100" />
+            </div>
+            <div className="flex gap-2">
+              <div className="h-9 w-24 rounded-lg bg-slate-100" />
+              <div className="h-9 w-32 rounded-lg bg-slate-200" />
+            </div>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div className="border-b border-slate-100 px-5 py-4">
+              <div className="h-4 w-32 rounded bg-slate-200" />
+            </div>
+            <div className="divide-y divide-slate-100">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="px-5 py-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <div className="h-4 w-24 rounded bg-slate-200" />
+                        <div className="h-5 w-16 rounded-full bg-slate-100" />
+                      </div>
+                      <div className="h-3 w-52 rounded bg-slate-100" />
+                    </div>
+                    <div className="h-4 w-12 rounded bg-slate-100" />
+                  </div>
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 space-y-2">
+                    <div className="h-3 w-20 rounded bg-slate-200" />
+                    <div className="h-4 w-full rounded bg-slate-100" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </AppShell>
     );
@@ -233,11 +267,29 @@ export default function IssuesPage() {
 
         {/* Loading */}
         {loading && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="animate-pulse space-y-3">
-              <div className="h-5 w-44 rounded-lg bg-slate-200" />
-              <div className="h-16 w-full rounded-xl bg-slate-100" />
-              <div className="h-16 w-full rounded-xl bg-slate-100" />
+          <div className="animate-pulse rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div className="border-b border-slate-100 px-5 py-4">
+              <div className="h-4 w-32 rounded bg-slate-200" />
+            </div>
+            <div className="divide-y divide-slate-100">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="px-5 py-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <div className="h-4 w-24 rounded bg-slate-200" />
+                        <div className="h-5 w-16 rounded-full bg-slate-100" />
+                      </div>
+                      <div className="h-3 w-52 rounded bg-slate-100" />
+                    </div>
+                    <div className="h-4 w-12 rounded bg-slate-100" />
+                  </div>
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 space-y-2">
+                    <div className="h-3 w-20 rounded bg-slate-200" />
+                    <div className="h-4 w-full rounded bg-slate-100" />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -254,12 +306,15 @@ export default function IssuesPage() {
 
         {/* Empty */}
         {!loading && !error && rows.length === 0 && leases.length > 0 && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 mb-5">
-              <AlertCircle className="h-7 w-7 text-indigo-300" />
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="rounded-full bg-indigo-50 p-4 mb-4">
+              <Wrench className="h-8 w-8 text-indigo-400" />
             </div>
-            <h2 className="text-lg font-bold text-slate-900">{t("noIssues")}</h2>
-            <p className="mt-2 text-sm text-slate-500">No maintenance issues reported. Click &quot;Report Issue&quot; to submit one.</p>
+            <h3 className="text-lg font-semibold text-slate-700 mb-1">{t("noIssues")}</h3>
+            <p className="text-sm text-slate-500 mb-4">No maintenance issues reported. Click &quot;Report Issue&quot; to submit one.</p>
+            <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => setShowForm(true)}>
+              <Plus className="h-4 w-4" /> {t("reportIssue")}
+            </Button>
           </div>
         )}
 

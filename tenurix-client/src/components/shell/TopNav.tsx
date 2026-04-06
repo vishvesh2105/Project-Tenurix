@@ -20,6 +20,7 @@ export function TopNav() {
   const [portal, setPortal] = useState<"client" | "landlord">("client");
   const [user, setUser] = useState<UserInfo | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
 
   useEffect(() => {
     const p = (localStorage.getItem("tenurix_portal") as any) || "client";
@@ -48,8 +49,9 @@ export function TopNav() {
   const portalLabel = portal === "landlord" ? "Landlord Portal" : "Client Portal";
 
   return (
+    <>
     <header
-      className={`sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b transition-all duration-300 ${scrolled ? "border-slate-200 shadow-lg shadow-black/5" : "border-slate-100"}`}
+      className={`sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b transition-all duration-200 ${scrolled ? "border-slate-200 shadow-lg shadow-black/5" : "border-slate-100"}`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         {/* Logo */}
@@ -64,9 +66,9 @@ export function TopNav() {
         {/* Right side */}
         <div className="flex items-center gap-1">
           {/* Browse listings link */}
-          <Link href="/listings">
+          <Link href="/listings" aria-label="Browse listings">
             <Button variant="ghost" className="text-slate-500 hover:text-indigo-600 text-sm hidden sm:flex">
-              Browse Listings
+              {t("browseListings")}
             </Button>
           </Link>
 
@@ -74,13 +76,13 @@ export function TopNav() {
           <NotificationBell />
 
           {/* Profile */}
-          <Link href="/profile">
+          <Link href="/profile" aria-label="View profile">
             <Button variant="ghost" className="gap-2 text-slate-700 hover:text-indigo-600 hover:bg-indigo-50">
               {user?.photoBase64 ? (
                 <img
                   src={`data:${user.photoContentType};base64,${user.photoBase64}`}
                   alt="Profile"
-                  className="h-7 w-7 rounded-full object-cover ring-2 ring-amber-300"
+                  className="h-7 w-7 rounded-full object-cover ring-2 ring-indigo-300"
                 />
               ) : initials ? (
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-[11px] font-bold text-indigo-600">
@@ -91,19 +93,16 @@ export function TopNav() {
                   <User className="h-4 w-4 text-slate-500" />
                 </span>
               )}
-              <span className="hidden sm:inline text-sm font-medium">{user?.fullName || "Profile"}</span>
+              <span className="hidden sm:inline text-sm font-medium">{user?.fullName || t("profile")}</span>
             </Button>
           </Link>
 
           {/* Sign out */}
           <Button
             variant="ghost"
+            aria-label="Sign out"
             className="gap-2 text-slate-500 hover:text-red-500 hover:bg-red-50"
-            onClick={() => {
-              localStorage.removeItem("tenurix_token");
-              localStorage.removeItem("tenurix_portal");
-              window.location.href = "/auth";
-            }}
+            onClick={() => setShowLogout(true)}
           >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline text-sm">{t("signout")}</span>
@@ -111,5 +110,32 @@ export function TopNav() {
         </div>
       </div>
     </header>
+      {showLogout && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm mx-4 space-y-4">
+            <h3 className="text-lg font-semibold text-slate-900">Sign out?</h3>
+            <p className="text-sm text-slate-500">Are you sure you want to sign out of your account?</p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowLogout(false)}
+                className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  localStorage.removeItem("tenurix_token");
+                  localStorage.removeItem("tenurix_portal");
+                  window.location.href = "/auth";
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

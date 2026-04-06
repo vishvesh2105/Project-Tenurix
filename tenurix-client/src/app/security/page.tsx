@@ -6,15 +6,32 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/useAuth";
 import { apiFetch } from "@/lib/api";
 import { useI18n } from "@/components/providers/I18nProvider";
+import { useToast } from "@/components/ui/Toast";
 import { Shield, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pr-10 text-sm text-slate-900 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition placeholder:text-slate-400";
 
+function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[a-z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+  if (score <= 2) return { score, label: "Weak", color: "bg-red-500" };
+  if (score <= 3) return { score, label: "Fair", color: "bg-amber-500" };
+  if (score <= 4) return { score, label: "Good", color: "bg-blue-500" };
+  return { score, label: "Strong", color: "bg-green-500" };
+}
+
 export default function SecurityPage() {
   const { isReady } = useAuth();
   const { t } = useI18n();
+  const { toast } = useToast();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -48,12 +65,12 @@ export default function SecurityPage() {
         throw new Error(data?.message || data?.title || "Failed to change password");
       }
 
-      setSuccess("Password changed successfully.");
+      toast("Password changed successfully", "success");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (e: any) {
-      setError(e?.message ?? "Failed to change password");
+      toast(e?.message ?? "Failed to change password", "error");
     } finally {
       setSaving(false);
     }
@@ -154,6 +171,19 @@ export default function SecurityPage() {
               {newPassword && !minLength && (
                 <p className="mt-1.5 text-xs text-amber-600">Password must be at least 8 characters.</p>
               )}
+              {newPassword && (() => {
+                const strength = getPasswordStrength(newPassword);
+                return (
+                  <div className="mt-2 space-y-1">
+                    <div className="flex gap-1">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i < Math.ceil(strength.score / 1.5) ? strength.color : "bg-slate-200"}`} />
+                      ))}
+                    </div>
+                    <p className={`text-xs ${strength.color.replace("bg-", "text-")}`}>{strength.label}</p>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Confirm Password */}

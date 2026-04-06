@@ -96,8 +96,9 @@ export function NotificationBell() {
     <div ref={ref} className="relative">
       <button
         onClick={toggle}
-        className="relative flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+        className="relative flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors duration-200"
         aria-label="Notifications"
+        aria-expanded={open}
       >
         <Bell className="h-5 w-5" />
         {count > 0 && (
@@ -108,13 +109,14 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-slate-200 bg-white shadow-xl z-[100] overflow-hidden">
+        <div role="dialog" aria-label="Notifications panel" className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-slate-200 bg-white shadow-xl z-[100] overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
             <h3 className="text-sm font-semibold text-slate-800">Notifications</h3>
             {count > 0 && (
               <button
                 onClick={markAllRead}
+                aria-label="Mark all as read"
                 className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
               >
                 Mark all read
@@ -133,7 +135,7 @@ export function NotificationBell() {
                 <button
                   key={n.notificationId}
                   onClick={() => markRead(n)}
-                  className={`w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-colors ${!n.isRead ? "bg-indigo-50/50" : ""}`}
+                  className={`w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-colors duration-200 ${!n.isRead ? "bg-indigo-50/50" : ""}`}
                 >
                   <div className="flex items-start gap-2">
                     {!n.isRead && (

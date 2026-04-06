@@ -88,7 +88,7 @@ export default function LandlordDashboard() {
             { label: t("pendingSubmissions"), value: pendingSubmissions,  Icon: Clock,        bg: "bg-amber-50",   color: "text-amber-600"   },
             { label: t("approved"),           value: approvedCount,      Icon: CheckCircle2, bg: "bg-indigo-50",  color: "text-indigo-600"  },
           ].map((s) => (
-            <div key={s.label} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div key={s.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
               <div className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${s.bg} mb-3`}>
                 <s.Icon className={`h-5 w-5 ${s.color}`} />
               </div>
@@ -136,8 +136,15 @@ export default function LandlordDashboard() {
           <div className="p-4">
             {loading ? (
               <div className="animate-pulse space-y-3">
-                <div className="h-14 rounded-xl bg-slate-100" />
-                <div className="h-14 rounded-xl bg-slate-100" />
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-4">
+                    <div className="space-y-2">
+                      <div className="h-4 w-48 rounded bg-slate-200" />
+                      <div className="h-3 w-64 rounded bg-slate-100" />
+                    </div>
+                    <div className="h-5 w-16 rounded-full bg-slate-200" />
+                  </div>
+                ))}
               </div>
             ) : properties.length === 0 ? (
               <div className="text-sm text-slate-500 py-4 text-center">No properties yet.</div>

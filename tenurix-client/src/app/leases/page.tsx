@@ -8,7 +8,7 @@ import { StatusBadge } from "@/components/tenurix/StatusBadge";
 import { useAuth } from "@/lib/useAuth";
 import { apiFetch, safeJson } from "@/lib/api";
 import { useI18n } from "@/components/providers/I18nProvider";
-import { ScrollText, RefreshCw, ArrowRight, Home } from "lucide-react";
+import { ScrollText, RefreshCw, ArrowRight, Home, Key } from "lucide-react";
 
 type LeaseRow = {
   leaseId: number;
@@ -50,8 +50,39 @@ export default function LeasesPage() {
   if (!isReady) {
     return (
       <AppShell>
-        <div className="animate-pulse rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="h-6 w-32 rounded-lg bg-slate-200" />
+        <div className="animate-pulse flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <div className="h-7 w-32 rounded-lg bg-slate-200" />
+              <div className="h-4 w-64 rounded-lg bg-slate-100" />
+            </div>
+            <div className="h-9 w-24 rounded-lg bg-slate-100" />
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-slate-200" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-28 rounded bg-slate-200" />
+                    <div className="h-3 w-44 rounded bg-slate-100" />
+                  </div>
+                  <div className="h-5 w-16 rounded-full bg-slate-100" />
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  {[...Array(3)].map((_, j) => (
+                    <div key={j} className="rounded-xl border border-slate-100 bg-slate-50 p-3 space-y-2">
+                      <div className="h-2.5 w-14 rounded bg-slate-200" />
+                      <div className="h-4 w-20 rounded bg-slate-100" />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-end">
+                  <div className="h-8 w-28 rounded-lg bg-slate-100" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </AppShell>
     );
@@ -82,25 +113,40 @@ export default function LeasesPage() {
 
         {/* Loading */}
         {loading && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="animate-pulse space-y-3">
-              <div className="h-5 w-44 rounded-lg bg-slate-200" />
-              <div className="h-20 w-full rounded-xl bg-slate-100" />
-              <div className="h-20 w-full rounded-xl bg-slate-100" />
-            </div>
+          <div className="animate-pulse grid grid-cols-1 gap-4 md:grid-cols-2">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-slate-200" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-28 rounded bg-slate-200" />
+                    <div className="h-3 w-44 rounded bg-slate-100" />
+                  </div>
+                  <div className="h-5 w-16 rounded-full bg-slate-100" />
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  {[...Array(3)].map((_, j) => (
+                    <div key={j} className="rounded-xl border border-slate-100 bg-slate-50 p-3 space-y-2">
+                      <div className="h-2.5 w-14 rounded bg-slate-200" />
+                      <div className="h-4 w-20 rounded bg-slate-100" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
         {/* Empty */}
         {!loading && !error && rows.length === 0 && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 mb-5">
-              <ScrollText className="h-7 w-7 text-indigo-300" />
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="rounded-full bg-indigo-50 p-4 mb-4">
+              <Key className="h-8 w-8 text-indigo-400" />
             </div>
-            <h2 className="text-lg font-bold text-slate-900">{t("noLeases")}</h2>
-            <p className="mt-2 text-sm text-slate-500">Lease details will appear here once your application is approved.</p>
+            <h3 className="text-lg font-semibold text-slate-700 mb-1">{t("noLeases")}</h3>
+            <p className="text-sm text-slate-500 mb-4">Lease details will appear here once your application is approved.</p>
             <Link href="/listings">
-              <Button className="mt-5 gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+              <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
                 {t("browseListings")} <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>

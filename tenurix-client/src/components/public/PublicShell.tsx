@@ -43,7 +43,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-white text-slate-900">
       {/* Header */}
       <header
-        className={`sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b transition-all duration-300 ${scrolled ? "border-slate-200 shadow-lg shadow-black/5" : "border-transparent"}`}
+        className={`sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b transition-all duration-200 ${scrolled ? "border-slate-200 shadow-lg shadow-black/5" : "border-transparent"}`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <Link href="/" className="flex items-center gap-2.5 group">
@@ -54,10 +54,10 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600">
-            <Link href="/listings" className="hover:text-indigo-600 transition-colors relative after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-0.5 after:bg-indigo-500 after:transition-all hover:after:w-full">Browse Listings</Link>
-            <a href="#about" className="hover:text-indigo-600 transition-colors relative after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-0.5 after:bg-indigo-500 after:transition-all hover:after:w-full">About</a>
-            <a href="#contact" className="hover:text-indigo-600 transition-colors relative after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-0.5 after:bg-indigo-500 after:transition-all hover:after:w-full">Contact</a>
+          <nav role="navigation" aria-label="Main navigation" className="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600">
+            <Link href="/listings" className="hover:text-indigo-600 transition-colors duration-200 relative after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-0.5 after:bg-indigo-500 after:transition-all after:duration-200 hover:after:w-full">Browse Listings</Link>
+            <a href="#about" className="hover:text-indigo-600 transition-colors duration-200 relative after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-0.5 after:bg-indigo-500 after:transition-all after:duration-200 hover:after:w-full">About</a>
+            <a href="#contact" className="hover:text-indigo-600 transition-colors duration-200 relative after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-0.5 after:bg-indigo-500 after:transition-all after:duration-200 hover:after:w-full">Contact</a>
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
@@ -78,9 +78,9 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors duration-200"
             onClick={() => setMenuOpen((v) => !v)}
-            aria-label="Toggle menu"
+            aria-label="Toggle mobile menu"
           >
             {menuOpen ? <X className="h-5 w-5 text-slate-700" /> : <Menu className="h-5 w-5 text-slate-700" />}
           </button>
@@ -122,10 +122,10 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
             <div>
               <h4 className="font-semibold text-[#B48E6A] mb-4 text-xs tracking-widest uppercase">Quick Links</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><Link href="/listings" className="hover:text-white transition-colors">Browse Listings</Link></li>
-                <li><Link href="/auth?role=client" className="hover:text-white transition-colors">Tenant Sign In</Link></li>
-                <li><Link href="/auth?role=landlord" className="hover:text-white transition-colors">Landlord Portal</Link></li>
-                <li><Link href={getListPropertyHref()} className="hover:text-white transition-colors">List Your Property</Link></li>
+                <li><Link href="/listings" className="hover:text-white transition-colors duration-200">Browse Listings</Link></li>
+                <li><Link href="/auth?role=client" className="hover:text-white transition-colors duration-200">Tenant Sign In</Link></li>
+                <li><Link href="/auth?role=landlord" className="hover:text-white transition-colors duration-200">Landlord Portal</Link></li>
+                <li><Link href={getListPropertyHref()} className="hover:text-white transition-colors duration-200">List Your Property</Link></li>
               </ul>
             </div>
 
@@ -157,11 +157,11 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
 
           <div className="mt-10 border-t border-slate-700/50 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
             <p>&copy; {new Date().getFullYear()} Tenurix Inc. All rights reserved. Unauthorized reproduction is prohibited.</p>
-            <div className="flex items-center gap-5">
-              <a href="#" className="hover:text-slate-300 transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-slate-300 transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-slate-300 transition-colors">Copyright Notice</a>
-            </div>
+            <nav aria-label="Footer navigation" className="flex items-center gap-5">
+              <a href="#" className="hover:text-slate-300 transition-colors duration-200">Privacy Policy</a>
+              <a href="#" className="hover:text-slate-300 transition-colors duration-200">Terms of Service</a>
+              <a href="#" className="hover:text-slate-300 transition-colors duration-200">Copyright Notice</a>
+            </nav>
           </div>
         </div>
       </footer>

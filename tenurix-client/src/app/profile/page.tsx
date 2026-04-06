@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/useAuth";
 import { apiFetch } from "@/lib/api";
 import { useI18n } from "@/components/providers/I18nProvider";
+import { useToast } from "@/components/ui/Toast";
 import { User, Camera, Save, ArrowLeft, Lock } from "lucide-react";
 import Link from "next/link";
 
@@ -27,6 +28,7 @@ const inputClass =
 export default function ProfilePage() {
   const { isReady } = useAuth();
   const { t } = useI18n();
+  const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -88,12 +90,12 @@ export default function ProfilePage() {
         throw new Error(data?.message || data?.title || "Failed to save");
       }
 
-      setSuccess("Profile updated successfully.");
+      toast("Profile updated successfully", "success");
       setProfile((prev) =>
         prev ? { ...prev, fullName: fullName.trim(), phone: phone.trim(), jobTitle: jobTitle.trim(), department: department.trim() } : prev
       );
     } catch (e: any) {
-      setError(e?.message ?? "Failed to save profile");
+      toast(e?.message ?? "Failed to update profile", "error");
     } finally {
       setSaving(false);
     }
@@ -129,9 +131,9 @@ export default function ProfilePage() {
         setProfile(data);
       }
 
-      setSuccess("Photo updated successfully.");
+      toast("Photo updated successfully", "success");
     } catch (e: any) {
-      setError(e?.message ?? "Failed to upload photo");
+      toast(e?.message ?? "Failed to upload photo", "error");
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
