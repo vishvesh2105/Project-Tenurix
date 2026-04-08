@@ -29,16 +29,23 @@ public partial class LandlordsPage : Page
 
         Loaded += async (_, __) =>
         {
+            LoadingOverlay.Visibility = Visibility.Visible;
+            EmptyState.Visibility = Visibility.Collapsed;
             try
             {
                 ErrorText.Text = "";
                 var results = await _api.SearchLandlordsAsync("");
                 LandlordsGrid.ItemsSource = results;
                 ResultsHeader.Text = $"All Landlords ({results.Count})";
+                EmptyState.Visibility = results.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             }
             catch (Exception ex)
             {
                 ErrorText.Text = ex.Message;
+            }
+            finally
+            {
+                LoadingOverlay.Visibility = Visibility.Collapsed;
             }
         };
     }
@@ -46,6 +53,8 @@ public partial class LandlordsPage : Page
     private async void Search_Click(object sender, RoutedEventArgs e)
     {
         ErrorText.Text = "";
+        LoadingOverlay.Visibility = Visibility.Visible;
+        EmptyState.Visibility = Visibility.Collapsed;
         try
         {
             var q = QueryBox.Text.Trim();
@@ -54,10 +63,15 @@ public partial class LandlordsPage : Page
             ResultsHeader.Text = string.IsNullOrWhiteSpace(q)
                 ? $"All Landlords ({landlords.Count})"
                 : $"Results ({landlords.Count})";
+            EmptyState.Visibility = landlords.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception ex)
         {
             ErrorText.Text = ex.Message;
+        }
+        finally
+        {
+            LoadingOverlay.Visibility = Visibility.Collapsed;
         }
     }
 

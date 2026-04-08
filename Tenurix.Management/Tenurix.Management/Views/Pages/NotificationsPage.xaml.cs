@@ -31,6 +31,8 @@ public partial class NotificationsPage : Page
             _items.Clear();
         }
 
+        LoadingOverlay.Visibility = Visibility.Visible;
+        EmptyState.Visibility = Visibility.Collapsed;
         try
         {
             var result = await _api.GetNotificationsAsync(_currentPage, PageSize);
@@ -41,6 +43,7 @@ public partial class NotificationsPage : Page
             NotifList.ItemsSource = _items;
 
             EmptyText.Visibility = _items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            EmptyState.Visibility = _items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
             int unread = result.UnreadCount;
             UnreadLabel.Text = unread > 0
@@ -53,6 +56,10 @@ public partial class NotificationsPage : Page
         {
             MessageBox.Show("Failed to load notifications. Please try again.", "Error",
                 MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        finally
+        {
+            LoadingOverlay.Visibility = Visibility.Collapsed;
         }
     }
 

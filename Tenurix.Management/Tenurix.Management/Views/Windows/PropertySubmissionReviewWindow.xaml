@@ -13,9 +13,14 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Property Details"
-                   FontSize="22" FontWeight="SemiBold"
-                   Margin="0,0,0,16"/>
+        <Grid Margin="0,0,0,16">
+            <TextBlock Text="Property Details"
+                       FontSize="22" FontWeight="SemiBold"/>
+            <Button Content="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                    Background="Transparent" BorderThickness="0" Foreground="{StaticResource TextMuted}"
+                    Cursor="Hand" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0"
+                    Click="CloseButton_Click" ToolTip="Close" Padding="6" Panel.ZIndex="10"/>
+        </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
@@ -25,7 +30,7 @@
                 <!-- ============================================ -->
                 <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="LANDLORD PERSONAL DETAILS" FontSize="10" FontWeight="SemiBold"
+                        <TextBlock Text="LANDLORD PERSONAL DETAILS" FontSize="12" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextMuted}" Margin="0,0,0,12"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -58,20 +63,20 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel>
-                                    <TextBlock Text="FULL NAME" FontSize="10" FontWeight="SemiBold"
+                                    <TextBlock Text="FULL NAME" FontSize="12" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
                                     <TextBlock x:Name="LandlordNameText" FontSize="15" FontWeight="SemiBold"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2">
-                                    <TextBlock Text="EMAIL" FontSize="10" FontWeight="SemiBold"
+                                    <TextBlock Text="EMAIL" FontSize="12" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
                                     <TextBlock x:Name="LandlordEmailText" FontSize="13"
                                                Foreground="{StaticResource Text}" TextWrapping="Wrap"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Row="2">
-                                    <TextBlock Text="PHONE" FontSize="10" FontWeight="SemiBold"
+                                    <TextBlock Text="PHONE" FontSize="12" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
                                     <TextBlock x:Name="LandlordPhoneText" FontSize="13"
                                                Foreground="{StaticResource Text}"/>
@@ -86,7 +91,7 @@
                 <!-- ============================================ -->
                 <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="PROPERTY OVERVIEW" FontSize="10" FontWeight="SemiBold"
+                        <TextBlock Text="PROPERTY OVERVIEW" FontSize="12" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextMuted}" Margin="0,0,0,12"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -98,7 +103,7 @@
                             <!-- Left column -->
                             <StackPanel>
                                 <StackPanel Margin="0,0,0,10">
-                                    <TextBlock Text="PROPERTY TYPE" FontSize="10" FontWeight="SemiBold"
+                                    <TextBlock Text="PROPERTY TYPE" FontSize="12" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock x:Name="PropTypeText" FontSize="14" FontWeight="SemiBold"
@@ -109,7 +114,7 @@
                                 </StackPanel>
 
                                 <StackPanel Margin="0,0,0,10">
-                                    <TextBlock Text="ADDRESS" FontSize="10" FontWeight="SemiBold"
+                                    <TextBlock Text="ADDRESS" FontSize="12" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                     <TextBlock x:Name="PropAddressLine1Text" FontSize="13" TextWrapping="Wrap"/>
                                     <TextBlock x:Name="PropAddressLine2Text" FontSize="12"
@@ -119,7 +124,7 @@
                                 </StackPanel>
 
                                 <StackPanel Margin="0,0,0,10">
-                                    <TextBlock Text="MONTHLY RENT" FontSize="10" FontWeight="SemiBold"
+                                    <TextBlock Text="MONTHLY RENT" FontSize="12" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                     <TextBlock x:Name="PropRentText" FontSize="18" FontWeight="Bold"
                                                Foreground="#166534"/>
@@ -135,31 +140,31 @@
                                     </Grid.ColumnDefinitions>
 
                                     <StackPanel>
-                                        <TextBlock Text="BEDROOMS" FontSize="10" FontWeight="SemiBold"
+                                        <TextBlock Text="BEDROOMS" FontSize="12" FontWeight="SemiBold"
                                                    Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                         <TextBlock x:Name="PropBedsText" FontSize="16" FontWeight="SemiBold"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1">
-                                        <TextBlock Text="BATHROOMS" FontSize="10" FontWeight="SemiBold"
+                                        <TextBlock Text="BATHROOMS" FontSize="12" FontWeight="SemiBold"
                                                    Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                         <TextBlock x:Name="PropBathsText" FontSize="16" FontWeight="SemiBold"/>
                                     </StackPanel>
                                 </Grid>
 
                                 <StackPanel Margin="0,0,0,10">
-                                    <TextBlock Text="LEASE TERM" FontSize="10" FontWeight="SemiBold"
+                                    <TextBlock Text="LEASE TERM" FontSize="12" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                     <TextBlock x:Name="PropLeaseTermText" FontSize="13"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="0,0,0,10">
-                                    <TextBlock Text="AVAILABLE FROM" FontSize="10" FontWeight="SemiBold"
+                                    <TextBlock Text="AVAILABLE FROM" FontSize="12" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                     <TextBlock x:Name="PropAvailDateText" FontSize="13"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="0,0,0,10">
-                                    <TextBlock Text="DESCRIPTION" FontSize="10" FontWeight="SemiBold"
+                                    <TextBlock Text="DESCRIPTION" FontSize="12" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                     <TextBlock x:Name="PropDescText" FontSize="12" TextWrapping="Wrap"
                                                Foreground="{StaticResource TextMuted}" MaxHeight="80"
@@ -176,7 +181,7 @@
                 <Border x:Name="FeaturesCard" Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12"
                         Visibility="Collapsed">
                     <StackPanel>
-                        <TextBlock Text="PROPERTY FEATURES" FontSize="10" FontWeight="SemiBold"
+                        <TextBlock Text="PROPERTY FEATURES" FontSize="12" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextMuted}" Margin="0,0,0,12"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -191,43 +196,43 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Margin="0,0,12,10">
-                                <TextBlock Text="FURNISHED" FontSize="10" FontWeight="SemiBold"
+                                <TextBlock Text="FURNISHED" FontSize="12" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                 <TextBlock x:Name="FurnishedText" FontSize="13" FontWeight="Medium"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Margin="0,0,12,10">
-                                <TextBlock Text="SHORT TERM" FontSize="10" FontWeight="SemiBold"
+                                <TextBlock Text="SHORT TERM" FontSize="12" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                 <TextBlock x:Name="ShortTermText" FontSize="13" FontWeight="Medium"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="2" Margin="0,0,12,10">
-                                <TextBlock Text="YEAR BUILT" FontSize="10" FontWeight="SemiBold"
+                                <TextBlock Text="YEAR BUILT" FontSize="12" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                 <TextBlock x:Name="YearBuiltText" FontSize="13" FontWeight="Medium"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="3" Margin="0,0,0,10">
-                                <TextBlock Text="FLOORS" FontSize="10" FontWeight="SemiBold"
+                                <TextBlock Text="FLOORS" FontSize="12" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                 <TextBlock x:Name="FloorsText" FontSize="13" FontWeight="Medium"/>
                             </StackPanel>
 
                             <StackPanel Grid.Row="1" Margin="0,0,12,0">
-                                <TextBlock Text="UNITS" FontSize="10" FontWeight="SemiBold"
+                                <TextBlock Text="UNITS" FontSize="12" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                 <TextBlock x:Name="UnitsText" FontSize="13" FontWeight="Medium"/>
                             </StackPanel>
 
                             <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,12,0">
-                                <TextBlock Text="PARKING SPOTS" FontSize="10" FontWeight="SemiBold"
+                                <TextBlock Text="PARKING SPOTS" FontSize="12" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                 <TextBlock x:Name="ParkingSpotsText" FontSize="13" FontWeight="Medium"/>
                             </StackPanel>
 
                             <StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="0,0,0,0">
-                                <TextBlock Text="PARKING TYPE" FontSize="10" FontWeight="SemiBold"
+                                <TextBlock Text="PARKING TYPE" FontSize="12" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextMuted}" Margin="0,0,0,3"/>
                                 <TextBlock x:Name="ParkingTypeText" FontSize="13" FontWeight="Medium"/>
                             </StackPanel>
@@ -240,7 +245,7 @@
                 <!-- ============================================ -->
                 <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="UTILITIES INCLUDED" FontSize="10" FontWeight="SemiBold"
+                        <TextBlock Text="UTILITIES INCLUDED" FontSize="12" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextMuted}" Margin="0,0,0,10"/>
                         <TextBlock x:Name="NoUtilitiesText" Text="No utilities specified"
                                    Foreground="{StaticResource TextMuted}" FontSize="12" FontStyle="Italic"
@@ -274,7 +279,7 @@
                 <!-- ============================================ -->
                 <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="AMENITIES" FontSize="10" FontWeight="SemiBold"
+                        <TextBlock Text="AMENITIES" FontSize="12" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextMuted}" Margin="0,0,0,10"/>
                         <TextBlock x:Name="NoAmenitiesText" Text="No amenities specified"
                                    Foreground="{StaticResource TextMuted}" FontSize="12" FontStyle="Italic"
@@ -287,7 +292,7 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="#F0FDF4" CornerRadius="8"
+                                    <Border Background="{StaticResource SuccessSoftBrush}" CornerRadius="8"
                                             Padding="12,7" Margin="0,0,8,8">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="&#xE10B;" FontFamily="Segoe MDL2 Assets"
@@ -309,7 +314,7 @@
                 <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,12">
                     <StackPanel>
                         <DockPanel Margin="0,0,0,12">
-                            <TextBlock Text="PROPERTY PHOTOS" FontSize="10" FontWeight="SemiBold"
+                            <TextBlock Text="PROPERTY PHOTOS" FontSize="12" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
                             <TextBlock x:Name="PropPhotoCountText"
                                        Foreground="{StaticResource TextMuted}"
@@ -405,7 +410,7 @@
                 <Border Background="{StaticResource Panel}" CornerRadius="12" Padding="16" Margin="0,0,0,4">
                     <StackPanel>
                         <DockPanel Margin="0,0,0,12">
-                            <TextBlock Text="LANDLORD ID DOCUMENTS" FontSize="10" FontWeight="SemiBold"
+                            <TextBlock Text="LANDLORD ID DOCUMENTS" FontSize="12" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
                             <TextBlock x:Name="IdPhotoCountText"
                                        Foreground="{StaticResource TextMuted}"

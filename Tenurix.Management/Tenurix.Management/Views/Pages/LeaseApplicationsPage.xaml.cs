@@ -35,6 +35,7 @@ public partial class LeaseApplicationsPage : Page
         {
             var items = await _api.GetLeaseApplicationsAsync(SelectedStatus());
             Grid.ItemsSource = items;
+            ResultCount.Text = $"Showing {items.Count} application(s)";
             EmptyState.Visibility = items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception ex)

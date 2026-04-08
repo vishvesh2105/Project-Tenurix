@@ -28,6 +28,8 @@ public partial class EmployeeProfileWindow : Window
         Loaded += async (_, _) => await LoadDetails();
     }
 
+    private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
+
     private async System.Threading.Tasks.Task LoadDetails()
     {
         try

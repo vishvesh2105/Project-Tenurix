@@ -1,7 +1,9 @@
 using System;
-using System.Diagnostics;
+using System.IO;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Tenurix.Management.Client.Api;
 using Tenurix.Management.Client.Models;
 
@@ -12,6 +14,7 @@ namespace Tenurix.Management.Views.Windows
         private readonly TenurixApiClient _api;
         private readonly int _issueId;
         private IssueDetailDto? _detail;
+        private bool _hasChanges = false;
 
         public IssueDetailWindow(TenurixApiClient api, int issueId)
         {
@@ -60,9 +63,12 @@ namespace Tenurix.Management.Views.Windows
                     NoteBorder.Visibility = Visibility.Visible;
                 }
 
-                // Hide image button if no image
-                if (string.IsNullOrWhiteSpace(_detail.ImageUrl))
-                    ViewImageButton.IsEnabled = false;
+                // Attached image: show card and load bytes when present
+                if (!string.IsNullOrWhiteSpace(_detail.ImageUrl))
+                {
+                    ImageCard.Visibility = Visibility.Visible;
+                    await LoadAttachedImageAsync(_detail.ImageUrl);
+                }
             }
             catch (Exception ex)
             {
@@ -71,11 +77,48 @@ namespace Tenurix.Management.Views.Windows
             }
         }
 
+        private async System.Threading.Tasks.Task LoadAttachedImageAsync(string url)
+        {
+            try
+            {
+                ImageStatusText.Text = "Loading image...";
+                AttachedImage.Visibility = Visibility.Collapsed;
+
+                using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
+                var bytes = await http.GetByteArrayAsync(url);
+
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.CacheOption  = BitmapCacheOption.OnLoad;
+                bmp.StreamSource = new MemoryStream(bytes);
+                bmp.EndInit();
+                bmp.Freeze();
+
+                AttachedImage.Source     = bmp;
+                AttachedImage.Visibility = Visibility.Visible;
+                ImageStatusText.Text     = "";
+            }
+            catch
+            {
+                ImageStatusText.Text = "Unable to load image.";
+            }
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            if (_hasChanges)
+            {
+                var r = MessageBox.Show("You have unsaved changes. Close anyway?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (r != MessageBoxResult.Yes) { e.Cancel = true; return; }
+            }
+            base.OnClosing(e);
+        }
+
         private void ViewImage_Click(object sender, RoutedEventArgs e)
         {
-            if (_detail == null) return;
-
-            if (string.IsNullOrWhiteSpace(_detail.ImageUrl))
+            if (_detail == null || string.IsNullOrWhiteSpace(_detail.ImageUrl))
             {
                 MessageBox.Show("No image uploaded for this issue.");
                 return;
@@ -83,11 +126,8 @@ namespace Tenurix.Management.Views.Windows
 
             try
             {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = _detail.ImageUrl,
-                    UseShellExecute = true
-                });
+                var win = new ImageViewerWindow("Issue Attachment", _detail.ImageUrl) { Owner = this };
+                win.ShowDialog();
             }
             catch
             {
@@ -104,11 +144,15 @@ namespace Tenurix.Management.Views.Windows
             {
                 await _api.UpdateIssueStatusAsync(_issueId, "InProgress");
                 MessageBox.Show("Status updated to In Progress.");
+                if (Application.Current.MainWindow is ShellWindow shell)
+                    shell.ShowToast("Issue marked as In Progress");
                 Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Update failed:\n" + ex.Message);
+                if (Application.Current.MainWindow is ShellWindow shell2)
+                    shell2.ShowToast("Failed to update issue status", true);
             }
         }
 
@@ -121,11 +165,15 @@ namespace Tenurix.Management.Views.Windows
             {
                 await _api.UpdateIssueStatusAsync(_issueId, "Resolved");
                 MessageBox.Show("Status updated to Resolved.");
+                if (Application.Current.MainWindow is ShellWindow shell)
+                    shell.ShowToast("Issue marked as Resolved");
                 Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Update failed:\n" + ex.Message);
+                if (Application.Current.MainWindow is ShellWindow shell2)
+                    shell2.ShowToast("Failed to update issue status", true);
             }
         }
     }

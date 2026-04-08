@@ -2,6 +2,7 @@ using Capstone.Api.Data;
 using Capstone.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -11,14 +12,47 @@ using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load local secrets file (gitignored) if present — overrides appsettings.json placeholders
+// Configuration sources, in order of precedence (later wins):
+//   1. appsettings.json                — committed defaults / placeholders
+//   2. appsettings.{Environment}.json  — committed env-specific overrides
+//   3. appsettings.Local.json          — gitignored, local dev secrets
+//   4. Environment variables           — production secrets (e.g. Jwt__Key, ConnectionStrings__AzureSql)
+//   5. Command-line arguments
+// In production, NEVER ship appsettings.Local.json. Set secrets via environment variables
+// (or Azure App Service "Application Settings", which become env vars at runtime).
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+builder.Configuration.AddEnvironmentVariables();
 
-builder.Services.AddControllers()
+// Hard caps on request body size — defense against memory exhaustion / oversized payload DoS.
+// Per-endpoint [RequestSizeLimit(...)] still overrides this for upload routes.
+const long MaxRequestBodyBytes = 50L * 1024 * 1024; // 50 MB (matches the largest upload endpoint)
+const int MaxJsonPayloadBytes = 1 * 1024 * 1024;    // 1 MB JSON cap for non-upload routes
+
+builder.WebHost.ConfigureKestrel(o =>
+{
+    o.Limits.MaxRequestBodySize = MaxRequestBodyBytes;
+    o.Limits.MaxRequestHeadersTotalSize = 32 * 1024;       // 32 KB
+    o.Limits.MaxRequestLineSize = 8 * 1024;                // 8 KB
+});
+
+builder.Services.Configure<FormOptions>(o =>
+{
+    o.MultipartBodyLengthLimit = MaxRequestBodyBytes;
+    o.ValueLengthLimit = MaxJsonPayloadBytes;
+    o.KeyLengthLimit = 1024;
+});
+
+builder.Services.AddControllers(o =>
+{
+    // Reject malformed payloads (e.g. fields of wrong type) with a clean 400 instead of crashing.
+    o.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = false;
+})
     .AddJsonOptions(o =>
     {
         o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         o.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+        // Cap deserialization depth to prevent stack-exhaustion via deeply nested JSON.
+        o.JsonSerializerOptions.MaxDepth = 32;
     });
 builder.Services.AddEndpointsApiExplorer();
 
@@ -72,40 +106,65 @@ builder.Services.AddCors(options =>
 });
 
 // Rate limiting — protect auth endpoints from brute force (H2)
+// All limiters partition by client IP so one abusive caller cannot starve everyone else.
 builder.Services.AddRateLimiter(options =>
 {
-    // Login: max 10 attempts per minute per IP
-    options.AddFixedWindowLimiter("login", o =>
-    {
-        o.Window = TimeSpan.FromMinutes(1);
-        o.PermitLimit = 10;
-        o.QueueLimit = 0;
-        o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-    });
+    static string ClientKey(HttpContext ctx) =>
+        ctx.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
 
-    // 2FA verify: max 5 attempts per minute per IP
-    options.AddFixedWindowLimiter("verify2fa", o =>
-    {
-        o.Window = TimeSpan.FromMinutes(1);
-        o.PermitLimit = 5;
-        o.QueueLimit = 0;
-        o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-    });
+    // Auth routes (login, register, forgot/reset password): 5 attempts per IP per 15 minutes.
+    options.AddPolicy("login", ctx =>
+        RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => new FixedWindowRateLimiterOptions
+        {
+            Window = TimeSpan.FromMinutes(15),
+            PermitLimit = 5,
+            QueueLimit = 0,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            AutoReplenishment = true
+        }));
 
-    // Resend 2FA: max 3 per minute per IP
-    options.AddFixedWindowLimiter("resend2fa", o =>
-    {
-        o.Window = TimeSpan.FromMinutes(1);
-        o.PermitLimit = 3;
-        o.QueueLimit = 0;
-        o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-    });
+    // 2FA code verification: 5 attempts per IP per 15 minutes.
+    options.AddPolicy("verify2fa", ctx =>
+        RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => new FixedWindowRateLimiterOptions
+        {
+            Window = TimeSpan.FromMinutes(15),
+            PermitLimit = 5,
+            QueueLimit = 0,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            AutoReplenishment = true
+        }));
 
-    // Return 429 as JSON instead of plain text
+    // Resend 2FA code: 3 per IP per 15 minutes (tighter — prevents email-bombing).
+    options.AddPolicy("resend2fa", ctx =>
+        RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => new FixedWindowRateLimiterOptions
+        {
+            Window = TimeSpan.FromMinutes(15),
+            PermitLimit = 3,
+            QueueLimit = 0,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            AutoReplenishment = true
+        }));
+
+    // Global default for every other endpoint: 100 requests per IP per minute.
+    // Catches scrapers and runaway clients without affecting normal interactive use.
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
+        RateLimitPartition.GetFixedWindowLimiter(ClientKey(ctx), _ => new FixedWindowRateLimiterOptions
+        {
+            Window = TimeSpan.FromMinutes(1),
+            PermitLimit = 100,
+            QueueLimit = 0,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            AutoReplenishment = true
+        }));
+
+    // Return 429 as JSON with a Retry-After hint instead of plain text.
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     options.OnRejected = async (ctx, token) =>
     {
-        ctx.HttpContext.Response.StatusCode = 429;
+        ctx.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
         ctx.HttpContext.Response.ContentType = "application/json";
+        if (ctx.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+            ctx.HttpContext.Response.Headers.RetryAfter = ((int)retryAfter.TotalSeconds).ToString();
         await ctx.HttpContext.Response.WriteAsync(
             "{\"message\":\"Too many requests. Please wait and try again.\"}", token);
     };

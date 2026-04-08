@@ -32,6 +32,8 @@ public partial class DashboardPage : Page
             RecentPropsGrid.ItemsSource = d.RecentPropertySubmissions;
             RecentAppsGrid.ItemsSource = d.RecentLeaseApplications;
             RecentIssuesGrid.ItemsSource = d.RecentIssues;
+
+            LastUpdated.Text = $"Last updated: {DateTime.Now:h:mm tt}";
         }
         catch (Exception ex)
         {

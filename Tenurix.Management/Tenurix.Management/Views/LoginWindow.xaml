@@ -74,13 +74,23 @@
                     <TextBlock Text="Sign In" FontSize="20" FontWeight="SemiBold"
                                Foreground="{StaticResource Text}" Margin="0,0,0,20"/>
 
-                    <TextBlock Text="EMAIL" FontSize="10" FontWeight="SemiBold"
+                    <TextBlock Text="EMAIL" FontSize="12" FontWeight="SemiBold"
                                Foreground="{StaticResource TextMuted}" Margin="0,0,0,6"/>
                     <TextBox x:Name="EmailBox" Style="{StaticResource LoginInput}"/>
 
-                    <TextBlock Text="PASSWORD" FontSize="10" FontWeight="SemiBold"
+                    <TextBlock Text="PASSWORD" FontSize="12" FontWeight="SemiBold"
                                Foreground="{StaticResource TextMuted}" Margin="0,16,0,6"/>
-                    <PasswordBox x:Name="PasswordBox" Style="{StaticResource LoginPwd}"/>
+                    <Grid>
+                        <PasswordBox x:Name="PasswordBox" Style="{StaticResource LoginPwd}"/>
+                        <TextBox x:Name="PasswordVisible" Visibility="Collapsed" FontSize="14" Padding="12,0,36,0"
+                                 Height="42"
+                                 Background="{StaticResource Panel2}" BorderBrush="{StaticResource Border}"
+                                 BorderThickness="1" VerticalContentAlignment="Center"/>
+                        <Button x:Name="TogglePasswordBtn" Content="&#xE7B3;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                                Background="Transparent" BorderThickness="0" Foreground="#94A3B8"
+                                HorizontalAlignment="Right" Margin="0,0,8,0" VerticalAlignment="Center"
+                                Cursor="Hand" Click="TogglePassword_Click" ToolTip="Show password" Panel.ZIndex="5"/>
+                    </Grid>
 
                     <Button x:Name="LoginBtn" Content="Sign In"
                             Style="{StaticResource LoginBtn}"

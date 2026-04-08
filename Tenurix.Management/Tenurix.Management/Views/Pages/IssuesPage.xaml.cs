@@ -33,6 +33,7 @@ public partial class IssuesPage : Page
         {
             var rows = await _api.GetIssuesAsync(SelectedStatus());
             Grid.ItemsSource = rows;
+            ResultCount.Text = $"Showing {rows.Count} issue(s)";
             EmptyState.Visibility = rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception ex)

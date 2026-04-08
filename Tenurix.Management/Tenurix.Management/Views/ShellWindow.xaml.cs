@@ -15,6 +15,7 @@ namespace Tenurix.Management.Views
         private readonly TenurixApiClient _api;
         private readonly LoginResponse _session;
         private DispatcherTimer? _bellTimer;
+        private DispatcherTimer? _toastTimer;
 
         public ShellWindow(TenurixApiClient api, LoginResponse session)
         {
@@ -259,6 +260,21 @@ namespace Tenurix.Management.Views
             var login = new LoginWindow();
             login.Show();
             Close();
+        }
+
+        public void ShowToast(string message, bool isError = false)
+        {
+            ToastIcon.Text = isError ? "\uEA39" : "\uE73E";
+            ToastIcon.Foreground = new System.Windows.Media.SolidColorBrush(
+                isError ? (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#EF4444")
+                        : (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#22C55E"));
+            ToastMessage.Text = message;
+            ToastBar.Visibility = Visibility.Visible;
+
+            if (_toastTimer != null) _toastTimer.Stop();
+            _toastTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(4) };
+            _toastTimer.Tick += (s, e2) => { _toastTimer.Stop(); ToastBar.Visibility = Visibility.Collapsed; };
+            _toastTimer.Start();
         }
     }
 }

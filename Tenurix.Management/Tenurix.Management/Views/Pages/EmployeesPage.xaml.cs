@@ -63,6 +63,8 @@ public partial class EmployeesPage : Page
 
     private async Task ReloadEmployees()
     {
+        LoadingOverlay.Visibility = Visibility.Visible;
+        EmptyState.Visibility = Visibility.Collapsed;
         try
         {
             var employees = await _api.GetEmployeesAsync();
@@ -76,10 +78,16 @@ public partial class EmployeesPage : Page
                 .ToList();
 
             EmployeeGrid.ItemsSource = filtered;
+            ResultCount.Text = $"Showing {filtered.Count} employee(s)";
+            EmptyState.Visibility = filtered.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception ex)
         {
             MessageBox.Show("Failed to load employees:\n" + ex.Message);
+        }
+        finally
+        {
+            LoadingOverlay.Visibility = Visibility.Collapsed;
         }
     }
 

@@ -335,6 +335,14 @@ ORDER BY i.CreatedAt DESC;";
         if (!Perm.Has(User, "REVIEW_ISSUES"))
             return Forbid();
 
+        string? Abs(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url)) return null;
+            if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return url;
+            if (!url.StartsWith("/")) url = "/" + url;
+            return $"{Request.Scheme}://{Request.Host}{url}";
+        }
+
         try
         {
             await using var conn = _db.Create();
@@ -342,9 +350,11 @@ ORDER BY i.CreatedAt DESC;";
             bool hasLeases = await TableExistsAsync(conn, "dbo.Leases");
             bool hasProps = await TableExistsAsync(conn, "dbo.Properties");
 
+            dynamic? row;
+
             if (hasLeases && hasProps)
             {
-                var row = await conn.QuerySingleOrDefaultAsync(@"
+                row = await conn.QuerySingleOrDefaultAsync(@"
 SELECT TOP 1
     i.IssueId,
     i.IssueType,
@@ -369,11 +379,27 @@ WHERE i.IssueId = @IssueId;
 ", new { IssueId = issueId });
 
                 if (row == null) return NotFound(new ApiError("This issue could not be found."));
-                return Ok(row);
+
+                return Ok(new
+                {
+                    issueId         = (int)row.IssueId,
+                    issueType       = (string?)row.IssueType,
+                    title           = (string?)row.Title,
+                    description     = (string?)row.Description,
+                    status          = (string?)row.Status,
+                    createdAt       = (DateTime?)row.CreatedAt,
+                    imageUrl        = Abs((string?)row.ImageUrl),
+                    propertyAddress = (string?)row.PropertyAddress,
+                    filedByName     = (string?)row.FiledByName,
+                    filedByEmail    = (string?)row.FiledByEmail,
+                    landlordName    = (string?)row.LandlordName,
+                    landlordEmail   = (string?)row.LandlordEmail,
+                    internalNote    = (string?)row.InternalNote,
+                });
             }
             else
             {
-                var row = await conn.QuerySingleOrDefaultAsync(@"
+                row = await conn.QuerySingleOrDefaultAsync(@"
 SELECT TOP 1
     i.IssueId,
     i.IssueType,
@@ -381,6 +407,7 @@ SELECT TOP 1
     i.Description,
     i.Status,
     i.CreatedAt,
+    i.ImageUrl,
     CONCAT('Lease #', i.LeaseId) AS PropertyAddress,
     COALESCE(NULLIF(fu.FullName,''), fu.Email, 'N/A') AS FiledByName,
     ISNULL(fu.Email,'N/A') AS FiledByEmail,
@@ -393,7 +420,23 @@ WHERE i.IssueId = @IssueId;
 ", new { IssueId = issueId });
 
                 if (row == null) return NotFound(new ApiError("This issue could not be found."));
-                return Ok(row);
+
+                return Ok(new
+                {
+                    issueId         = (int)row.IssueId,
+                    issueType       = (string?)row.IssueType,
+                    title           = (string?)row.Title,
+                    description     = (string?)row.Description,
+                    status          = (string?)row.Status,
+                    createdAt       = (DateTime?)row.CreatedAt,
+                    imageUrl        = Abs((string?)row.ImageUrl),
+                    propertyAddress = (string?)row.PropertyAddress,
+                    filedByName     = (string?)row.FiledByName,
+                    filedByEmail    = (string?)row.FiledByEmail,
+                    landlordName    = (string?)row.LandlordName,
+                    landlordEmail   = (string?)row.LandlordEmail,
+                    internalNote    = (string?)row.InternalNote,
+                });
             }
         }
         catch (Exception ex)

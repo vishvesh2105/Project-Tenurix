@@ -181,7 +181,7 @@
         </Grid>
         <Border x:Name="ToastBar" Background="#1E293B" CornerRadius="10" Padding="16,12"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,24"
-                Visibility="Collapsed" Panel.ZIndex="200" MaxWidth="400">
+                Visibility="Collapsed" Panel.ZIndex="200" MaxWidth="400" Grid.ColumnSpan="99" Grid.RowSpan="99">
             <StackPanel Orientation="Horizontal" >
                 <TextBlock x:Name="ToastIcon" FontFamily="Segoe MDL2 Assets" FontSize="16"
                            Foreground="White" VerticalAlignment="Center" Margin="0,0,10,0"/>

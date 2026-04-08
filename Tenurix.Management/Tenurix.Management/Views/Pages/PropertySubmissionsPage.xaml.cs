@@ -54,6 +54,7 @@ public partial class PropertySubmissionsPage : Page
             }
 
             Grid.ItemsSource = submissions;
+            ResultCount.Text = $"Showing {submissions.Count} submission(s)";
             EmptyState.Visibility = submissions.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception ex)

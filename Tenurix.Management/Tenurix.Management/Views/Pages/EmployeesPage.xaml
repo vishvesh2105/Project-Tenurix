@@ -32,6 +32,7 @@
             <RowDefinition Height="16"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Page Header -->
@@ -169,5 +170,12 @@
             </StackPanel>
         </Border>
 
+        <TextBlock x:Name="ResultCount" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,8,0,0" Grid.Row="6"/>
+
+        <TextBlock x:Name="EmptyState" Text="No employees found." FontSize="14" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" Grid.Row="4"/>
+
+        <Border x:Name="LoadingOverlay" Background="#80FFFFFF" Visibility="Collapsed" Grid.RowSpan="7" Panel.ZIndex="100">
+            <TextBlock Text="Loading..." FontSize="14" Foreground="{StaticResource Accent}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+        </Border>
     </Grid>
 </Page>

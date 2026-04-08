@@ -82,6 +82,8 @@ namespace Tenurix.Management.Views.Windows
             }
         }
 
+        private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
+
         private async void Reject_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(ReasonBox.Text))
@@ -97,11 +99,15 @@ namespace Tenurix.Management.Views.Windows
             {
                 await _api.RejectLeaseApplicationAsync(_applicationId, ReasonBox.Text.Trim());
                 MessageBox.Show("Rejected.");
+                if (Application.Current.MainWindow is ShellWindow shell)
+                    shell.ShowToast("Application rejected successfully");
                 Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Reject failed:\n" + ex.Message);
+                if (Application.Current.MainWindow is ShellWindow shell2)
+                    shell2.ShowToast("Failed to reject application", true);
             }
         }
 
@@ -118,12 +124,16 @@ namespace Tenurix.Management.Views.Windows
                     "Approved",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
-                DialogResult = true; // signals the parent page to switch filter to Approved
+                if (Application.Current.MainWindow is ShellWindow shell)
+                    shell.ShowToast("Application approved successfully");
+                DialogResult = true;
                 Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Approve failed:\n" + ex.Message);
+                if (Application.Current.MainWindow is ShellWindow shell2)
+                    shell2.ShowToast("Failed to approve application", true);
             }
         }
     }

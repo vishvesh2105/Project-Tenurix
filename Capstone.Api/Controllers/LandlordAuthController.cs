@@ -4,6 +4,7 @@ using Capstone.Api.Services;
 using Dapper;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 
 namespace Capstone.Api.Controllers;
@@ -29,6 +30,7 @@ public sealed class LandlordAuthController : ControllerBase
     }
 
     [HttpPost("google")]
+    [EnableRateLimiting("login")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest req)
     {
         if (string.IsNullOrWhiteSpace(req.IdToken))

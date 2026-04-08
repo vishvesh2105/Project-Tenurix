@@ -17,6 +17,7 @@ namespace Tenurix.Management.Views.Windows
     {
         private readonly TenurixApiClient _api;
         private string? _selectedPhotoPath;
+        private bool _hasChanges = false;
 
         public MyProfileWindow(TenurixApiClient api)
         {
@@ -27,6 +28,11 @@ namespace Tenurix.Management.Views.Windows
 
             PhoneBox.PreviewTextInput += PhoneBox_PreviewTextInput;
             DataObject.AddPastingHandler(PhoneBox, PhoneBox_Pasting);
+
+            FullNameBox.TextChanged += (_, __) => _hasChanges = true;
+            PhoneBox.TextChanged += (_, __) => _hasChanges = true;
+            JobTitleBox.TextChanged += (_, __) => _hasChanges = true;
+            DepartmentBox.TextChanged += (_, __) => _hasChanges = true;
         }
 
         private async void MyProfileWindow_Loaded(object sender, RoutedEventArgs e)
@@ -83,6 +89,18 @@ namespace Tenurix.Management.Views.Windows
             }
         }
 
+        private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            if (_hasChanges && DialogResult != true)
+            {
+                var r = MessageBox.Show("You have unsaved changes. Close anyway?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (r != MessageBoxResult.Yes) { e.Cancel = true; return; }
+            }
+            base.OnClosing(e);
+        }
+
         private void ChoosePhoto_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new OpenFileDialog
@@ -135,12 +153,16 @@ namespace Tenurix.Management.Views.Windows
                     await _api.UploadMyPhotoAsync(_selectedPhotoPath);
                 }
 
+                if (Application.Current.MainWindow is ShellWindow shell)
+                    shell.ShowToast("Profile saved successfully");
                 DialogResult = true;
                 Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to save profile:\n" + ex.Message);
+                if (Application.Current.MainWindow is ShellWindow shell2)
+                    shell2.ShowToast("Failed to save profile", true);
             }
         }
 

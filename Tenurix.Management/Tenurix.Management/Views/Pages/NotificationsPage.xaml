@@ -141,6 +141,12 @@
             </ScrollViewer>
         </Border>
 
+        <TextBlock x:Name="EmptyState" Text="No notifications." FontSize="14" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" Grid.Row="4"/>
+
+        <Border x:Name="LoadingOverlay" Background="#80FFFFFF" Visibility="Collapsed" Grid.RowSpan="6" Panel.ZIndex="100">
+            <TextBlock Text="Loading..." FontSize="14" Foreground="{StaticResource Accent}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+        </Border>
+
         <!-- Load More -->
         <Button Grid.Row="5" x:Name="LoadMoreBtn"
                 Content="Load more" Click="LoadMore_Click"

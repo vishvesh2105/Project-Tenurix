@@ -31,6 +31,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="16"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Page Header -->
@@ -89,9 +90,13 @@
                                         <TextBlock Text="{Binding Address}" FontSize="15" FontWeight="SemiBold"
                                                    Foreground="{StaticResource Text}" TextWrapping="Wrap"/>
                                         <Border x:Name="sbadge" Grid.Column="1" CornerRadius="12" Padding="10,4"
-                                                Background="#FFF7ED" VerticalAlignment="Top" Margin="10,0,0,0">
-                                            <TextBlock x:Name="stxt" Text="{Binding SubmissionStatus}"
-                                                       FontSize="10" FontWeight="SemiBold" Foreground="#C2410C"/>
+                                                Background="{StaticResource PendingSoftBrush}" VerticalAlignment="Top" Margin="10,0,0,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock x:Name="sicon" FontFamily="Segoe MDL2 Assets" Text="&#xE823;" FontSize="10"
+                                                           Foreground="#C2410C" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                                <TextBlock x:Name="stxt" Text="{Binding SubmissionStatus}"
+                                                           FontSize="11" FontWeight="SemiBold" Foreground="#C2410C"/>
+                                            </StackPanel>
                                         </Border>
                                     </Grid>
 
@@ -138,16 +143,22 @@
                             </Border>
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding SubmissionStatus}" Value="Approved">
-                                    <Setter TargetName="sbadge" Property="Background" Value="#F0FDF4"/>
+                                    <Setter TargetName="sbadge" Property="Background" Value="{StaticResource SuccessSoftBrush}"/>
                                     <Setter TargetName="stxt"  Property="Foreground" Value="#15803D"/>
+                                    <Setter TargetName="sicon" Property="Foreground" Value="#15803D"/>
+                                    <Setter TargetName="sicon" Property="Text" Value="&#xE73E;"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding SubmissionStatus}" Value="Rejected">
-                                    <Setter TargetName="sbadge" Property="Background" Value="#FEF2F2"/>
+                                    <Setter TargetName="sbadge" Property="Background" Value="{StaticResource DangerSoftBrush}"/>
                                     <Setter TargetName="stxt"  Property="Foreground" Value="#DC2626"/>
+                                    <Setter TargetName="sicon" Property="Foreground" Value="#DC2626"/>
+                                    <Setter TargetName="sicon" Property="Text" Value="&#xE711;"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding SubmissionStatus}" Value="OnHold">
-                                    <Setter TargetName="sbadge" Property="Background" Value="#EFF6FF"/>
+                                    <Setter TargetName="sbadge" Property="Background" Value="{StaticResource InfoSoftBrush}"/>
                                     <Setter TargetName="stxt"  Property="Foreground" Value="#1D4ED8"/>
+                                    <Setter TargetName="sicon" Property="Foreground" Value="#1D4ED8"/>
+                                    <Setter TargetName="sicon" Property="Text" Value="&#xE769;"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
@@ -156,9 +167,11 @@
             </ScrollViewer>
         </Border>
 
+        <TextBlock x:Name="ResultCount" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,8,0,0" Grid.Row="5"/>
+
         <TextBlock x:Name="EmptyState" Text="No property submissions found." FontSize="14" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" Margin="0,40,0,0" Visibility="Collapsed" Grid.Row="4"/>
 
-        <Border x:Name="LoadingOverlay" Background="#80FFFFFF" Visibility="Collapsed" Grid.RowSpan="5" Panel.ZIndex="100">
+        <Border x:Name="LoadingOverlay" Background="#80FFFFFF" Visibility="Collapsed" Grid.RowSpan="6" Panel.ZIndex="100">
             <TextBlock Text="Loading..." FontSize="14" Foreground="{StaticResource Accent}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
         </Border>
     </Grid>

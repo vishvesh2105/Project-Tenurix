@@ -14,6 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Tenurix.Management.Client\Tenurix.Management.Client.csproj" />
     <ProjectReference Include="..\Tenurix.Management.Models\Tenurix.Management.Models.csproj" />
   </ItemGroup>

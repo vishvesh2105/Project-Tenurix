@@ -29,6 +29,12 @@
     <SolidColorBrush x:Key="WarningSoftBg" Color="#FFFBEB"/>
     <SolidColorBrush x:Key="PendingSoftBg" Color="#FFF7ED"/>
     <SolidColorBrush x:Key="SuccessSoftBg" Color="#F0FDF4"/>
+    <SolidColorBrush x:Key="DangerSoftBrush" Color="#FEF2F2"/>
+    <SolidColorBrush x:Key="SuccessSoftBrush" Color="#F0FDF4"/>
+    <SolidColorBrush x:Key="WarningSoftBrush" Color="#FEF3C7"/>
+    <SolidColorBrush x:Key="PendingSoftBrush" Color="#FFF7ED"/>
+    <SolidColorBrush x:Key="InfoSoftBrush" Color="#EFF6FF"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#3B82F6"/>
 
     <!-- Typography defaults -->
     <Style TargetType="TextBlock">
@@ -72,7 +78,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
-                    <Border Background="{TemplateBinding Background}"
+                    <Border x:Name="TbBorder" Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="12"
@@ -81,6 +87,12 @@
                                       Margin="0"
                                       VerticalAlignment="Center"/>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="TbBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            <Setter TargetName="TbBorder" Property="BorderThickness" Value="2"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

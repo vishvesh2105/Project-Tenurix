@@ -488,6 +488,8 @@ namespace Tenurix.Management.Views.Windows
         // -------------------------------------------------------
         // Action buttons
         // -------------------------------------------------------
+        private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
+
         private async void Reject_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(ReasonBox.Text))
@@ -503,9 +505,16 @@ namespace Tenurix.Management.Views.Windows
             {
                 await _api.RejectPropertySubmissionAsync(_propertyId, ReasonBox.Text.Trim());
                 MessageBox.Show("Rejected.");
+                if (Application.Current.MainWindow is ShellWindow shell)
+                    shell.ShowToast("Submission rejected successfully");
                 Close();
             }
-            catch (Exception ex) { MessageBox.Show("Reject failed:\n" + ex.Message); }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Reject failed:\n" + ex.Message);
+                if (Application.Current.MainWindow is ShellWindow shell2)
+                    shell2.ShowToast("Failed to reject submission", true);
+            }
         }
 
         private async void Hold_Click(object sender, RoutedEventArgs e)
@@ -517,9 +526,16 @@ namespace Tenurix.Management.Views.Windows
             {
                 await _api.HoldPropertySubmissionAsync(_propertyId, ReasonBox.Text?.Trim());
                 MessageBox.Show("Property put on hold.");
+                if (Application.Current.MainWindow is ShellWindow shell)
+                    shell.ShowToast("Submission put on hold");
                 Close();
             }
-            catch (Exception ex) { MessageBox.Show("Hold failed:\n" + ex.Message); }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hold failed:\n" + ex.Message);
+                if (Application.Current.MainWindow is ShellWindow shell2)
+                    shell2.ShowToast("Failed to put submission on hold", true);
+            }
         }
 
         private async void Approve_Click(object sender, RoutedEventArgs e)
@@ -531,9 +547,16 @@ namespace Tenurix.Management.Views.Windows
             {
                 await _api.ApprovePropertySubmissionAsync(_propertyId);
                 MessageBox.Show("Approved. It will be visible in Public Listings.");
+                if (Application.Current.MainWindow is ShellWindow shell)
+                    shell.ShowToast("Submission approved successfully");
                 Close();
             }
-            catch (Exception ex) { MessageBox.Show("Approve failed:\n" + ex.Message); }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Approve failed:\n" + ex.Message);
+                if (Application.Current.MainWindow is ShellWindow shell2)
+                    shell2.ShowToast("Failed to approve submission", true);
+            }
         }
     }
 }

@@ -1,16 +1,36 @@
 using System.Windows;
 using Tenurix.Management.Client.Api;
+using Tenurix.Management.Services;
 
 namespace Tenurix.Management.Views;
 
 public partial class LoginWindow : Window
 {
-    private readonly TenurixApiClient _api =
-        new TenurixApiClient("https://capstone-api-aryan.azurewebsites.net/");
+    private readonly TenurixApiClient _api = new TenurixApiClient(AppConfig.ApiBaseUrl);
 
     public LoginWindow()
     {
         InitializeComponent();
+    }
+
+    private void TogglePassword_Click(object sender, RoutedEventArgs e)
+    {
+        if (PasswordVisible.Visibility == Visibility.Collapsed)
+        {
+            PasswordVisible.Text = PasswordBox.Password;
+            PasswordVisible.Visibility = Visibility.Visible;
+            PasswordBox.Visibility = Visibility.Collapsed;
+            TogglePasswordBtn.Content = "\uED1A";
+            TogglePasswordBtn.ToolTip = "Hide password";
+        }
+        else
+        {
+            PasswordBox.Password = PasswordVisible.Text;
+            PasswordBox.Visibility = Visibility.Visible;
+            PasswordVisible.Visibility = Visibility.Collapsed;
+            TogglePasswordBtn.Content = "\uE7B3";
+            TogglePasswordBtn.ToolTip = "Show password";
+        }
     }
 
     private async void Login_Click(object sender, RoutedEventArgs e)
@@ -22,7 +42,9 @@ public partial class LoginWindow : Window
         try
         {
             var email = EmailBox.Text.Trim();
-            var pass = PasswordBox.Password;
+            var pass = PasswordVisible.Visibility == Visibility.Visible
+                ? PasswordVisible.Text
+                : PasswordBox.Password;
 
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(pass))
             {

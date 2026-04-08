@@ -30,6 +30,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="16"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Page Header -->
@@ -91,9 +92,13 @@
                                                        Foreground="{StaticResource TextMuted}" Margin="0,2,0,0"/>
                                         </StackPanel>
                                         <Border x:Name="sbadge" Grid.Column="1" CornerRadius="12" Padding="10,4"
-                                                Background="#FFF7ED" VerticalAlignment="Top">
-                                            <TextBlock x:Name="stxt" Text="{Binding Status}"
-                                                       FontSize="10" FontWeight="SemiBold" Foreground="#C2410C"/>
+                                                Background="{StaticResource PendingSoftBrush}" VerticalAlignment="Top">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock x:Name="sicon" FontFamily="Segoe MDL2 Assets" Text="&#xE823;" FontSize="10"
+                                                           Foreground="#C2410C" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                                <TextBlock x:Name="stxt" Text="{Binding Status}"
+                                                           FontSize="11" FontWeight="SemiBold" Foreground="#C2410C"/>
+                                            </StackPanel>
                                         </Border>
                                     </Grid>
 
@@ -132,24 +137,26 @@
                                                 Height="32" Padding="12,0"
                                                 Visibility="Collapsed"
                                                 Style="{StaticResource LaBtn}"
-                                                Background="#EFF6FF"
+                                                Background="{StaticResource InfoSoftBrush}"
                                                 Foreground="#1D4ED8"/>
                                     </StackPanel>
                                 </Grid>
                             </Border>
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding Status}" Value="Approved">
-                                    <Setter TargetName="sbadge"     Property="Background"  Value="#F0FDF4"/>
+                                    <Setter TargetName="sbadge"     Property="Background"  Value="{StaticResource SuccessSoftBrush}"/>
                                     <Setter TargetName="stxt"       Property="Foreground"  Value="#15803D"/>
-                                    <!-- Hide Approve/Reject, show Edit &amp; Send -->
+                                    <Setter TargetName="sicon"      Property="Foreground"  Value="#15803D"/>
+                                    <Setter TargetName="sicon"      Property="Text"        Value="&#xE73E;"/>
                                     <Setter TargetName="ApproveBtn"  Property="Visibility"  Value="Collapsed"/>
                                     <Setter TargetName="RejectBtn"   Property="Visibility"  Value="Collapsed"/>
                                     <Setter TargetName="EditSendBtn" Property="Visibility"  Value="Visible"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Status}" Value="Rejected">
-                                    <Setter TargetName="sbadge"     Property="Background"  Value="#FEF2F2"/>
+                                    <Setter TargetName="sbadge"     Property="Background"  Value="{StaticResource DangerSoftBrush}"/>
                                     <Setter TargetName="stxt"       Property="Foreground"  Value="#DC2626"/>
-                                    <!-- Hide Approve/Reject for rejected apps too -->
+                                    <Setter TargetName="sicon"      Property="Foreground"  Value="#DC2626"/>
+                                    <Setter TargetName="sicon"      Property="Text"        Value="&#xE711;"/>
                                     <Setter TargetName="ApproveBtn"  Property="Visibility"  Value="Collapsed"/>
                                     <Setter TargetName="RejectBtn"   Property="Visibility"  Value="Collapsed"/>
                                 </DataTrigger>
@@ -160,9 +167,11 @@
             </ScrollViewer>
         </Border>
 
+        <TextBlock x:Name="ResultCount" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,8,0,0" Grid.Row="5"/>
+
         <TextBlock x:Name="EmptyState" Text="No lease applications found." FontSize="14" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" Margin="0,40,0,0" Visibility="Collapsed" Grid.Row="4"/>
 
-        <Border x:Name="LoadingOverlay" Background="#80FFFFFF" Visibility="Collapsed" Grid.RowSpan="5" Panel.ZIndex="100">
+        <Border x:Name="LoadingOverlay" Background="#80FFFFFF" Visibility="Collapsed" Grid.RowSpan="6" Panel.ZIndex="100">
             <TextBlock Text="Loading..." FontSize="14" Foreground="{StaticResource Accent}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
         </Border>
     </Grid>

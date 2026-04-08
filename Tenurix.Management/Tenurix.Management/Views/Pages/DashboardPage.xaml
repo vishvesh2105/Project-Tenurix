@@ -45,12 +45,16 @@
         <StackPanel Margin="0,0,0,24">
 
             <!-- Page Title -->
-            <StackPanel Margin="0,0,0,20">
-                <TextBlock Text="Dashboard" FontSize="24" FontWeight="Bold"
-                           Foreground="{StaticResource Text}"/>
-                <TextBlock Text="Overview of pending work and recent activity."
-                           FontSize="13" Foreground="{StaticResource TextMuted}" Margin="0,4,0,0"/>
-            </StackPanel>
+            <DockPanel Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Dashboard" FontSize="24" FontWeight="Bold"
+                               Foreground="{StaticResource Text}"/>
+                    <TextBlock Text="Overview of pending work and recent activity."
+                               FontSize="13" Foreground="{StaticResource TextMuted}" Margin="0,4,0,0"/>
+                </StackPanel>
+                <TextBlock x:Name="LastUpdated" FontSize="11" Foreground="{StaticResource TextMuted}"
+                           VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            </DockPanel>
 
             <!-- Stat Cards -->
             <Grid Margin="0,0,0,24">
