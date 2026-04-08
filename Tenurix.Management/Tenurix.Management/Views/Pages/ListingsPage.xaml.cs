@@ -64,18 +64,25 @@ public partial class ListingsPage : Page
     private async System.Threading.Tasks.Task LoadAllAsync()
     {
         ErrorText.Text = "";
+        LoadingOverlay.Visibility = Visibility.Visible;
+        EmptyState.Visibility = Visibility.Collapsed;
         try
         {
             _all = await _api.GetAllListingsAsync();
             var filtered = ApplyFilters();
             ListingsGrid.ItemsSource = filtered;
             UpdateCount(filtered);
+            EmptyState.Visibility = filtered.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception ex)
         {
             ErrorText.Text = ex.Message;
             ListingsGrid.ItemsSource = null;
             CountText.Text = "Showing 0 of 0 listings";
+        }
+        finally
+        {
+            LoadingOverlay.Visibility = Visibility.Collapsed;
         }
     }
 

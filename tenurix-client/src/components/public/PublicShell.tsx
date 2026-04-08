@@ -47,7 +47,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <Image src="/home-logo.svg" alt="Tenurix" width={50} height={50} className="transition-transform group-hover:scale-105" />
+            <Image src="/home-logo.svg" alt="Tenurix" width={50} height={38} className="transition-transform group-hover:scale-105" />
             <div>
               <div className="text-sm font-bold text-slate-800 leading-tight">Tenurix</div>
               <div className="text-[10px] text-[#B48E6A] leading-tight font-medium">Find your home</div>
@@ -111,7 +111,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4">
             <div>
               <Link href="/" className="inline-flex items-center gap-2 mb-4">
-                <Image src="/dark-logo.svg" alt="Tenurix" width={28} height={28} />
+                <Image src="/dark-logo.svg" alt="Tenurix" width={28} height={21} />
                 <span className="font-bold text-white text-sm">Tenurix</span>
               </Link>
               <p className="text-sm text-slate-400 leading-relaxed">
@@ -158,9 +158,9 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           <div className="mt-10 border-t border-slate-700/50 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
             <p>&copy; {new Date().getFullYear()} Tenurix Inc. All rights reserved. Unauthorized reproduction is prohibited.</p>
             <nav aria-label="Footer navigation" className="flex items-center gap-5">
-              <a href="#" className="hover:text-slate-300 transition-colors duration-200">Privacy Policy</a>
-              <a href="#" className="hover:text-slate-300 transition-colors duration-200">Terms of Service</a>
-              <a href="#" className="hover:text-slate-300 transition-colors duration-200">Copyright Notice</a>
+              <button type="button" className="cursor-pointer hover:text-slate-300 hover:underline transition-colors duration-200">Privacy Policy</button>
+              <button type="button" className="cursor-pointer hover:text-slate-300 hover:underline transition-colors duration-200">Terms of Service</button>
+              <button type="button" className="cursor-pointer hover:text-slate-300 hover:underline transition-colors duration-200">Copyright Notice</button>
             </nav>
           </div>
         </div>

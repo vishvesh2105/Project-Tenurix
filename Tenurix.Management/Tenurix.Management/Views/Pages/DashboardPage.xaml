@@ -40,6 +40,7 @@
         </Style>
     </Page.Resources>
 
+    <Grid>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,0,0,24">
 
@@ -304,4 +305,8 @@
             </Grid>
         </StackPanel>
     </ScrollViewer>
+    <Border x:Name="LoadingOverlay" Background="#80FFFFFF" Visibility="Collapsed" Panel.ZIndex="100">
+        <TextBlock Text="Loading..." FontSize="14" Foreground="{StaticResource Accent}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+    </Border>
+    </Grid>
 </Page>

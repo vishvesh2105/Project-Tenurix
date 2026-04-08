@@ -90,6 +90,9 @@ namespace Tenurix.Management.Views.Windows
                 return;
             }
 
+            var result = MessageBox.Show("Are you sure you want to reject this application?", "Confirm Rejection", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+
             try
             {
                 await _api.RejectLeaseApplicationAsync(_applicationId, ReasonBox.Text.Trim());
@@ -104,6 +107,9 @@ namespace Tenurix.Management.Views.Windows
 
         private async void Approve_Click(object sender, RoutedEventArgs e)
         {
+            var result = MessageBox.Show("Are you sure you want to approve this application?", "Confirm Approval", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+
             try
             {
                 await _api.ApproveLeaseApplicationAsync(_applicationId);

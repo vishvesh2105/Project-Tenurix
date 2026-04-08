@@ -495,6 +495,10 @@ namespace Tenurix.Management.Views.Windows
                 MessageBox.Show("Reject reason is required.");
                 return;
             }
+
+            var confirmResult = MessageBox.Show("Are you sure you want to reject this submission?", "Confirm Rejection", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (confirmResult != MessageBoxResult.Yes) return;
+
             try
             {
                 await _api.RejectPropertySubmissionAsync(_propertyId, ReasonBox.Text.Trim());
@@ -506,6 +510,9 @@ namespace Tenurix.Management.Views.Windows
 
         private async void Hold_Click(object sender, RoutedEventArgs e)
         {
+            var confirmResult = MessageBox.Show("Are you sure you want to put this submission on hold?", "Confirm Hold", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (confirmResult != MessageBoxResult.Yes) return;
+
             try
             {
                 await _api.HoldPropertySubmissionAsync(_propertyId, ReasonBox.Text?.Trim());
@@ -517,6 +524,9 @@ namespace Tenurix.Management.Views.Windows
 
         private async void Approve_Click(object sender, RoutedEventArgs e)
         {
+            var confirmResult = MessageBox.Show("Are you sure you want to approve this submission?", "Confirm Approval", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (confirmResult != MessageBoxResult.Yes) return;
+
             try
             {
                 await _api.ApprovePropertySubmissionAsync(_propertyId);

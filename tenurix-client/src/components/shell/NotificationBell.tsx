@@ -102,14 +102,17 @@ export function NotificationBell() {
       >
         <Bell className="h-5 w-5" />
         {count > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white leading-none">
+          <span
+            aria-label={`${count} unread notification${count === 1 ? "" : "s"}`}
+            className="absolute -top-0.5 -right-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white leading-none"
+          >
             {count > 99 ? "99+" : count}
           </span>
         )}
       </button>
 
       {open && (
-        <div role="dialog" aria-label="Notifications panel" className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-slate-200 bg-white shadow-xl z-[100] overflow-hidden">
+        <div role="dialog" aria-label="Notifications panel" className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-slate-200 bg-white shadow-xl z-[200] overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
             <h3 className="text-sm font-semibold text-slate-800">Notifications</h3>

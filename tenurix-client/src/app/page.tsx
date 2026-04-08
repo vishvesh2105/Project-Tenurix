@@ -178,7 +178,7 @@ export default function HomePage() {
                 {/* Portal CTAs */}
             <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
               <Link href="/auth?role=client">
-                <Button variant ="outline" className="gap-2 border-amber-400 bg-transparent px-6 text-amber-500 transition-all hover:-translate-y-0.5 hover:border-[#a37e5d] hover:bg-[#a37e5d] hover:text-white">
+                <Button variant="outline" className="gap-2 border-amber-400 bg-transparent px-6 text-amber-500 transition-all hover:-translate-y-0.5 hover:border-[#a37e5d] hover:bg-[#a37e5d] hover:text-white">
                   Tenant Portal <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -197,9 +197,9 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 py-9">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4 text-center">
             {[
-              { label: "Active Listings" },
-              { label: "Happy Tenants" },
-              { label: "Verified Landlords" },
+              { id: 1, label: "Active Listings" as React.ReactNode },
+              { id: 2, label: "Happy Tenants" as React.ReactNode },
+              { id: 3, label: "Verified Landlords" as React.ReactNode },
               { id: 4, label: <>Many<br />Cities Covered</> },
             ].map((s) => (
               <div key={s.id}>

@@ -120,17 +120,15 @@ function ListingsContent() {
     const qs = buildQuery(effectivePage);
 
     // Update URL
-    if (typeof window !== "undefined") {
-      const urlP = new URLSearchParams();
-      if (city.trim()) urlP.set("city", city.trim());
-      if (minRent) urlP.set("minRent", minRent);
-      if (maxRent) urlP.set("maxRent", maxRent);
-      if (bedrooms !== "") urlP.set("bedrooms", bedrooms);
-      if (propertyType) urlP.set("propertyType", propertyType);
-      const urlQs = urlP.toString();
-      const url = urlQs ? `${window.location.pathname}?${urlQs}` : window.location.pathname;
-      window.history.replaceState(null, "", url);
-    }
+    const urlP = new URLSearchParams();
+    if (city.trim()) urlP.set("city", city.trim());
+    if (minRent) urlP.set("minRent", minRent);
+    if (maxRent) urlP.set("maxRent", maxRent);
+    if (bedrooms !== "") urlP.set("bedrooms", bedrooms);
+    if (propertyType) urlP.set("propertyType", propertyType);
+    const urlQs = urlP.toString();
+    const url = urlQs ? `${window.location.pathname}?${urlQs}` : window.location.pathname;
+    window.history.replaceState(null, "", url);
 
     if (!mountedRef.current) {
       // First load — no debounce
@@ -316,7 +314,7 @@ function ListingsContent() {
             )}
 
             {/* Filters sidebar */}
-            <aside className="hidden md:block lg:w-68 shrink-0">
+            <aside className="hidden md:block lg:w-72 shrink-0">
               <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-sm">
                 <button
                   className="w-full flex items-center justify-between px-5 py-4 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"

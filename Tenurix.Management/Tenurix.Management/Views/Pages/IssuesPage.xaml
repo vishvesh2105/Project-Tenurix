@@ -153,5 +153,10 @@
             </ScrollViewer>
         </Border>
 
+        <TextBlock x:Name="EmptyState" Text="No issues reported." FontSize="14" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" Margin="0,40,0,0" Visibility="Collapsed" Grid.Row="4"/>
+
+        <Border x:Name="LoadingOverlay" Background="#80FFFFFF" Visibility="Collapsed" Grid.RowSpan="5" Panel.ZIndex="100">
+            <TextBlock Text="Loading..." FontSize="14" Foreground="{StaticResource Accent}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+        </Border>
     </Grid>
 </Page>

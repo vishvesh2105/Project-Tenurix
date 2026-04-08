@@ -13,13 +13,14 @@ type I18nCtx = {
 const Ctx = createContext<I18nCtx | null>(null);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("en");
+  const [lang, setLangState] = useState<Lang>(() => {
+    if (typeof window === "undefined") return "en";
+    return ((localStorage.getItem("tenurix_lang") as Lang | null) || "en");
+  });
 
   useEffect(() => {
-    const saved = (localStorage.getItem("tenurix_lang") as Lang | null) || "en";
-    setLangState(saved);
-    document.documentElement.lang = saved;
-  }, []);
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const setLang = (l: Lang) => {
     setLangState(l);

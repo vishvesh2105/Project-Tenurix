@@ -18,13 +18,14 @@ function applyTheme(theme: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "light";
+    return ((localStorage.getItem("tenurix_theme") as Theme | null) || "light");
+  });
 
   useEffect(() => {
-    const saved = (localStorage.getItem("tenurix_theme") as Theme | null) || "dark";
-    setThemeState(saved);
-    applyTheme(saved);
-  }, []);
+    applyTheme(theme);
+  }, [theme]);
 
   const setTheme = (t: Theme) => {
     setThemeState(t);

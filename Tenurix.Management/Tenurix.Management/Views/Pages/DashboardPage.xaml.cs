@@ -19,6 +19,7 @@ public partial class DashboardPage : Page
 
     private async void DashboardPage_Loaded(object sender, RoutedEventArgs e)
     {
+        LoadingOverlay.Visibility = Visibility.Visible;
         try
         {
             var d = await _api.GetDashboardAsync();
@@ -35,6 +36,10 @@ public partial class DashboardPage : Page
         catch (Exception ex)
         {
             MessageBox.Show("Dashboard load failed:\n" + ex.Message);
+        }
+        finally
+        {
+            LoadingOverlay.Visibility = Visibility.Collapsed;
         }
     }
 

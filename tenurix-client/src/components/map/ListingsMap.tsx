@@ -197,7 +197,7 @@ export default function ListingsMap({ listings, apiBase }: Props) {
 
       const popupHtml = `
         <div style="min-width:220px;font-family:system-ui,sans-serif;">
-          ${imgSrc ? `<img src="${imgSrc}" alt="" style="width:100%;height:120px;object-fit:cover;border-radius:8px 8px 0 0;margin:-14px -14px 10px -14px;width:calc(100% + 28px);" onerror="this.style.display='none'" />` : ""}
+          ${imgSrc ? `<img src="${imgSrc}" alt="Property at ${listing.addressLine1}" style="width:100%;height:120px;object-fit:cover;border-radius:8px 8px 0 0;margin:-14px -14px 10px -14px;width:calc(100% + 28px);" onerror="this.style.display='none'" />` : ""}
           <div style="font-weight:700;font-size:13px;color:#1e293b;margin-bottom:4px;">${listing.addressLine1}</div>
           <div style="font-size:11px;color:#64748b;margin-bottom:8px;">${listing.city}${listing.province ? `, ${listing.province}` : ""}</div>
           <div style="display:flex;gap:8px;margin-bottom:8px;">

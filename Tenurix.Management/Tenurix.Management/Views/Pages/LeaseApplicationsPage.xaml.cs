@@ -29,13 +29,21 @@ public partial class LeaseApplicationsPage : Page
     private async System.Threading.Tasks.Task Reload()
     {
         if (Grid == null) return;
+        LoadingOverlay.Visibility = Visibility.Visible;
+        EmptyState.Visibility = Visibility.Collapsed;
         try
         {
-            Grid.ItemsSource = await _api.GetLeaseApplicationsAsync(SelectedStatus());
+            var items = await _api.GetLeaseApplicationsAsync(SelectedStatus());
+            Grid.ItemsSource = items;
+            EmptyState.Visibility = items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception ex)
         {
             MessageBox.Show("Failed to load lease applications. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        finally
+        {
+            LoadingOverlay.Visibility = Visibility.Collapsed;
         }
     }
 

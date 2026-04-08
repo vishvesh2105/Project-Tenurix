@@ -46,7 +46,7 @@ export function TopNav() {
     : null;
 
   const homeHref = portal === "landlord" ? "/landlord/dashboard" : "/dashboard";
-  const portalLabel = portal === "landlord" ? "Landlord Portal" : "Client Portal";
+  const portalLabel = portal === "landlord" ? "Landlord Portal" : "Tenant Portal";
 
   return (
     <>
@@ -56,7 +56,7 @@ export function TopNav() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         {/* Logo */}
         <Link href={homeHref} className="flex items-center gap-2.5 group">
-          <Image src="/home-logo.svg" alt="Tenurix" width={36} height={36} className="transition-transform group-hover:scale-105" />
+          <Image src="/home-logo.svg" alt="Tenurix" width={36} height={28} className="transition-transform group-hover:scale-105" />
           <div>
             <div className="text-sm font-bold text-indigo-600 leading-tight">Tenurix</div>
             <div className="text-[10px] text-amber-500 leading-tight font-medium">{portalLabel}</div>

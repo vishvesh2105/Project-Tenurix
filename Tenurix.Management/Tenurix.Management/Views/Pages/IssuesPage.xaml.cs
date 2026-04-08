@@ -27,14 +27,21 @@ public partial class IssuesPage : Page
     private async System.Threading.Tasks.Task Reload()
     {
         if (Grid == null) return;
+        LoadingOverlay.Visibility = Visibility.Visible;
+        EmptyState.Visibility = Visibility.Collapsed;
         try
         {
             var rows = await _api.GetIssuesAsync(SelectedStatus());
             Grid.ItemsSource = rows;
+            EmptyState.Visibility = rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception ex)
         {
             MessageBox.Show("Failed to load issues. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        finally
+        {
+            LoadingOverlay.Visibility = Visibility.Collapsed;
         }
     }
 

@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   `;
 
   return (
-    <html lang="en" className={`${inter.variable} ${sora.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${sora.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
         {googleClientId ? <script src="https://accounts.google.com/gsi/client" async defer /> : null}

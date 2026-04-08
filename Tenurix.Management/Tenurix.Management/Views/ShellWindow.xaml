@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Tenurix Management"
-        Width="1200" Height="760"
+        MinWidth="1000" MinHeight="650" Width="1200" Height="760"
+        ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource Bg}">
 
@@ -178,5 +179,15 @@
                        Background="Transparent"/>
             </Border>
         </Grid>
+        <Border x:Name="ToastBar" Background="#1E293B" CornerRadius="10" Padding="16,12"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,24"
+                Visibility="Collapsed" Panel.ZIndex="200" MaxWidth="400">
+            <StackPanel Orientation="Horizontal" >
+                <TextBlock x:Name="ToastIcon" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                           Foreground="White" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock x:Name="ToastMessage" Foreground="White" FontSize="13"
+                           VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="320"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

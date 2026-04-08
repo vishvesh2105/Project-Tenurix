@@ -382,7 +382,7 @@ function AuthPageInner() {
 
             <div className="relative">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-amber-500 backdrop-blur-sm">
-                <Image src="/dark-logo.svg" alt="" width={16} height={16} />
+                <Image src="/dark-logo.svg" alt="" width={16} height={12} />
                 Tenurix
               </div>
 
@@ -428,7 +428,7 @@ function AuthPageInner() {
             <div className="mb-6 flex items-start justify-between gap-4">
               <div className="flex items-center gap-4">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-lg shadow-indigo-600/25 overflow-hidden">
-                  <Image src="/home-logo.svg" alt="Tenurix" width={36} height={36} />
+                  <Image src="/home-logo.svg" alt="Tenurix" width={36} height={28} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-slate-500">Welcome to</p>

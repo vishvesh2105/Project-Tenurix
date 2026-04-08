@@ -97,6 +97,9 @@ namespace Tenurix.Management.Views.Windows
 
         private async void InProgress_Click(object sender, RoutedEventArgs e)
         {
+            var result = MessageBox.Show("Are you sure you want to mark this issue as In Progress?", "Confirm Status Change", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+
             try
             {
                 await _api.UpdateIssueStatusAsync(_issueId, "InProgress");
@@ -111,6 +114,9 @@ namespace Tenurix.Management.Views.Windows
 
         private async void Resolved_Click(object sender, RoutedEventArgs e)
         {
+            var result = MessageBox.Show("Are you sure you want to mark this issue as Resolved?", "Confirm Status Change", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+
             try
             {
                 await _api.UpdateIssueStatusAsync(_issueId, "Resolved");

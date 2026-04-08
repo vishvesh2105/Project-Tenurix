@@ -332,22 +332,22 @@ function ApplyPageInner() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Full legal name <span className="text-red-500">*</span></label>
-              <input value={fullName} onChange={(e) => setFullName(e.target.value)} onBlur={() => handleBlur("fullName")} className={`${inputClass} ${fieldErrorClass("fullName", fullName)}`} placeholder="Your full legal name" />
+              <input name="fullName" autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} onBlur={() => handleBlur("fullName")} className={`${inputClass} ${fieldErrorClass("fullName", fullName)}`} placeholder="Your full legal name" />
               {isFieldError("fullName", fullName) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Phone Number <span className="text-red-500">*</span></label>
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} onBlur={() => handleBlur("phone")} className={`${inputClass} ${fieldErrorClass("phone", phone)}`} placeholder="(416) 555-1234" />
+              <input name="phone" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} onBlur={() => handleBlur("phone")} className={`${inputClass} ${fieldErrorClass("phone", phone)}`} placeholder="(416) 555-1234" />
               {isFieldError("phone", phone) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
               {touched["phone"] && phone.trim() && !/^[\d\s()+-]{7,20}$/.test(phone.trim()) && <p className="mt-1 text-xs text-red-500">Please enter a valid phone number</p>}
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Date of Birth</label>
-              <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} className={inputClass} />
+              <input name="dateOfBirth" type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} className={inputClass} />
             </div>
             <div className="md:col-span-2">
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Current Address <span className="text-red-500">*</span></label>
-              <input value={currentAddress} onChange={(e) => setCurrentAddress(e.target.value)} onBlur={() => handleBlur("currentAddress")} className={`${inputClass} ${fieldErrorClass("currentAddress", currentAddress)}`} placeholder="Your current home address" />
+              <input name="currentAddress" autoComplete="street-address" value={currentAddress} onChange={(e) => setCurrentAddress(e.target.value)} onBlur={() => handleBlur("currentAddress")} className={`${inputClass} ${fieldErrorClass("currentAddress", currentAddress)}`} placeholder="Your current home address" />
               {isFieldError("currentAddress", currentAddress) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
           </div>
@@ -365,22 +365,22 @@ function ApplyPageInner() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Employment Status *</label>
-              <select value={employmentStatus} onChange={(e) => setEmploymentStatus(e.target.value)} className={inputClass}>
+              <select name="employmentStatus" value={employmentStatus} onChange={(e) => setEmploymentStatus(e.target.value)} className={inputClass}>
                 <option value="">Select...</option>
                 {EMPLOYMENT_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Annual Income ($) *</label>
-              <input inputMode="numeric" value={annualIncome} onChange={(e) => setAnnualIncome(e.target.value.replace(/[^0-9]/g, ""))} className={inputClass} placeholder="e.g. 55000" />
+              <input name="annualIncome" inputMode="numeric" value={annualIncome} onChange={(e) => setAnnualIncome(e.target.value.replace(/[^0-9]/g, ""))} className={inputClass} placeholder="e.g. 55000" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Employer Name</label>
-              <input value={employerName} onChange={(e) => setEmployerName(e.target.value)} className={inputClass} placeholder="Company name" />
+              <input name="employerName" autoComplete="organization" value={employerName} onChange={(e) => setEmployerName(e.target.value)} className={inputClass} placeholder="Company name" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Job Title</label>
-              <input value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} className={inputClass} placeholder="Your position" />
+              <input name="jobTitle" autoComplete="organization-title" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} className={inputClass} placeholder="Your position" />
             </div>
           </div>
         </div>
@@ -397,7 +397,7 @@ function ApplyPageInner() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Number of Occupants</label>
-              <input inputMode="numeric" value={numberOfOccupants} onChange={(e) => setNumberOfOccupants(e.target.value.replace(/[^0-9]/g, ""))} className={inputClass} placeholder="1" />
+              <input name="numberOfOccupants" inputMode="numeric" value={numberOfOccupants} onChange={(e) => setNumberOfOccupants(e.target.value.replace(/[^0-9]/g, ""))} className={inputClass} placeholder="1" />
             </div>
             <div className="flex items-end">
               <button
@@ -418,7 +418,7 @@ function ApplyPageInner() {
           {hasPets && (
             <div className="mt-4">
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Pet Details (type, breed, size)</label>
-              <input value={petDetails} onChange={(e) => setPetDetails(e.target.value)} className={inputClass} placeholder="e.g. 1 small dog (Poodle, 15 lbs)" />
+              <input name="petDetails" value={petDetails} onChange={(e) => setPetDetails(e.target.value)} className={inputClass} placeholder="e.g. 1 small dog (Poodle, 15 lbs)" />
             </div>
           )}
         </div>
@@ -435,17 +435,17 @@ function ApplyPageInner() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Name <span className="text-red-500">*</span></label>
-              <input value={emergencyContactName} onChange={(e) => setEmergencyContactName(e.target.value)} onBlur={() => handleBlur("emergencyName")} className={`${inputClass} ${fieldErrorClass("emergencyName", emergencyContactName)}`} placeholder="Contact name" />
+              <input name="emergencyContactName" value={emergencyContactName} onChange={(e) => setEmergencyContactName(e.target.value)} onBlur={() => handleBlur("emergencyName")} className={`${inputClass} ${fieldErrorClass("emergencyName", emergencyContactName)}`} placeholder="Contact name" />
               {isFieldError("emergencyName", emergencyContactName) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Phone <span className="text-red-500">*</span></label>
-              <input value={emergencyContactPhone} onChange={(e) => setEmergencyContactPhone(e.target.value)} onBlur={() => handleBlur("emergencyPhone")} className={`${inputClass} ${fieldErrorClass("emergencyPhone", emergencyContactPhone)}`} placeholder="(416) 555-0000" />
+              <input name="emergencyContactPhone" type="tel" value={emergencyContactPhone} onChange={(e) => setEmergencyContactPhone(e.target.value)} onBlur={() => handleBlur("emergencyPhone")} className={`${inputClass} ${fieldErrorClass("emergencyPhone", emergencyContactPhone)}`} placeholder="(416) 555-0000" />
               {isFieldError("emergencyPhone", emergencyContactPhone) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Relationship</label>
-              <input value={emergencyContactRelation} onChange={(e) => setEmergencyContactRelation(e.target.value)} className={inputClass} placeholder="e.g. Parent, Spouse" />
+              <input name="emergencyContactRelation" value={emergencyContactRelation} onChange={(e) => setEmergencyContactRelation(e.target.value)} className={inputClass} placeholder="e.g. Parent, Spouse" />
             </div>
           </div>
         </div>
@@ -465,15 +465,15 @@ function ApplyPageInner() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Name</label>
-              <input value={referenceName} onChange={(e) => setReferenceName(e.target.value)} className={inputClass} placeholder="Reference name" />
+              <input name="referenceName" value={referenceName} onChange={(e) => setReferenceName(e.target.value)} className={inputClass} placeholder="Reference name" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Phone</label>
-              <input value={referencePhone} onChange={(e) => setReferencePhone(e.target.value)} className={inputClass} placeholder="(416) 555-0000" />
+              <input name="referencePhone" type="tel" value={referencePhone} onChange={(e) => setReferencePhone(e.target.value)} className={inputClass} placeholder="(416) 555-0000" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Relationship</label>
-              <input value={referenceRelation} onChange={(e) => setReferenceRelation(e.target.value)} className={inputClass} placeholder="e.g. Previous Landlord" />
+              <input name="referenceRelation" value={referenceRelation} onChange={(e) => setReferenceRelation(e.target.value)} className={inputClass} placeholder="e.g. Previous Landlord" />
             </div>
           </div>
         </div>
@@ -485,12 +485,12 @@ function ApplyPageInner() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Requested Start Date <span className="text-red-500">*</span></label>
-              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} onBlur={() => handleBlur("requestedStartDate")} className={`${inputClass} ${fieldErrorClass("requestedStartDate", startDate)}`} />
+              <input name="requestedStartDate" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} onBlur={() => handleBlur("requestedStartDate")} className={`${inputClass} ${fieldErrorClass("requestedStartDate", startDate)}`} />
               {isFieldError("requestedStartDate", startDate) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5">Requested End Date <span className="text-red-500">*</span></label>
-              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} onBlur={() => handleBlur("requestedEndDate")} className={`${inputClass} ${fieldErrorClass("requestedEndDate", endDate)}`} />
+              <input name="requestedEndDate" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} onBlur={() => handleBlur("requestedEndDate")} className={`${inputClass} ${fieldErrorClass("requestedEndDate", endDate)}`} />
               {isFieldError("requestedEndDate", endDate) && <p className="mt-1 text-xs text-red-500">This field is required</p>}
             </div>
           </div>
@@ -560,6 +560,7 @@ function ApplyPageInner() {
           <div className="mt-4">
             <label className="block text-xs font-semibold text-slate-500 mb-1.5">Additional Notes</label>
             <textarea
+              name="additionalNotes"
               value={additionalNotes}
               onChange={(e) => setAdditionalNotes(e.target.value)}
               rows={3}

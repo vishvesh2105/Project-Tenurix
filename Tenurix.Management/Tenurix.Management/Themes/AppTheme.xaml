@@ -23,6 +23,12 @@
     <SolidColorBrush x:Key="SuccessSoft" Color="#DCFCE7"/>
     <SolidColorBrush x:Key="Danger" Color="#DC2626"/>
     <SolidColorBrush x:Key="DangerSoft" Color="#FEE2E2"/>
+    <SolidColorBrush x:Key="DangerSoftBg" Color="#FEF2F2"/>
+    <SolidColorBrush x:Key="Warning" Color="#D97706"/>
+    <SolidColorBrush x:Key="WarningSoft" Color="#FEF3C7"/>
+    <SolidColorBrush x:Key="WarningSoftBg" Color="#FFFBEB"/>
+    <SolidColorBrush x:Key="PendingSoftBg" Color="#FFF7ED"/>
+    <SolidColorBrush x:Key="SuccessSoftBg" Color="#F0FDF4"/>
 
     <!-- Typography defaults -->
     <Style TargetType="TextBlock">
@@ -282,6 +288,21 @@
                 <Setter Property="Background" Value="{StaticResource AccentSoft}"/>
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style x:Key="LoadingOverlay" TargetType="Border">
+        <Setter Property="Background" Value="#80FFFFFF"/>
+        <Setter Property="Visibility" Value="Collapsed"/>
+        <Setter Property="Panel.ZIndex" Value="100"/>
+    </Style>
+
+    <Style x:Key="LoadingText" TargetType="TextBlock">
+        <Setter Property="Text" Value="Loading..."/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource Accent}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
 
 </ResourceDictionary>

@@ -40,24 +40,29 @@ public partial class PropertySubmissionsPage : Page
 
     private async System.Threading.Tasks.Task Reload()
     {
-        if (Grid == null) return; // guard: called before InitializeComponent finishes
+        if (Grid == null) return;
+        LoadingOverlay.Visibility = Visibility.Visible;
+        EmptyState.Visibility = Visibility.Collapsed;
         try
         {
             var submissions = await _api.GetPropertySubmissionsAsync(SelectedStatus());
 
-            // Set approve/reject visibility per item based on role + status
             foreach (var s in submissions)
             {
                 var isPending = s.SubmissionStatus == "Pending" || s.SubmissionStatus == "OnHold";
-                // Manager can approve/reject any status; Staff only Pending/OnHold
                 s.CanApproveReject = _isManager || isPending;
             }
 
             Grid.ItemsSource = submissions;
+            EmptyState.Visibility = submissions.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception ex)
         {
             MessageBox.Show("Failed to load submissions:\n" + ex.Message);
+        }
+        finally
+        {
+            LoadingOverlay.Visibility = Visibility.Collapsed;
         }
     }
 

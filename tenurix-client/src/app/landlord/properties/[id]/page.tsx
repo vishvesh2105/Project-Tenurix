@@ -360,7 +360,7 @@ export default function LandlordPropertyDetailPage() {
                       i === selectedPhoto ? "border-indigo-500" : "border-transparent hover:border-slate-300"
                     }`}
                   >
-                    <img src={imgSrc(p) || ""} alt="" className="h-full w-full object-cover" />
+                    <img src={imgSrc(p) || ""} alt={`Property photo ${i + 1}`} className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>

@@ -219,7 +219,7 @@ export default function ProfilePage() {
 
             <div className="mt-4">
               <span className="inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600 border border-indigo-100">
-                {profile?.roleName || "Client"}
+                {profile?.roleName || "Tenant"}
               </span>
             </div>
           </div>

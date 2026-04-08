@@ -195,14 +195,14 @@ export default function IssuesPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1.5">Lease</label>
-                <select value={formLeaseId} onChange={(e) => setFormLeaseId(e.target.value)} className={inputClass}>
+                <select name="leaseId" value={formLeaseId} onChange={(e) => setFormLeaseId(e.target.value)} className={inputClass}>
                   <option value="">Select a lease...</option>
                   {leases.map((l) => <option key={l.leaseId} value={l.leaseId}>Lease #{l.leaseId} — {l.address}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1.5">{t("issueType")}</label>
-                <select value={formType} onChange={(e) => setFormType(e.target.value)} className={inputClass}>
+                <select name="issueType" value={formType} onChange={(e) => setFormType(e.target.value)} className={inputClass}>
                   <option value="">Select type...</option>
                   {ISSUE_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
                 </select>
